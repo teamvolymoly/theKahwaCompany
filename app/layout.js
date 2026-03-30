@@ -31,7 +31,7 @@ export default function RootLayout({ children }) {
         className={`${inter.variable} ${baskervville.variable} antialiased`}
       >
         <AuthProvider>
-          <AddBar />
+          {/* <AddBar /> */}
           <Header />
           {children}
           <Footer />

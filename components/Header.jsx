@@ -87,7 +87,7 @@ export default function Header() {
   }, []);
 
   return (
-    <header className="bg-white text-gray-900">
+    <header className="bg-white/0 text-gray-900 w-full absolute top-0 z-50">
       {isOfferOpen ? (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
           <div className="relative w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl">
@@ -141,42 +141,9 @@ export default function Header() {
         </div>
       ) : null}
 
-      <div className="border-b border-gray-200">
+      <div className="">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between py-2">
-            <div className="flex items-center gap-3">
-              <button
-                type="button"
-                className="lg:hidden inline-flex items-center justify-center rounded border border-gray-300 p-2"
-                aria-label="Open menu"
-                aria-expanded={isOpen}
-                onClick={() => setIsOpen((prev) => !prev)}
-              >
-                <svg
-                  viewBox="0 0 24 24"
-                  className="h-5 w-5"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <line x1="3" y1="6" x2="21" y2="6" />
-                  <line x1="3" y1="12" x2="21" y2="12" />
-                  <line x1="3" y1="18" x2="21" y2="18" />
-                </svg>
-              </button>
-              <div className="leading-none">
-                <Link href="/">
-                  <img
-                    src="/logo/LOGO_TKC-02.png"
-                    alt="Logo"
-                    className="h-14 w-auto object-contain cursor-pointer sm:h-16 lg:h-20"
-                  />
-                </Link>
-              </div>
-            </div>
-
             <nav className="hidden lg:flex items-center gap-8 text-sm font-medium">
               <Link href="/" className="hover:text-gray-700">
                 Home
@@ -310,7 +277,7 @@ export default function Header() {
                   </div>
                 </div>
               </div>
-              <Link href="/#bulk-inquiry" className="hover:text-gray-700">
+              {/* <Link href="/#bulk-inquiry" className="hover:text-gray-700">
                 Bulk Inquiry
               </Link>
               <div
@@ -365,8 +332,41 @@ export default function Header() {
                     </div>
                   </div>
                 </div>
-              </div>
+              </div> */}
             </nav>
+
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                className="lg:hidden inline-flex items-center justify-center rounded border border-gray-300 p-2"
+                aria-label="Open menu"
+                aria-expanded={isOpen}
+                onClick={() => setIsOpen((prev) => !prev)}
+              >
+                <svg
+                  viewBox="0 0 24 24"
+                  className="h-5 w-5"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <line x1="3" y1="6" x2="21" y2="6" />
+                  <line x1="3" y1="12" x2="21" y2="12" />
+                  <line x1="3" y1="18" x2="21" y2="18" />
+                </svg>
+              </button>
+              <div className="leading-none">
+                <Link href="/">
+                  <img
+                    src="/logo/LOGO_TKC-02.png"
+                    alt="Logo"
+                    className="h-14 w-auto object-contain cursor-pointer sm:h-16 lg:h-20"
+                  />
+                </Link>
+              </div>
+            </div>
 
             <div className="flex items-center gap-4">
               <button

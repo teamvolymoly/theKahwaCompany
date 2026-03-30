@@ -19,12 +19,12 @@ const page = () => {
         backgroundImage: "url('/bg/beautiful-view-mountains-sunny-day.jpg')",
       }}
     >
-      <div className="text-center mt-15 flex flex-col gap-4 max-w-3xl">
-        <div className="font-(family-name:--font-basker) uppercase text-4xl">
-          <h2>Where tradition</h2>
+      <div className="text-center mt-35 flex flex-col gap-4 max-w-3xl">
+        <div className="font-(family-name:--font-basker) uppercase text-5xl mt-10 mb-10">
+          <h2 className="mb-2">Where tradition</h2>
           <h2>meets imagination</h2>
         </div>
-        <p className="font-thin">
+        <p className="font-thin text-xl">
           Experience a Magical variety of Kahwa with different flavor and and
           contribute to a social cause{" "}
         </p>
