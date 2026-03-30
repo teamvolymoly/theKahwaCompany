@@ -87,7 +87,7 @@ export default function Header() {
   }, []);
 
   return (
-    <header className="bg-white/0 text-gray-900 w-full absolute top-0 z-50">
+    <header className="bg-white/0 text-gray-900 w-full absolute top-0 z-50 py-6">
       {isOfferOpen ? (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
           <div className="relative w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl">
@@ -143,42 +143,64 @@ export default function Header() {
 
       <div className="">
         <div className="container mx-auto px-4">
-          <div className="flex items-center justify-between py-2">
-            <nav className="hidden lg:flex items-center gap-8 text-sm font-medium">
-              <Link href="/" className="hover:text-gray-700">
-                Home
-              </Link>
-              <div
-                className="relative group"
-                onMouseEnter={() => setIsShopOpen(true)}
-                onMouseLeave={() => setIsShopOpen(false)}
+          <div className="relative flex items-center justify-between py-2">
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                className="lg:hidden inline-flex items-center justify-center rounded border border-gray-300 p-2"
+                aria-label="Open menu"
+                aria-expanded={isOpen}
+                onClick={() => setIsOpen((prev) => !prev)}
               >
-                <Link
-                  href="/shop"
-                  className="flex items-center gap-2 hover:text-gray-700"
-                  aria-expanded={isShopOpen}
-                  onClick={() => setIsShopOpen((prev) => !prev)}
+                <svg
+                  viewBox="0 0 24 24"
+                  className="h-5 w-5"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
                 >
-                  Shop
-                  <svg
-                    viewBox="0 0 20 20"
-                    className="h-3 w-3"
-                    fill="currentColor"
-                  >
-                    <path d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 11.17l3.71-3.94a.75.75 0 1 1 1.08 1.04l-4.25 4.5a.75.75 0 0 1-1.08 0l-4.25-4.5a.75.75 0 0 1 .02-1.06Z" />
-                  </svg>
+                  <line x1="3" y1="6" x2="21" y2="6" />
+                  <line x1="3" y1="12" x2="21" y2="12" />
+                  <line x1="3" y1="18" x2="21" y2="18" />
+                </svg>
+              </button>
+              <nav className="hidden lg:flex items-center gap-8 text-sm font-medium">
+                <Link href="/" className="hover:text-gray-700">
+                  Home
                 </Link>
-
                 <div
-                  className={`absolute left-1/2 top-8 z-40 w-[95vw] -translate-x-[45%] transition duration-150 ${
-                    isShopOpen ? "visible opacity-100" : "invisible opacity-0"
-                  }`}
+                  className="relative group"
+                  onMouseEnter={() => setIsShopOpen(true)}
+                  onMouseLeave={() => setIsShopOpen(false)}
                 >
-                  <div className="mt-5 border border-gray-200 bg-white shadow-xl">
-                    <div className="px-6 py-8">
-                      <div className="flex flex-col gap-10 lg:flex-row">
-                        <div className="flex-1 max-h-[360px] overflow-y-auto pr-4">
-                          {/* <div className="mb-6 flex items-center gap-6 text-sm font-semibold text-gray-900">
+                  <Link
+                    href="/shop"
+                    className="flex items-center gap-2 hover:text-gray-700"
+                    aria-expanded={isShopOpen}
+                    onClick={() => setIsShopOpen((prev) => !prev)}
+                  >
+                    Shop
+                    <svg
+                      viewBox="0 0 20 20"
+                      className="h-3 w-3"
+                      fill="currentColor"
+                    >
+                      <path d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 11.17l3.71-3.94a.75.75 0 1 1 1.08 1.04l-4.25 4.5a.75.75 0 0 1-1.08 0l-4.25-4.5a.75.75 0 0 1 .02-1.06Z" />
+                    </svg>
+                  </Link>
+
+                  <div
+                    className={`absolute left-1/2 top-8 z-40 w-[95vw] -translate-x-[45%] transition duration-150 ${
+                      isShopOpen ? "visible opacity-100" : "invisible opacity-0"
+                    }`}
+                  >
+                    <div className="mt-5 border border-gray-200 bg-white shadow-xl">
+                      <div className="px-6 py-8">
+                        <div className="flex flex-col gap-10 lg:flex-row">
+                          <div className="flex-1 max-h-[360px] overflow-y-auto pr-4">
+                            {/* <div className="mb-6 flex items-center gap-6 text-sm font-semibold text-gray-900">
                             <Link href="/shop" className="hover:text-gray-700">
                               Bestsellers
                             </Link>
@@ -186,98 +208,100 @@ export default function Header() {
                               Samplers
                             </Link>
                           </div> */}
-                          <div className="grid grid-cols-2 gap-8 text-sm">
-                            {shopLinks.map((group) => (
-                              <div key={group.label}>
-                                <p className="mb-4 text-base font-semibold">
-                                  {group.label}
-                                </p>
-                                <ul className="space-y-2 text-gray-700">
-                                  {group.items.map((item) => (
-                                    <li key={item}>
-                                      <Link
-                                        href={`/shop?category=${toCategoryParam(
-                                          item,
-                                        )}`}
-                                        className="hover:text-gray-900"
-                                      >
-                                        {item}
-                                      </Link>
-                                    </li>
-                                  ))}
-                                </ul>
-                              </div>
-                            ))}
+                            <div className="grid grid-cols-2 gap-8 text-sm">
+                              {shopLinks.map((group) => (
+                                <div key={group.label}>
+                                  <p className="mb-4 text-base font-semibold">
+                                    {group.label}
+                                  </p>
+                                  <ul className="space-y-2 text-gray-700">
+                                    {group.items.map((item) => (
+                                      <li key={item}>
+                                        <Link
+                                          href={`/shop?category=${toCategoryParam(
+                                            item,
+                                          )}`}
+                                          className="hover:text-gray-900"
+                                        >
+                                          {item}
+                                        </Link>
+                                      </li>
+                                    ))}
+                                  </ul>
+                                </div>
+                              ))}
+                            </div>
                           </div>
-                        </div>
-                        <div className="w-full shrink-0 lg:w-[420px]">
-                          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-2">
-                            <Link
-                              href="/shop?search=kashmiri-kahwa"
-                              className="overflow-hidden rounded-xl border border-gray-200"
-                            >
-                              <img
-                                src="/products/W1.png"
-                                alt="Kashmiri Kahwa"
-                                className="h-40 w-full object-cover"
-                              />
-                              <div className="px-4 py-3 text-sm font-semibold">
-                                Bestsellers
-                              </div>
-                            </Link>
-                            <Link
-                              href="/shop?search=sampler"
-                              className="overflow-hidden rounded-xl border border-gray-200"
-                            >
-                              <img
-                                src="/products/W2.png"
-                                alt="Sampler set"
-                                className="h-40 w-full object-cover"
-                              />
-                              <div className="px-4 py-3 text-sm font-semibold">
-                                Samplers
-                              </div>
-                            </Link>
+                          <div className="w-full shrink-0 lg:w-[420px]">
+                            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-2">
+                              <Link
+                                href="/shop?search=kashmiri-kahwa"
+                                className="overflow-hidden rounded-xl border border-gray-200"
+                              >
+                                <img
+                                  src="/products/W1.png"
+                                  alt="Kashmiri Kahwa"
+                                  className="h-40 w-full object-cover"
+                                />
+                                <div className="px-4 py-3 text-sm font-semibold">
+                                  Bestsellers
+                                </div>
+                              </Link>
+                              <Link
+                                href="/shop?search=sampler"
+                                className="overflow-hidden rounded-xl border border-gray-200"
+                              >
+                                <img
+                                  src="/products/W2.png"
+                                  alt="Sampler set"
+                                  className="h-40 w-full object-cover"
+                                />
+                                <div className="px-4 py-3 text-sm font-semibold">
+                                  Samplers
+                                </div>
+                              </Link>
+                            </div>
                           </div>
                         </div>
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
-              <div
-                className="relative group"
-                onMouseEnter={() => setIsGiftsOpen(true)}
-                onMouseLeave={() => setIsGiftsOpen(false)}
-              >
-                <Link
-                  href="/shop?category=gifts"
-                  className="flex items-center gap-2 hover:text-gray-700"
-                  aria-expanded={isGiftsOpen}
-                  onClick={() => setIsGiftsOpen((prev) => !prev)}
-                >
-                  Gifts
-                  <svg
-                    viewBox="0 0 20 20"
-                    className="h-3 w-3"
-                    fill="currentColor"
-                  >
-                    <path d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 11.17l3.71-3.94a.75.75 0 1 1 1.08 1.04l-4.25 4.5a.75.75 0 0 1-1.08 0l-4.25-4.5a.75.75 0 0 1 .02-1.06Z" />
-                  </svg>
-                </Link>
                 <div
-                  className={`absolute left-0 top-full z-40 w-64 transition duration-150 ${
-                    isGiftsOpen ? "visible opacity-100" : "invisible opacity-0"
-                  }`}
+                  className="relative group"
+                  onMouseEnter={() => setIsGiftsOpen(true)}
+                  onMouseLeave={() => setIsGiftsOpen(false)}
                 >
-                  <div className="mt-5 border border-gray-200 bg-white shadow-xl">
-                    <div className="px-5 py-4 text-sm text-gray-700">
-                      Products coming soon
+                  <Link
+                    href="/shop?category=gifts"
+                    className="flex items-center gap-2 hover:text-gray-700"
+                    aria-expanded={isGiftsOpen}
+                    onClick={() => setIsGiftsOpen((prev) => !prev)}
+                  >
+                    Gifts
+                    <svg
+                      viewBox="0 0 20 20"
+                      className="h-3 w-3"
+                      fill="currentColor"
+                    >
+                      <path d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 11.17l3.71-3.94a.75.75 0 1 1 1.08 1.04l-4.25 4.5a.75.75 0 0 1-1.08 0l-4.25-4.5a.75.75 0 0 1 .02-1.06Z" />
+                    </svg>
+                  </Link>
+                  <div
+                    className={`absolute left-0 top-full z-40 w-64 transition duration-150 ${
+                      isGiftsOpen
+                        ? "visible opacity-100"
+                        : "invisible opacity-0"
+                    }`}
+                  >
+                    <div className="mt-5 border border-gray-200 bg-white shadow-xl">
+                      <div className="px-5 py-4 text-sm text-gray-700">
+                        Products coming soon
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-              {/* <Link href="/#bulk-inquiry" className="hover:text-gray-700">
+                {/* <Link href="/#bulk-inquiry" className="hover:text-gray-700">
                 Bulk Inquiry
               </Link>
               <div
@@ -333,39 +357,17 @@ export default function Header() {
                   </div>
                 </div>
               </div> */}
-            </nav>
+              </nav>
+            </div>
 
-            <div className="w-[70vw] flex justify-between items-center gap-3">
-              <button
-                type="button"
-                className="lg:hidden inline-flex items-center justify-center rounded border border-gray-300 p-2"
-                aria-label="Open menu"
-                aria-expanded={isOpen}
-                onClick={() => setIsOpen((prev) => !prev)}
-              >
-                <svg
-                  viewBox="0 0 24 24"
-                  className="h-5 w-5"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <line x1="3" y1="6" x2="21" y2="6" />
-                  <line x1="3" y1="12" x2="21" y2="12" />
-                  <line x1="3" y1="18" x2="21" y2="18" />
-                </svg>
-              </button>
-              <div className="leading-none">
-                <Link href="/">
-                  <img
-                    src="/logo/LOGO_TKC-02.png"
-                    alt="Logo"
-                    className="h-14 w-auto object-contain cursor-pointer sm:h-16 lg:h-20"
-                  />
-                </Link>
-              </div>
+            <div className="absolute left-1/2 -translate-x-1/2 leading-none">
+              <Link href="/">
+                <img
+                  src="/logo/LOGO_TKC-02.png"
+                  alt="Logo"
+                  className="h-14 w-auto object-contain cursor-pointer sm:h-16 lg:h-20"
+                />
+              </Link>
             </div>
 
             <div className="flex items-center gap-4">
