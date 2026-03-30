@@ -694,7 +694,7 @@ export default function CircularGallery({
   ]);
   return (
     <div
-      className="w-full h-full overflow-hidden bg-transparent cursor-grab active:cursor-grabbing"
+      className="max-w-full h-full overflow-hidden bg-transparent cursor-grab active:cursor-grabbing"
       ref={containerRef}
     />
   );

@@ -35,7 +35,7 @@ const page = () => {
       <div
         className="bg-gradient-to-t from-white to-transparent w-full"
         style={{
-          height: "700px",
+          height: "850px",
           position: "relative",
         }}
       >
