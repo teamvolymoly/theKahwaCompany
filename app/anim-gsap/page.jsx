@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useMemo } from "react";
 import gsap from "gsap";
 import ShopNowButton from "@/components/ShopNowButton";
+import Link from "next/link";
 
-const items = [
+const ITEMS = [
   { image: "/products/tin/BLTIN1.png", text: "Blue Lotus" },
   { image: "/products/tin/HLTIN1.png", text: "Honey Lemon" },
   { image: "/products/tin/OTTIN1.png", text: "Orange Tulsi" },
@@ -12,136 +13,180 @@ const items = [
   { image: "/products/tin/MLTIN1.png", text: "Mint Lemongrass" },
 ];
 
+// Triple-clone for seamless infinite loop (prev | real | next)
+const GALLERY_ITEMS = [...ITEMS, ...ITEMS, ...ITEMS];
+const COUNT = GALLERY_ITEMS.length;
+
 export default function AnimGsapPage() {
   const containerRef = useRef(null);
-  const trackRef = useRef(null);
   const cardsRef = useRef([]);
-  const metricsRef = useRef({
-    width: 0,
-    height: 0,
-    cardWidth: 0,
-    cardHeight: 0,
-    gap: 0,
+
+  // Stable mutable refs — no re-renders on change
+  const stateRef = useRef({
+    offset: 0,
     step: 0,
     total: 0,
+    cardWidth: 0,
+    containerWidth: 0,
+    drag: { isDown: false, startX: 0, startOffset: 0, velocity: 0, lastX: 0 },
+    // Cache base positions to avoid per-frame calculation
+    basePositions: /** @type {number[]} */ ([]),
   });
-  const offsetRef = useRef(0);
-  const dragRef = useRef({
-    isDown: false,
-    startX: 0,
-    startOffset: 0,
-    velocity: 0,
-    lastX: 0,
-  });
+
+  // Memoize so JSX array never re-creates between renders
+  const galleryItems = useMemo(() => GALLERY_ITEMS, []);
 
   useEffect(() => {
     const container = containerRef.current;
-    const cards = cardsRef.current;
-    if (!container || !cards.length) return;
+    const cards = cardsRef.current.filter(Boolean);
+    if (!container || cards.length !== COUNT) return;
 
-    const setup = () => {
-      const width = container.clientWidth;
-      const height = container.clientHeight;
-      const gap = width < 640 ? 18 : width < 1024 ? 24 : 32;
-      const cardWidth = Math.max(220, (width - gap * 2) / 3);
-      const cardHeight = cardWidth * 1.35;
+    // --- Promote all cards to their own GPU layer once ---
+    cards.forEach((card) => {
+      card.style.willChange = "transform";
+    });
+
+    // ─── Metrics ────────────────────────────────────────────────────────────
+    const compute = () => {
+      const W = container.clientWidth;
+      const gap = W < 640 ? 18 : W < 1024 ? 24 : 32;
+
+      // Always show exactly 3 cards: derive cardWidth from container
+      const cardWidth = (W - gap * 4) / 3; // 4 gaps: left + between + right
       const step = cardWidth + gap;
-      const total = cards.length * step;
+      const total = COUNT * step;
 
-      metricsRef.current = {
-        width,
-        height,
-        cardWidth,
-        cardHeight,
-        gap,
-        step,
-        total,
-      };
+      // Seed offset so the real (middle) set is centred on screen
+      const centerSet = ITEMS.length; // index of first "real" item
+      const centreOffset = centerSet * step - (W / 2 - cardWidth / 2);
 
-      cards.forEach((card, i) => {
+      const state = stateRef.current;
+      state.cardWidth = cardWidth;
+      state.step = step;
+      state.total = total;
+      state.containerWidth = W;
+      state.offset = centreOffset;
+
+      // Pre-compute base X for each card (never changes after resize)
+      state.basePositions = cards.map((_, i) => i * step);
+
+      // Set card dimensions via CSS only — no JS height calculation
+      cards.forEach((card) => {
         card.style.width = `${cardWidth}px`;
-        card.style.height = `${cardHeight}px`;
-        card.dataset.baseX = String(i * step);
       });
     };
 
-    setup();
-    const onResize = () => setup();
-    window.addEventListener("resize", onResize);
+    compute();
 
-    const speed = 0.6; // px per tick
-    const update = () => {
-      const { width, cardWidth, step, total } = metricsRef.current;
+    // Debounce resize to avoid thrashing
+    let resizeTimer;
+    const onResize = () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(compute, 60);
+    };
+    window.addEventListener("resize", onResize, { passive: true });
+
+    // ─── Ticker ──────────────────────────────────────────────────────────────
+    const AUTO_SPEED = 0.5; // px / frame
+    const FRICTION = 0.93;
+
+    const tick = () => {
+      const state = stateRef.current;
+      const { step, total, cardWidth, containerWidth, drag, basePositions } =
+        state;
       if (!total) return;
-      if (!dragRef.current.isDown) {
-        offsetRef.current = (offsetRef.current + speed) % total;
-        dragRef.current.velocity *= 0.95;
-        if (Math.abs(dragRef.current.velocity) > 0.01) {
-          offsetRef.current =
-            (offsetRef.current + dragRef.current.velocity) % total;
-        }
-      }
-      const center = width / 2;
-      const curveDepth = Math.min(80, width * 0.08);
-      const maxRotate = 8;
 
-      cards.forEach((card) => {
-        const baseX = Number(card.dataset.baseX || 0);
-        let x = baseX - offsetRef.current;
+      // Auto-scroll + inertia when not dragging
+      if (!drag.isDown) {
+        state.offset += AUTO_SPEED + drag.velocity;
+        drag.velocity *= FRICTION;
+        if (Math.abs(drag.velocity) < 0.01) drag.velocity = 0;
+      }
+
+      // Keep offset in [0, total) — modulo wrapping
+      state.offset = ((state.offset % total) + total) % total;
+
+      const center = containerWidth / 2;
+      const CURVE_DEPTH = Math.min(70, containerWidth * 0.07);
+      const MAX_ROTATE = 7;
+      const MAX_SCALE_LOSS = 0.16;
+
+      for (let i = 0; i < COUNT; i++) {
+        const card = cards[i];
+        // Shift raw base position by current offset
+        let x = basePositions[i] - state.offset;
+
+        // Wrap into the visible window ±1 full set
         if (x < -step) x += total;
-        if (x > total - step) x -= total;
+        else if (x > total - step) x -= total;
 
         const mid = x + cardWidth / 2;
-        const dist = (mid - center) / center;
-        const curve = -curveDepth * (1 - Math.min(1, Math.abs(dist))) ** 2;
-        const rotate = dist * maxRotate;
-        const scale = 1 - Math.min(0.18, Math.abs(dist) * 0.12);
+        const dist = (mid - center) / center; // -1 … 1 (rough)
+        const absDist = Math.abs(dist);
 
+        // Smooth parabolic curve: deepest at centre, flat at edges
+        const t = Math.max(0, 1 - absDist * 0.9);
+        const y = -CURVE_DEPTH * t * t;
+        const rotation = dist * MAX_ROTATE;
+        const scale = 1 - Math.min(MAX_SCALE_LOSS, absDist * 0.1);
+
+        // Single gsap.set call per card per frame — minimal overhead
         gsap.set(card, {
           x,
-          y: curve,
-          rotation: rotate,
+          y,
+          rotation,
           scale,
-          transformOrigin: "center center",
+          transformOrigin: "50% 100%", // rotate from bottom for natural arc
         });
-      });
+      }
     };
 
-    gsap.ticker.add(update);
+    gsap.ticker.add(tick);
 
+    // ─── Drag ────────────────────────────────────────────────────────────────
     const onPointerDown = (e) => {
-      dragRef.current.isDown = true;
-      dragRef.current.startX = e.clientX;
-      dragRef.current.lastX = e.clientX;
-      dragRef.current.startOffset = offsetRef.current;
-      container.setPointerCapture?.(e.pointerId);
+      const drag = stateRef.current.drag;
+      drag.isDown = true;
+      drag.startX = e.clientX;
+      drag.lastX = e.clientX;
+      drag.startOffset = stateRef.current.offset;
+      drag.velocity = 0;
+      container.setPointerCapture(e.pointerId);
+      container.style.cursor = "grabbing";
     };
+
     const onPointerMove = (e) => {
-      if (!dragRef.current.isDown) return;
-      const dx = e.clientX - dragRef.current.startX;
-      offsetRef.current = dragRef.current.startOffset - dx;
-      dragRef.current.velocity = dragRef.current.lastX - e.clientX;
-      dragRef.current.lastX = e.clientX;
+      const drag = stateRef.current.drag;
+      if (!drag.isDown) return;
+      const dx = e.clientX - drag.startX;
+      stateRef.current.offset = drag.startOffset - dx;
+      drag.velocity = drag.lastX - e.clientX;
+      drag.lastX = e.clientX;
     };
+
     const onPointerUp = () => {
-      dragRef.current.isDown = false;
+      stateRef.current.drag.isDown = false;
+      container.style.cursor = "grab";
     };
 
     container.addEventListener("pointerdown", onPointerDown);
     container.addEventListener("pointermove", onPointerMove);
     container.addEventListener("pointerup", onPointerUp);
-    container.addEventListener("pointerleave", onPointerUp);
+    container.addEventListener("pointercancel", onPointerUp);
+
+    container.style.cursor = "grab";
+
     return () => {
-      gsap.ticker.remove(update);
+      gsap.ticker.remove(tick);
+      clearTimeout(resizeTimer);
       window.removeEventListener("resize", onResize);
       container.removeEventListener("pointerdown", onPointerDown);
       container.removeEventListener("pointermove", onPointerMove);
       container.removeEventListener("pointerup", onPointerUp);
-      container.removeEventListener("pointerleave", onPointerUp);
+      container.removeEventListener("pointercancel", onPointerUp);
+      cards.forEach((card) => (card.style.willChange = "auto"));
     };
   }, []);
-
-  const galleryItems = [...items, ...items];
 
   return (
     <div
@@ -150,46 +195,59 @@ export default function AnimGsapPage() {
         backgroundImage: "url('/bg/beautiful-view-mountains-sunny-day.jpg')",
       }}
     >
-      <div className="text-center mt-10 flex flex-col gap-4 max-w-3xl">
+      {/* Hero text */}
+      <div className="text-center mt-34 flex flex-col gap-4 max-w-3xl px-4">
         <div className="font-(family-name:--font-basker) uppercase text-5xl mt-10 mb-10">
           <h2 className="mb-2">Where tradition</h2>
           <h2>meets imagination</h2>
         </div>
         <p className="font-thin text-xl">
-          Experience a Magical variety of Kahwa with different flavor and and
+          Experience a Magical variety of Kahwa with different flavors and
           contribute to a social cause
         </p>
       </div>
 
+      {/* Carousel */}
       <section
         ref={containerRef}
-        className="relative w-full bg-gradient-to-t from-white to-transparent h-[60vh] min-h-[420px] sm:h-[62vh] md:h-[65vh] lg:h-[125vh] 2xl:h-[72vh] overflow-hidden"
+        className="
+          relative w-full overflow-hidden select-none touch-pan-y
+          bg-gradient-to-t from-white to-transparent
+          h-[58vh] sm:h-[62vh] md:h-[65vh] lg:h-[115vh]
+        "
+        aria-label="Product carousel"
       >
-        <div
-          ref={trackRef}
-          className="absolute left-0 top-1/2 -translate-y-1/2"
-        >
-          {galleryItems.map((item, i) => (
-            <article
-              key={`${item.text}-${i}`}
-              ref={(el) => {
-                if (el) cardsRef.current[i] = el;
-              }}
-              className="absolute left-0 top-1/2 -translate-y-1/2 flex flex-col items-center justify-end"
-            >
-              <div className="flex h-full w-full items-center justify-center">
-                <img
-                  src={item.image}
-                  alt={item.text}
-                  className="max-h-full max-w-full object-contain drop-shadow-[0_18px_35px_rgba(0,0,0,0.18)]"
-                />
-              </div>
-              <div className="mt-6">
-                <ShopNowButton />
-              </div>
-            </article>
-          ))}
-        </div>
+        {galleryItems.map((item, i) => (
+          <article
+            key={`${item.text}-${i}`}
+            ref={(el) => {
+              if (el) cardsRef.current[i] = el;
+            }}
+            className="
+              absolute left-0
+              top-1/2 -translate-y-1/2
+              flex flex-col items-center justify-end
+              /* aspect ratio driven by CSS — no JS height */
+              aspect-[3/4]
+            "
+            aria-label={item.text}
+          >
+            <div className="flex h-full w-full items-center justify-center">
+              <img
+                src={item.image}
+                alt={item.text}
+                className="max-h-full max-w-full object-contain drop-shadow-[0_18px_35px_rgba(0,0,0,0.18)]"
+                draggable={false} /* prevent ghost drag image */
+              />
+            </div>
+            <p className="mt-2 mb-1 text-sm font-medium tracking-wide opacity-80">
+              {item.text}
+            </p>
+            <Link href="#" className="mt-1 mb-4 cursor-pointer">
+              <ShopNowButton className="cursor-pointer" />
+            </Link>
+          </article>
+        ))}
       </section>
     </div>
   );
