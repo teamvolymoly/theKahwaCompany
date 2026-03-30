@@ -169,7 +169,6 @@ export default function Home() {
 
   return (
     <>
-     
       <main>
         {/* Hero Section  */}
         <section id="home" className="w-full">
@@ -189,7 +188,7 @@ export default function Home() {
             {slides.map((slide) => (
               <SwiperSlide key={slide.title}>
                 <article
-                  className="hero-slide relative w-full min-h-[70vh] h-[400px] flex items-center justify-center bg-center bg-cover"
+                  className="hero-slide relative w-full min-h-[70vh] h-[600px] flex items-center justify-center bg-center bg-cover"
                   style={{ backgroundImage: `url(${slide.image})` }}
                 >
                   <div className="absolute inset-0 bg-gradient-to-br from-black/90 via-black/70 to-black/30" />

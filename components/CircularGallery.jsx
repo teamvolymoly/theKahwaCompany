@@ -55,6 +55,48 @@ function createTextTexture(
   return { texture, width: canvas.width, height: canvas.height };
 }
 
+function createButtonTexture(
+  gl,
+  text,
+  font = "600 22px Inter, sans-serif",
+  textColor = "#ffffff",
+) {
+  const canvas = document.createElement("canvas");
+  const width = 420;
+  const height = 90;
+  canvas.width = width;
+  canvas.height = height;
+  const context = canvas.getContext("2d");
+
+  const gradient = context.createLinearGradient(0, 0, width, 0);
+  gradient.addColorStop(0, "rgba(255,255,255,0)");
+  gradient.addColorStop(0.28, "rgba(170,180,175,0.95)");
+  gradient.addColorStop(0.5, "rgba(140,155,150,0.95)");
+  gradient.addColorStop(0.72, "rgba(170,180,175,0.95)");
+  gradient.addColorStop(1, "rgba(255,255,255,0)");
+  context.fillStyle = gradient;
+  context.fillRect(0, 0, width, height);
+
+  const highlight = context.createLinearGradient(0, 0, width, 0);
+  highlight.addColorStop(0, "rgba(255,255,255,0)");
+  highlight.addColorStop(0.22, "rgba(255,255,255,0.35)");
+  highlight.addColorStop(0.5, "rgba(255,255,255,0.1)");
+  highlight.addColorStop(0.78, "rgba(255,255,255,0.35)");
+  highlight.addColorStop(1, "rgba(255,255,255,0)");
+  context.fillStyle = highlight;
+  context.fillRect(0, 0, width, height);
+
+  context.font = font;
+  context.fillStyle = textColor;
+  context.textBaseline = "middle";
+  context.textAlign = "center";
+  context.fillText(text.toUpperCase(), width / 2, height / 2);
+
+  const texture = new Texture(gl, { generateMipmaps: false });
+  texture.image = canvas;
+  return { texture, width, height };
+}
+
 class Title {
   constructor({
     gl,
@@ -116,6 +158,75 @@ class Title {
   }
 }
 
+class Button {
+  constructor({
+    gl,
+    plane,
+    renderer,
+    text,
+    textColor = "#ffffff",
+    font = "600 22px Inter, sans-serif",
+  }) {
+    autoBind(this);
+    this.gl = gl;
+    this.plane = plane;
+    this.renderer = renderer;
+    this.text = text;
+    this.textColor = textColor;
+    this.font = font;
+    this.createMesh();
+  }
+  createMesh() {
+    const { texture, width, height } = createButtonTexture(
+      this.gl,
+      this.text,
+      this.font,
+      this.textColor,
+    );
+    const geometry = new Plane(this.gl);
+    const program = new Program(this.gl, {
+      vertex: `
+        attribute vec3 position;
+        attribute vec2 uv;
+        uniform mat4 modelViewMatrix;
+        uniform mat4 projectionMatrix;
+        varying vec2 vUv;
+        void main() {
+          vUv = uv;
+          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+        }
+      `,
+      fragment: `
+        precision highp float;
+        uniform sampler2D tMap;
+        varying vec2 vUv;
+        void main() {
+          vec4 color = texture2D(tMap, vUv);
+          if (color.a < 0.03) discard;
+          gl_FragColor = color;
+        }
+      `,
+      uniforms: { tMap: { value: texture } },
+      transparent: true,
+    });
+    this.mesh = new Mesh(this.gl, { geometry, program });
+    this.width = width;
+    this.height = height;
+    this.updateScale();
+    this.mesh.setParent(this.plane);
+  }
+  updateScale() {
+    if (!this.mesh) return;
+    const aspect = this.width / this.height;
+    const buttonHeight = this.plane.scale.y * 0.12;
+    const buttonWidth = buttonHeight * aspect;
+    this.mesh.scale.set(buttonWidth, buttonHeight, 1);
+    // keep button inside the card near the bottom edge
+    this.mesh.position.y = -this.plane.scale.y * 0.5 + buttonHeight * 0.85;
+    this.mesh.position.z = 0.02;
+  }
+}
+
 class Media {
   constructor({
     geometry,
@@ -132,6 +243,10 @@ class Media {
     textColor,
     borderRadius = 0,
     font,
+    visibleItems,
+    itemAspect,
+    gap,
+    buttonText,
   }) {
     this.extra = 0;
     this.geometry = geometry;
@@ -148,9 +263,13 @@ class Media {
     this.textColor = textColor;
     this.borderRadius = borderRadius;
     this.font = font;
+    this.visibleItems = visibleItems;
+    this.itemAspect = itemAspect;
+    this.gap = gap;
+    this.buttonText = buttonText;
     this.createShader();
     this.createMesh();
-    this.createTitle();
+    this.createButton();
     this.onResize();
   }
   createShader() {
@@ -166,14 +285,10 @@ class Media {
         attribute vec2 uv;
         uniform mat4 modelViewMatrix;
         uniform mat4 projectionMatrix;
-        uniform float uTime;
-        uniform float uSpeed;
         varying vec2 vUv;
         void main() {
           vUv = uv;
-          vec3 p = position;
-          p.z = (sin(p.x * 4.0 + uTime) * 1.5 + cos(p.y * 2.0 + uTime) * 1.5) * (0.1 + uSpeed * 0.5);
-          gl_Position = projectionMatrix * modelViewMatrix * vec4(p, 1.0);
+          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
         }
       `,
       fragment: `
@@ -206,15 +321,13 @@ class Media {
           float edgeSmooth = 0.002;
           float alpha = 1.0 - smoothstep(-edgeSmooth, edgeSmooth, d);
           
-          gl_FragColor = vec4(color.rgb, alpha);
+          gl_FragColor = vec4(color.rgb, color.a * alpha);
         }
       `,
       uniforms: {
         tMap: { value: texture },
         uPlaneSizes: { value: [0, 0] },
         uImageSizes: { value: [0, 0] },
-        uSpeed: { value: 0 },
-        uTime: { value: 100 * Math.random() },
         uBorderRadius: { value: this.borderRadius },
       },
       transparent: true,
@@ -237,14 +350,14 @@ class Media {
     });
     this.plane.setParent(this.scene);
   }
-  createTitle() {
-    this.title = new Title({
+  createButton() {
+    this.button = new Button({
       gl: this.gl,
       plane: this.plane,
       renderer: this.renderer,
-      text: this.text,
-      textColor: this.textColor,
-      fontFamily: this.font,
+      text: this.buttonText || "Shop now",
+      textColor: "#ffffff",
+      font: "600 20px Inter, sans-serif",
     });
   }
   update(scroll, direction) {
@@ -272,8 +385,6 @@ class Media {
     }
 
     this.speed = scroll.current - scroll.last;
-    this.program.uniforms.uTime.value += 0.04;
-    this.program.uniforms.uSpeed.value = this.speed;
 
     const planeOffset = this.plane.scale.x / 2;
     const viewportOffset = this.viewport.width / 2;
@@ -299,16 +410,20 @@ class Media {
         ];
       }
     }
-    this.scale = this.screen.height / 1500;
-    this.plane.scale.y =
-      (this.viewport.height * (900 * this.scale)) / this.screen.height;
-    this.plane.scale.x =
-      (this.viewport.width * (700 * this.scale)) / this.screen.width;
+    const baseWidth = this.viewport.width / this.visibleItems - this.gap;
+    const baseHeight = baseWidth * this.itemAspect;
+    const maxHeight = this.viewport.height * 0.65;
+    const height = baseHeight > maxHeight ? maxHeight : Math.max(baseHeight, 1);
+    const width = height / this.itemAspect;
+
+    this.plane.scale.x = width;
+    this.plane.scale.y = height;
     this.plane.program.uniforms.uPlaneSizes.value = [
       this.plane.scale.x,
       this.plane.scale.y,
     ];
-    this.padding = 2;
+    if (this.button) this.button.updateScale();
+    this.padding = this.gap;
     this.width = this.plane.scale.x + this.padding;
     this.widthTotal = this.width * this.length;
     this.x = this.width * this.index;
@@ -326,6 +441,10 @@ class App {
       font = "bold 30px Figtree",
       scrollSpeed = 2,
       scrollEase = 0.05,
+      visibleItems = 3,
+      itemAspect = 1.25,
+      gap = 0.8,
+      buttonText = "Shop now",
     } = {},
   ) {
     document.documentElement.classList.remove("no-js");
@@ -338,7 +457,17 @@ class App {
     this.createScene();
     this.onResize();
     this.createGeometry();
-    this.createMedias(items, bend, textColor, borderRadius, font);
+    this.createMedias(
+      items,
+      bend,
+      textColor,
+      borderRadius,
+      font,
+      visibleItems,
+      itemAspect,
+      gap,
+      buttonText,
+    );
     this.update();
     this.addEventListeners();
   }
@@ -366,52 +495,34 @@ class App {
       widthSegments: 100,
     });
   }
-  createMedias(items, bend = 1, textColor, borderRadius, font) {
+  createMedias(
+    items,
+    bend = 1,
+    textColor,
+    borderRadius,
+    font,
+    visibleItems,
+    itemAspect,
+    gap,
+    buttonText,
+  ) {
     const defaultItems = [
       { image: `/products/tin/BLTIN1.png`, text: "Bridge" },
       {
-        image: `https://picsum.photos/seed/2/800/600?grayscale`,
+        image: `/products/tin/HLTIN1.png`,
         text: "Desk Setup",
       },
       {
-        image: `https://picsum.photos/seed/3/800/600?grayscale`,
+        image: `/products/tin/KLTIN1.png`,
         text: "Waterfall",
       },
       {
-        image: `https://picsum.photos/seed/4/800/600?grayscale`,
+        image: `/products/tin/MLTIN1.png`,
         text: "Strawberries",
       },
       {
-        image: `https://picsum.photos/seed/5/800/600?grayscale`,
+        image: `/products/tin/OTTIN1.png`,
         text: "Deep Diving",
-      },
-      {
-        image: `https://picsum.photos/seed/16/800/600?grayscale`,
-        text: "Train Track",
-      },
-      {
-        image: `https://picsum.photos/seed/17/800/600?grayscale`,
-        text: "Santorini",
-      },
-      {
-        image: `https://picsum.photos/seed/8/800/600?grayscale`,
-        text: "Blurry Lights",
-      },
-      {
-        image: `https://picsum.photos/seed/9/800/600?grayscale`,
-        text: "New York",
-      },
-      {
-        image: `https://picsum.photos/seed/10/800/600?grayscale`,
-        text: "Good Boy",
-      },
-      {
-        image: `https://picsum.photos/seed/21/800/600?grayscale`,
-        text: "Coastline",
-      },
-      {
-        image: `https://picsum.photos/seed/12/800/600?grayscale`,
-        text: "Palm Trees",
       },
     ];
     const galleryItems = items && items.length ? items : defaultItems;
@@ -432,6 +543,10 @@ class App {
         textColor,
         borderRadius,
         font,
+        visibleItems,
+        itemAspect,
+        gap,
+        buttonText,
       });
     });
   }
@@ -541,6 +656,10 @@ export default function CircularGallery({
   font = "bold 30px Figtree",
   scrollSpeed = 2,
   scrollEase = 0.05,
+  visibleItems = 3,
+  itemAspect = 1.25,
+  gap = 0.8,
+  buttonText = "Shop now",
 }) {
   const containerRef = useRef(null);
   useEffect(() => {
@@ -552,14 +671,30 @@ export default function CircularGallery({
       font,
       scrollSpeed,
       scrollEase,
+      visibleItems,
+      itemAspect,
+      gap,
+      buttonText,
     });
     return () => {
       app.destroy();
     };
-  }, [items, bend, textColor, borderRadius, font, scrollSpeed, scrollEase]);
+  }, [
+    items,
+    bend,
+    textColor,
+    borderRadius,
+    font,
+    scrollSpeed,
+    scrollEase,
+    visibleItems,
+    itemAspect,
+    gap,
+    buttonText,
+  ]);
   return (
     <div
-      className="w-full h-full overflow-hidden cursor-grab active:cursor-grabbing"
+      className="w-full h-full overflow-hidden bg-transparent cursor-grab active:cursor-grabbing"
       ref={containerRef}
     />
   );
