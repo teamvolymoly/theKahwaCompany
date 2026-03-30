@@ -49,11 +49,19 @@ export default function AnimGsapPage() {
     // ─── Metrics ────────────────────────────────────────────────────────────
     const compute = () => {
       const W = container.clientWidth;
-      const gap = W < 640 ? 18 : W < 1024 ? 24 : 32;
+      // Control outer padding and inner spacing separately for tighter layout
+      const outerGap = W < 640 ? 8 : W < 1024 ? 12 : 16;
+      const innerGap = W < 640 ? 4 : W < 1024 ? 8 : 10;
 
-      // Always show exactly 3 cards: derive cardWidth from container
-      const cardWidth = (W - gap * 4) / 3; // 4 gaps: left + between + right
-      const step = cardWidth + gap;
+      // Responsive visible cards:
+      // - small: 1.5 cards
+      // - medium: 2.5 cards
+      // - large+: ~3.2 cards (slightly smaller cards to prevent bottom overflow)
+      const cardsVisible = W < 640 ? 1.5 : W < 1024 ? 2.5 : W < 1280 ? 3 : 3.2;
+
+      const cardWidth =
+        (W - outerGap * 2 - innerGap * (cardsVisible - 1)) / cardsVisible;
+      const step = cardWidth + innerGap;
       const total = COUNT * step;
 
       // Seed offset so the real (middle) set is centred on screen
@@ -87,7 +95,6 @@ export default function AnimGsapPage() {
     window.addEventListener("resize", onResize, { passive: true });
 
     // ─── Ticker ──────────────────────────────────────────────────────────────
-    const AUTO_SPEED = 0.5; // px / frame
     const FRICTION = 0.93;
 
     const tick = () => {
@@ -98,7 +105,7 @@ export default function AnimGsapPage() {
 
       // Auto-scroll + inertia when not dragging
       if (!drag.isDown) {
-        state.offset += AUTO_SPEED + drag.velocity;
+        state.offset += drag.velocity;
         drag.velocity *= FRICTION;
         if (Math.abs(drag.velocity) < 0.01) drag.velocity = 0;
       }
@@ -213,7 +220,7 @@ export default function AnimGsapPage() {
         className="
           relative w-full overflow-hidden select-none touch-pan-y
           bg-gradient-to-t from-white to-transparent
-          h-[58vh] sm:h-[62vh] md:h-[65vh] lg:h-[115vh]
+          h-[600px]  md:h-[700px] lg:h-[800px] 
         "
         aria-label="Product carousel"
       >
