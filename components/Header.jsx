@@ -335,7 +335,7 @@ export default function Header() {
               </div> */}
             </nav>
 
-            <div className="flex items-center gap-3">
+            <div className="w-[70vw] flex justify-between items-center gap-3">
               <button
                 type="button"
                 className="lg:hidden inline-flex items-center justify-center rounded border border-gray-300 p-2"

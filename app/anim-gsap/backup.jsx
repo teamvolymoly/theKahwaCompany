@@ -49,14 +49,11 @@ export default function AnimGsapPage() {
     // ─── Metrics ────────────────────────────────────────────────────────────
     const compute = () => {
       const W = container.clientWidth;
-      // Control outer padding and inner spacing separately for tighter layout
-      const outerGap = W < 640 ? 8 : W < 1024 ? 12 : 16;
-      const innerGap = W < 640 ? 4 : W < 1024 ? 8 : 10;
+      const gap = W < 640 ? 18 : W < 1024 ? 24 : 32;
 
       // Always show exactly 3 cards: derive cardWidth from container
-      // 2 outer gaps + 2 inner gaps between the 3 cards
-      const cardWidth = (W - outerGap * 2 - innerGap * 2) / 3;
-      const step = cardWidth + innerGap;
+      const cardWidth = (W - gap * 4) / 3; // 4 gaps: left + between + right
+      const step = cardWidth + gap;
       const total = COUNT * step;
 
       // Seed offset so the real (middle) set is centred on screen
@@ -90,6 +87,7 @@ export default function AnimGsapPage() {
     window.addEventListener("resize", onResize, { passive: true });
 
     // ─── Ticker ──────────────────────────────────────────────────────────────
+    const AUTO_SPEED = 0.5; // px / frame
     const FRICTION = 0.93;
 
     const tick = () => {
@@ -100,7 +98,7 @@ export default function AnimGsapPage() {
 
       // Auto-scroll + inertia when not dragging
       if (!drag.isDown) {
-        state.offset += drag.velocity;
+        state.offset += AUTO_SPEED + drag.velocity;
         drag.velocity *= FRICTION;
         if (Math.abs(drag.velocity) < 0.01) drag.velocity = 0;
       }
