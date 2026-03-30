@@ -247,6 +247,7 @@ class Media {
     itemAspect,
     gap,
     buttonText,
+    offsetY = 0,
   }) {
     this.extra = 0;
     this.geometry = geometry;
@@ -267,6 +268,7 @@ class Media {
     this.itemAspect = itemAspect;
     this.gap = gap;
     this.buttonText = buttonText;
+    this.offsetY = offsetY;
     this.createShader();
     this.createMesh();
     this.createButton();
@@ -383,6 +385,7 @@ class Media {
         this.plane.rotation.z = Math.sign(x) * Math.asin(effectiveX / R);
       }
     }
+    this.plane.position.y += this.offsetYCurrent ?? this.offsetY;
 
     this.speed = scroll.current - scroll.last;
 
@@ -410,11 +413,20 @@ class Media {
         ];
       }
     }
-    const baseWidth = this.viewport.width / this.visibleItems - this.gap;
-    const baseHeight = baseWidth * this.itemAspect;
-    const maxHeight = this.viewport.height * 0.65;
+    const isSmall = this.screen.width < 640;
+    const isMedium = this.screen.width < 1024;
+    const gap = isSmall ? this.gap * 0.7 : isMedium ? this.gap * 0.85 : this.gap;
+    const aspect = isSmall
+      ? this.itemAspect * 0.85
+      : isMedium
+      ? this.itemAspect * 0.95
+      : this.itemAspect;
+
+    const baseWidth = this.viewport.width / this.visibleItems - gap;
+    const baseHeight = baseWidth * aspect;
+    const maxHeight = this.viewport.height * (isSmall ? 0.75 : 0.85);
     const height = baseHeight > maxHeight ? maxHeight : Math.max(baseHeight, 1);
-    const width = height / this.itemAspect;
+    const width = height / aspect;
 
     this.plane.scale.x = width;
     this.plane.scale.y = height;
@@ -423,10 +435,11 @@ class Media {
       this.plane.scale.y,
     ];
     if (this.button) this.button.updateScale();
-    this.padding = this.gap;
+    this.padding = gap;
     this.width = this.plane.scale.x + this.padding;
     this.widthTotal = this.width * this.length;
     this.x = this.width * this.index;
+    this.offsetYCurrent = this.offsetY * (isSmall ? 0.6 : isMedium ? 0.8 : 1);
   }
 }
 

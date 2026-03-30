@@ -32,13 +32,7 @@ const page = () => {
         {/* <ShopNowButton /> */}
       </div>
 
-      <div
-        className="bg-gradient-to-t from-white to-transparent w-full"
-        style={{
-          height: "850px",
-          position: "relative",
-        }}
-      >
+      <div className="relative w-full bg-gradient-to-t from-white to-transparent h-[60vh] min-h-[420px] sm:h-[62vh] md:h-[65vh] lg:h-[70vh] 2xl:h-[72vh]">
         <CircularGallery
           items={galleryItems}
           bend={3}
@@ -48,7 +42,8 @@ const page = () => {
           scrollEase={0.07}
           visibleItems={3}
           itemAspect={1.6}
-          gap={1.6}
+          gap={1.1}
+          offsetY={0.35}
         />
       </div>
     </div>
