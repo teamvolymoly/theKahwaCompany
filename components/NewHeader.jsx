@@ -156,7 +156,7 @@ export default function NewHeader() {
           } ${isHome ? "backdrop-blur-sm" : ""}`}
         >
           <div className="container mx-auto px-4 lg:px-8">
-            <div className="relative flex items-center justify-between py-4 lg:py-5">
+            <div className="relative flex items-center justify-between py-4 lg:py-4">
               <div className="flex items-center gap-3 lg:gap-4">
                 <button
                   type="button"
