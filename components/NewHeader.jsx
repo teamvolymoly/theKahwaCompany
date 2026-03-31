@@ -190,7 +190,7 @@ export default function NewHeader() {
                     size={20}
                     color="#000"
                   />
-                  <p className="text-base lg:text-lg font-slime text-gray-900">
+                  <p className="text-base lg:text-lg font-slime text-black">
                     SHOP
                   </p>
                 </div>
@@ -445,17 +445,9 @@ export default function NewHeader() {
             }`}
           >
             <div className=" border border-gray-200 bg-white shadow-xl">
-              <div className="px-6 py-8">
-                <div className="flex flex-col gap-10 lg:flex-row">
+              <div className="px-10 py-8">
+                <div className=" flex flex-col gap-10 lg:flex-row">
                   <div className="flex-1 max-h-[360px] overflow-y-auto pr-4">
-                    <div className="mb-6 flex items-center gap-6 text-sm font-semibold text-gray-900">
-                      <Link href="/shop" className="hover:text-gray-700">
-                        Bestsellers
-                      </Link>
-                      <Link href="/shop" className="hover:text-gray-700">
-                        Samplers
-                      </Link>
-                    </div>
                     <div className="grid grid-cols-2 gap-8 text-sm">
                       {shopLinks.map((group) => (
                         <div key={group.label}>
