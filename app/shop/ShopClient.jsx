@@ -112,8 +112,27 @@ export default function ShopClient() {
 
   return (
     <>
-      <main className="bg-white text-black">
-        <div className="container mx-auto px-4 py-12">
+      <section className="mt-20 mb-20 w-full h-[280px] ">
+        <img
+          src="/products/W7.png"
+          alt="Adv_1"
+          className="w-full h-full object-cover object-center"
+        />
+      </section>
+      <main className="container mx-auto bg-white text-black ">
+        <div className="max-w-2xl mx-auto mb-8 flex flex-col items-center text-center justify-center gap-3">
+          <p
+            className="text-3xl uppercase text-[#4e5a50] "
+            style={{ fontFamily: "var(--font-basker)" }}
+          >
+            All Products
+          </p>
+          <p className="text-[#4e5a50] font-thin  max-w-xl">
+            Explore a wide range of wellness teas and natural supplements,
+            combining traditional herbs with modern nutrition.
+          </p>
+        </div>
+        <div className="container mx-auto px-12 py-12">
           <div className="flex gap-10">
             {/* Sidebar Filters */}
             <div className="w-72 hidden lg:block">
@@ -142,7 +161,7 @@ export default function ShopClient() {
                       />
                     </svg>
                   </div>
-                  <div className="mt-4">
+                  <div className="mt-2">
                     <input
                       type="range"
                       min="0"
@@ -151,7 +170,7 @@ export default function ShopClient() {
                       onChange={(e) =>
                         setPriceRange([priceRange[0], parseInt(e.target.value)])
                       }
-                      className="w-full accent-[#6a716a]"
+                      className="w-full accent-[#6a716a] h-1"
                     />
                     <div className="flex justify-between text-xs mt-2 text-black/70">
                       <span>₹{priceRange[0]}</span>

@@ -23,13 +23,13 @@ export default function ProductCard({ product }) {
   };
 
   return (
-    <article className="group flex h-full flex-col overflow-hidden rounded-sm  bg-gray-50  transition hover:-translate-y-1">
+    <article className="group flex h-full flex-col overflow-hidden py-4 rounded-sm bg-[#fafafa]  transition hover:-translate-y-1">
       <div className="flex flex-1 flex-col p-6 pb-4 text-center">
         <Link
           href={`/product/${slugOrId}`}
           className="relative block overflow-hidden rounded-sm"
         >
-          <div className="flex h-56 items-center justify-center">
+          <div className="flex h-50 w-50 items-center justify-center">
             <img
               src={
                 product.images?.[0]?.image_url ||
@@ -37,7 +37,7 @@ export default function ProductCard({ product }) {
                 "/products/W1.png"
               }
               alt={product.name}
-              className="h-52 w-auto object-contain object-center transition duration-300 group-hover:scale-[1.04]"
+              className="h-full w-full w-auto object-contain object-center transition duration-300 group-hover:scale-[1.04]"
             />
           </div>
         </Link>
@@ -64,7 +64,7 @@ export default function ProductCard({ product }) {
         </div>
 
         <h3
-          className="mt-3 text-sm font-semibold uppercase tracking-[0.18em] text-[#1c2230] "
+          className="mt-3 text-lg font-normal uppercase tracking-[0.05em] text-[#1c2230] "
           style={{ fontFamily: "var(--font-basker)" }}
         >
           {product.name}

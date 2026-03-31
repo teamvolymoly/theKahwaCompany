@@ -46,7 +46,7 @@ export const dummyCategories = [
 export const dummyProducts = [
   {
     id: 101,
-    name: "Kashmiri Kahwa Premium Green Tea",
+    name: "Kashmiri Kahwa",
     slug: "kashmiri-kahwa-premium-green-tea",
     short_description: "30 Pyramid Tea Bags",
     description:
@@ -68,8 +68,8 @@ export const dummyProducts = [
   },
   {
     id: 102,
-    name: "Saffron & Spices Kahwa Blend",
-    slug: "saffron-spices-kahwa-blend",
+    name: "Hibiscus Kahwa",
+    slug: "hibiscus-kahwa-rosehip-tea",
     short_description: "With Almonds & Cardamom",
     description:
       "Bold saffron notes with a spice-forward finish, perfect for evening unwinds.",
@@ -89,8 +89,8 @@ export const dummyProducts = [
   },
   {
     id: 103,
-    name: "Classic Kashmiri Kahwa",
-    slug: "classic-kashmiri-kahwa",
+    name: "Oolong Kahwa",
+    slug: "oolong-kahwa",
     short_description: "Traditional Herbal Infusion",
     description:
       "A timeless kahwa blend with citrus peel and whole spices for a classic sip.",
@@ -107,7 +107,7 @@ export const dummyProducts = [
   },
   {
     id: 104,
-    name: "Kahwa Sampler Set",
+    name: "Kashmiri Kahwa",
     slug: "kahwa-sampler-set",
     short_description: "Assorted Signature Blends",
     description:
@@ -125,11 +125,10 @@ export const dummyProducts = [
   },
   {
     id: 105,
-    name: "Mint & Saffron Kahwa",
+    name: "Mint Kahwa",
     slug: "mint-saffron-kahwa",
     short_description: "Refreshing Evening Brew",
-    description:
-      "Cooling mint with a saffron lift for a bright, soothing cup.",
+    description: "Cooling mint with a saffron lift for a bright, soothing cup.",
     category_id: 2,
     price: 459,
     oldPrice: 549,
