@@ -4,7 +4,7 @@ import Link from "next/link";
 
 export default function PaymentPage() {
   return (
-    <main className="min-h-screen bg-white text-black">
+    <main className="min-h-screen bg-white text-black mt-12">
       <section className="max-w-5xl mx-auto px-6 py-14">
         <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
           <div>
@@ -26,11 +26,23 @@ export default function PaymentPage() {
               Billing details
             </p>
             <div className="mt-6 grid gap-4">
-              <input className="rounded-full border border-black/20 px-4 py-3 text-sm" placeholder="Name on card" />
-              <input className="rounded-full border border-black/20 px-4 py-3 text-sm" placeholder="Card number" />
+              <input
+                className="rounded-full border border-black/20 px-4 py-3 text-sm"
+                placeholder="Name on card"
+              />
+              <input
+                className="rounded-full border border-black/20 px-4 py-3 text-sm"
+                placeholder="Card number"
+              />
               <div className="grid gap-4 md:grid-cols-2">
-                <input className="rounded-full border border-black/20 px-4 py-3 text-sm" placeholder="MM/YY" />
-                <input className="rounded-full border border-black/20 px-4 py-3 text-sm" placeholder="CVC" />
+                <input
+                  className="rounded-full border border-black/20 px-4 py-3 text-sm"
+                  placeholder="MM/YY"
+                />
+                <input
+                  className="rounded-full border border-black/20 px-4 py-3 text-sm"
+                  placeholder="CVC"
+                />
               </div>
               <Link
                 href="/payment-success"

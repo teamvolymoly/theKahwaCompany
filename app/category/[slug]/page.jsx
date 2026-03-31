@@ -65,7 +65,7 @@ export default function CategoryPage() {
 
   return (
     <>
-      <main className="bg-white text-black mt-20">
+      <main className="bg-white text-black mt-12">
         <div className="container mx-auto px-4 py-12">
           <h1 className="text-4xl md:text-5xl font-semibold mb-4">
             {category?.name}

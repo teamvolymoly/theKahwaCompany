@@ -4,7 +4,7 @@ import Link from "next/link";
 
 export default function CheckoutPage() {
   return (
-    <main className="min-h-screen bg-white text-black">
+    <main className="min-h-screen bg-white text-black mt-12">
       <section className="max-w-6xl mx-auto px-6 py-14">
         <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
           <div>
@@ -33,17 +33,44 @@ export default function CheckoutPage() {
             </p>
             <div className="mt-6 grid gap-4">
               <div className="grid gap-4 md:grid-cols-2">
-                <input className="rounded-full border border-black/20 px-4 py-3 text-sm" placeholder="First name" />
-                <input className="rounded-full border border-black/20 px-4 py-3 text-sm" placeholder="Last name" />
+                <input
+                  className="rounded-full border border-black/20 px-4 py-3 text-sm"
+                  placeholder="First name"
+                />
+                <input
+                  className="rounded-full border border-black/20 px-4 py-3 text-sm"
+                  placeholder="Last name"
+                />
               </div>
-              <input className="rounded-full border border-black/20 px-4 py-3 text-sm" placeholder="Email address" />
-              <input className="rounded-full border border-black/20 px-4 py-3 text-sm" placeholder="Phone number" />
-              <input className="rounded-full border border-black/20 px-4 py-3 text-sm" placeholder="Address line 1" />
-              <input className="rounded-full border border-black/20 px-4 py-3 text-sm" placeholder="Address line 2" />
+              <input
+                className="rounded-full border border-black/20 px-4 py-3 text-sm"
+                placeholder="Email address"
+              />
+              <input
+                className="rounded-full border border-black/20 px-4 py-3 text-sm"
+                placeholder="Phone number"
+              />
+              <input
+                className="rounded-full border border-black/20 px-4 py-3 text-sm"
+                placeholder="Address line 1"
+              />
+              <input
+                className="rounded-full border border-black/20 px-4 py-3 text-sm"
+                placeholder="Address line 2"
+              />
               <div className="grid gap-4 md:grid-cols-3">
-                <input className="rounded-full border border-black/20 px-4 py-3 text-sm" placeholder="City" />
-                <input className="rounded-full border border-black/20 px-4 py-3 text-sm" placeholder="State" />
-                <input className="rounded-full border border-black/20 px-4 py-3 text-sm" placeholder="Postal code" />
+                <input
+                  className="rounded-full border border-black/20 px-4 py-3 text-sm"
+                  placeholder="City"
+                />
+                <input
+                  className="rounded-full border border-black/20 px-4 py-3 text-sm"
+                  placeholder="State"
+                />
+                <input
+                  className="rounded-full border border-black/20 px-4 py-3 text-sm"
+                  placeholder="Postal code"
+                />
               </div>
               <Link
                 href="/payment"

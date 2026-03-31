@@ -64,7 +64,10 @@ export default function ProductDetail() {
     const safeQty = Number.isFinite(quantity) && quantity > 0 ? quantity : 1;
     await apiFetch("/cart", {
       method: "POST",
-      body: JSON.stringify({ variant_id: selectedVariant.id, quantity: safeQty }),
+      body: JSON.stringify({
+        variant_id: selectedVariant.id,
+        quantity: safeQty,
+      }),
     });
     alert("Added to cart!");
   };
@@ -92,7 +95,7 @@ export default function ProductDetail() {
 
   return (
     <>
-      <main className="bg-white text-black">
+      <main className="bg-white text-black mt-22">
         <section className="border-b border-black/10">
           <div className="max-w-7xl mx-auto px-6 py-8">
             <p className="text-xs uppercase tracking-[0.4em] text-black/50">
@@ -179,7 +182,9 @@ export default function ProductDetail() {
                   ))}
                 </div>
                 <span className="text-sm text-black/50">
-                  {reviews.length ? `${reviews.length} reviews` : "No reviews yet"}
+                  {reviews.length
+                    ? `${reviews.length} reviews`
+                    : "No reviews yet"}
                 </span>
               </div>
 
@@ -291,7 +296,10 @@ export default function ProductDetail() {
                 <p className="text-xs uppercase tracking-[0.35em] text-black/50">
                   Best paired with
                 </p>
-                <p className="mt-4 text-lg" style={{ fontFamily: "var(--font-display)" }}>
+                <p
+                  className="mt-4 text-lg"
+                  style={{ fontFamily: "var(--font-display)" }}
+                >
                   Citrus, honey biscuits, and slow mornings.
                 </p>
               </div>
@@ -318,7 +326,9 @@ export default function ProductDetail() {
                     <div className="flex items-center justify-between text-xs uppercase tracking-[0.3em] text-black/50">
                       <span>Customer</span>
                       <span className="text-[#FFBF00]">
-                        {Array.from({ length: r.rating || 0 }).map(() => "*").join("")}
+                        {Array.from({ length: r.rating || 0 })
+                          .map(() => "*")
+                          .join("")}
                       </span>
                     </div>
                     <p className="mt-3 text-sm text-black/60">{r.review}</p>

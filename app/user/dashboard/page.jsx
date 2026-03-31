@@ -57,7 +57,7 @@ export default function DashboardPage() {
 
   return (
     <>
-      <main className="min-h-screen bg-white text-black">
+      <main className="min-h-screen bg-white text-black mt-12">
         <section className="max-w-6xl mx-auto px-6 py-14">
           <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
             <div>
@@ -97,7 +97,9 @@ export default function DashboardPage() {
                   <p className="text-xs uppercase tracking-[0.3em] text-black/50">
                     Recent orders
                   </p>
-                  <h2 className="mt-2 text-xl font-semibold">Latest activity</h2>
+                  <h2 className="mt-2 text-xl font-semibold">
+                    Latest activity
+                  </h2>
                 </div>
                 <button className="rounded-full border border-black/60 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-black hover:border-black">
                   View all

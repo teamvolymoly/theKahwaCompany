@@ -4,7 +4,7 @@ import Link from "next/link";
 
 export default function AboutPage() {
   return (
-    <main className="min-h-screen bg-white text-black">
+    <main className="min-h-screen bg-white text-black mt-12">
       <section className="max-w-6xl mx-auto px-6 py-14">
         <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
           <div>
@@ -56,4 +56,3 @@ export default function AboutPage() {
     </main>
   );
 }
-

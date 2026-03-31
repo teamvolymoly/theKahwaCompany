@@ -4,7 +4,7 @@ import Link from "next/link";
 
 export default function PaymentSuccessPage() {
   return (
-    <main className="min-h-screen bg-white text-black">
+    <main className="min-h-screen bg-white text-black mt-12">
       <section className="max-w-3xl mx-auto px-6 py-24 text-center">
         <p className="text-xs uppercase tracking-[0.4em] text-black/60">
           Payment complete

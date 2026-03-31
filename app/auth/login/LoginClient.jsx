@@ -32,7 +32,7 @@ export default function LoginClient() {
 
   return (
     <>
-      <main className="min-h-screen bg-white text-black">
+      <main className="min-h-screen bg-white text-black mt-12">
         <section className="max-w-4xl mx-auto px-6 py-14 lg:py-20">
           <div className="grid gap-10 lg:grid-cols-[1.1fr_1fr]">
             <div>

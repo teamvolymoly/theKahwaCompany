@@ -22,6 +22,8 @@ export default function ShopClient() {
   const [priceRange, setPriceRange] = useState([0, 2000]);
   const [searchTerm, setSearchTerm] = useState("");
   const [sort, setSort] = useState("default");
+  const [openFilter, setOpenFilter] = useState("price");
+  const [sortOpen, setSortOpen] = useState(false);
   const categoryParam = useMemo(
     () => searchParams.get("category"),
     [searchParams],
@@ -110,9 +112,19 @@ export default function ShopClient() {
     setFilteredProducts(result);
   }, [selectedCategory, priceRange, searchTerm, sort, products]);
 
+  const handleClearFilters = () => {
+    setSelectedCategory(null);
+    setPriceRange([0, 2000]);
+    setSearchTerm("");
+  };
+
+  const toggleFilter = (key) => {
+    setOpenFilter((current) => (current === key ? null : key));
+  };
+
   return (
     <>
-      <section className="mt-20 mb-20 w-full h-[280px] ">
+      <section className="mt-12 mb-20 w-full h-[280px] ">
         <img
           src="/products/W7.png"
           alt="Adv_1"
@@ -122,27 +134,39 @@ export default function ShopClient() {
       <main className="container mx-auto bg-white text-black ">
         <div className="max-w-2xl mx-auto mb-8 flex flex-col items-center text-center justify-center gap-3">
           <p
-            className="text-3xl uppercase text-[#4e5a50] "
+            className="text-4xl uppercase text-[#4e5a50] "
             style={{ fontFamily: "var(--font-basker)" }}
           >
             All Products
           </p>
-          <p className="text-[#4e5a50] font-thin  max-w-xl">
+          <p className="text-[#4e5a50] font-thin text-md max-w-xl">
             Explore a wide range of wellness teas and natural supplements,
             combining traditional herbs with modern nutrition.
           </p>
         </div>
-        <div className="container mx-auto px-12 py-12">
-          <div className="flex gap-10">
+        <div className="container mx-auto px-4 sm:px-8 lg:px-12 py-12">
+          <div className="flex flex-col gap-10 lg:flex-row">
             {/* Sidebar Filters */}
-            <div className="w-72 hidden lg:block">
-              <h3 className="text-lg font-semibold text-[#4e5a50] mb-8">
-                Filters
-              </h3>
+            <div className="w-full lg:w-72">
+              <div className="flex items-center justify-between lg:justify-start lg:gap-6">
+                <h3 className="text-lg font-semibold text-[#4e5a50]">
+                  Filters
+                </h3>
+                <button
+                  onClick={handleClearFilters}
+                  className="text-xs font-semibold uppercase tracking-[0.2em] text-black/50 transition hover:text-black"
+                >
+                  Clear
+                </button>
+              </div>
 
-              <div className="space-y-6">
+              <div className="mt-6 space-y-6">
                 <div className="border-b border-black/10 pb-6">
-                  <div className="flex items-center justify-between text-sm font-semibold text-[#1c2230]">
+                  <button
+                    type="button"
+                    onClick={() => toggleFilter("price")}
+                    className="flex w-full items-center justify-between text-sm font-semibold text-[#1c2230]"
+                  >
                     <span>Price</span>
                     <svg
                       width="18"
@@ -150,7 +174,7 @@ export default function ShopClient() {
                       viewBox="0 0 24 24"
                       fill="none"
                       xmlns="http://www.w3.org/2000/svg"
-                      className="text-[#1c2230]"
+                      className={`text-[#1c2230] transition ${openFilter === "price" ? "rotate-180" : ""}`}
                     >
                       <path
                         d="M6 9l6 6 6-6"
@@ -160,27 +184,36 @@ export default function ShopClient() {
                         strokeLinejoin="round"
                       />
                     </svg>
-                  </div>
-                  <div className="mt-2">
-                    <input
-                      type="range"
-                      min="0"
-                      max="2000"
-                      value={priceRange[1]}
-                      onChange={(e) =>
-                        setPriceRange([priceRange[0], parseInt(e.target.value)])
-                      }
-                      className="w-full accent-[#6a716a] h-1"
-                    />
-                    <div className="flex justify-between text-xs mt-2 text-black/70">
-                      <span>₹{priceRange[0]}</span>
-                      <span>₹{priceRange[1]}</span>
+                  </button>
+                  {openFilter === "price" && (
+                    <div className="mt-2">
+                      <input
+                        type="range"
+                        min="0"
+                        max="2000"
+                        value={priceRange[1]}
+                        onChange={(e) =>
+                          setPriceRange([
+                            priceRange[0],
+                            parseInt(e.target.value),
+                          ])
+                        }
+                        className="w-full accent-[#6a716a] h-1"
+                      />
+                      <div className="mt-2 flex justify-between text-xs text-black/70">
+                        <span>₹{priceRange[0]}</span>
+                        <span>₹{priceRange[1]}</span>
+                      </div>
                     </div>
-                  </div>
+                  )}
                 </div>
 
                 <div className="border-b border-black/10 pb-6">
-                  <div className="flex items-center justify-between text-sm font-semibold text-[#1c2230]">
+                  <button
+                    type="button"
+                    onClick={() => toggleFilter("category")}
+                    className="flex w-full items-center justify-between text-sm font-semibold text-[#1c2230]"
+                  >
                     <span>Product Type</span>
                     <svg
                       width="18"
@@ -188,7 +221,7 @@ export default function ShopClient() {
                       viewBox="0 0 24 24"
                       fill="none"
                       xmlns="http://www.w3.org/2000/svg"
-                      className="text-[#1c2230]"
+                      className={`text-[#1c2230] transition ${openFilter === "category" ? "rotate-180" : ""}`}
                     >
                       <path
                         d="M6 9l6 6 6-6"
@@ -198,34 +231,42 @@ export default function ShopClient() {
                         strokeLinejoin="round"
                       />
                     </svg>
-                  </div>
-                  <div className="mt-4 space-y-2 text-sm text-black/70">
-                    {categories.map((c) => (
-                      <label
-                        key={c.id}
-                        className="flex items-center gap-2 cursor-pointer"
-                      >
-                        <input
-                          type="radio"
-                          name="category"
-                          checked={selectedCategory === c.id.toString()}
-                          onChange={() => setSelectedCategory(c.id.toString())}
-                          className="accent-[#6a716a]"
-                        />
-                        <span>{c.name}</span>
-                        <Link
-                          href={`/category/${c.slug || c.id}`}
-                          className="ml-auto text-[11px] text-black/40 underline"
+                  </button>
+                  {openFilter === "category" && (
+                    <div className="mt-4 space-y-2 text-sm text-black/70">
+                      {categories.map((c) => (
+                        <label
+                          key={c.id}
+                          className="flex items-center gap-2 cursor-pointer"
                         >
-                          View
-                        </Link>
-                      </label>
-                    ))}
-                  </div>
+                          <input
+                            type="radio"
+                            name="category"
+                            checked={selectedCategory === c.id.toString()}
+                            onChange={() =>
+                              setSelectedCategory(c.id.toString())
+                            }
+                            className="accent-[#6a716a]"
+                          />
+                          <span>{c.name}</span>
+                          <Link
+                            href={`/category/${c.slug || c.id}`}
+                            className="ml-auto text-[11px] text-black/40 underline"
+                          >
+                            View
+                          </Link>
+                        </label>
+                      ))}
+                    </div>
+                  )}
                 </div>
 
                 <div className="border-b border-black/10 pb-6">
-                  <div className="flex items-center justify-between text-sm font-semibold text-[#1c2230]">
+                  <button
+                    type="button"
+                    onClick={() => toggleFilter("form")}
+                    className="flex w-full items-center justify-between text-sm font-semibold text-[#1c2230]"
+                  >
                     <span>Form</span>
                     <svg
                       width="18"
@@ -233,7 +274,7 @@ export default function ShopClient() {
                       viewBox="0 0 24 24"
                       fill="none"
                       xmlns="http://www.w3.org/2000/svg"
-                      className="text-[#1c2230]"
+                      className={`text-[#1c2230] transition ${openFilter === "form" ? "rotate-180" : ""}`}
                     >
                       <path
                         d="M6 9l6 6 6-6"
@@ -243,14 +284,20 @@ export default function ShopClient() {
                         strokeLinejoin="round"
                       />
                     </svg>
-                  </div>
-                  <div className="mt-4 text-sm text-black/60">
-                    Loose Leaf, Tea Bags, Samplers
-                  </div>
+                  </button>
+                  {openFilter === "form" && (
+                    <div className="mt-4 text-sm text-black/60">
+                      Loose Leaf, Tea Bags, Samplers
+                    </div>
+                  )}
                 </div>
 
                 <div className="border-b border-black/10 pb-6">
-                  <div className="flex items-center justify-between text-sm font-semibold text-[#1c2230]">
+                  <button
+                    type="button"
+                    onClick={() => toggleFilter("caffeine")}
+                    className="flex w-full items-center justify-between text-sm font-semibold text-[#1c2230]"
+                  >
                     <span>Caffeine</span>
                     <svg
                       width="18"
@@ -258,7 +305,7 @@ export default function ShopClient() {
                       viewBox="0 0 24 24"
                       fill="none"
                       xmlns="http://www.w3.org/2000/svg"
-                      className="text-[#1c2230]"
+                      className={`text-[#1c2230] transition ${openFilter === "caffeine" ? "rotate-180" : ""}`}
                     >
                       <path
                         d="M6 9l6 6 6-6"
@@ -268,14 +315,20 @@ export default function ShopClient() {
                         strokeLinejoin="round"
                       />
                     </svg>
-                  </div>
-                  <div className="mt-4 text-sm text-black/60">
-                    Low, Medium, Caffeine Free
-                  </div>
+                  </button>
+                  {openFilter === "caffeine" && (
+                    <div className="mt-4 text-sm text-black/60">
+                      Low, Medium, Caffeine Free
+                    </div>
+                  )}
                 </div>
 
                 <div className="border-b border-black/10 pb-6">
-                  <div className="flex items-center justify-between text-sm font-semibold text-[#1c2230]">
+                  <button
+                    type="button"
+                    onClick={() => toggleFilter("collection")}
+                    className="flex w-full items-center justify-between text-sm font-semibold text-[#1c2230]"
+                  >
                     <span>Collection</span>
                     <svg
                       width="18"
@@ -283,7 +336,7 @@ export default function ShopClient() {
                       viewBox="0 0 24 24"
                       fill="none"
                       xmlns="http://www.w3.org/2000/svg"
-                      className="text-[#1c2230]"
+                      className={`text-[#1c2230] transition ${openFilter === "collection" ? "rotate-180" : ""}`}
                     >
                       <path
                         d="M6 9l6 6 6-6"
@@ -293,10 +346,12 @@ export default function ShopClient() {
                         strokeLinejoin="round"
                       />
                     </svg>
-                  </div>
-                  <div className="mt-4 text-sm text-black/60">
-                    Signature, Wellness, Gifts
-                  </div>
+                  </button>
+                  {openFilter === "collection" && (
+                    <div className="mt-4 text-sm text-black/60">
+                      Signature, Wellness, Gifts
+                    </div>
+                  )}
                 </div>
 
                 <div>
@@ -316,17 +371,20 @@ export default function ShopClient() {
 
             {/* Product Grid */}
             <div className="flex-1">
-              <div className="mb-8 flex items-center justify-between">
+              <div className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <p className="text-sm text-black/60">
                   Showing {filteredProducts.length} products
                 </p>
                 <div className="flex items-center gap-3 text-sm text-[#4e5a50]">
                   <span className="font-semibold">Sort By:</span>
-                  <div className="relative">
+                  <div className="relative group">
                     <select
                       value={sort}
                       onChange={(e) => setSort(e.target.value)}
-                      className="appearance-none bg-transparent pr-8  text-sm font-semibold text-[#1c2230] focus:outline-none"
+                      onFocus={() => setSortOpen(true)}
+                      onBlur={() => setSortOpen(false)}
+                      onMouseDown={() => setSortOpen(true)}
+                      className="appearance-none bg-transparent pr-8 text-sm font-semibold text-[#1c2230] focus:outline-none"
                     >
                       <option value="default">Default sorting</option>
                       <option value="price-low">Price: Low to High</option>
@@ -338,7 +396,7 @@ export default function ShopClient() {
                       viewBox="0 0 24 24"
                       fill="none"
                       xmlns="http://www.w3.org/2000/svg"
-                      className="pointer-events-none absolute right-0 top-1 text-[#1c2230]"
+                      className={`pointer-events-none absolute right-0 top-1 text-[#1c2230] transition-transform duration-200 ${sortOpen ? "rotate-180" : ""}`}
                     >
                       <path
                         d="M6 9l6 6 6-6"
@@ -352,7 +410,7 @@ export default function ShopClient() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {filteredProducts.map((p) => (
                   <ProductCard key={p.id} product={p} />
                 ))}
