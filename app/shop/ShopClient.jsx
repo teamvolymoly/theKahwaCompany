@@ -117,77 +117,220 @@ export default function ShopClient() {
           <div className="flex gap-10">
             {/* Sidebar Filters */}
             <div className="w-72 hidden lg:block">
-              <h3 className="font-semibold text-xl mb-6">Filters</h3>
+              <h3 className="text-lg font-semibold text-[#4e5a50] mb-8">
+                Filters
+              </h3>
 
-              <div className="mb-8">
-                <h4 className="uppercase tracking-widest text-black/60 mb-3">
-                  Categories
-                </h4>
-                {categories.map((c) => (
-                  <div key={c.id} className="flex items-center gap-2 mb-2">
-                    <label className="flex items-center gap-2 cursor-pointer">
-                      <input
-                        type="radio"
-                        name="category"
-                        checked={selectedCategory === c.id.toString()}
-                        onChange={() => setSelectedCategory(c.id.toString())}
-                      />
-                      <span className="text-black/80">{c.name}</span>
-                    </label>
-                    <Link
-                      href={`/category/${c.slug || c.id}`}
-                      className="text-xs text-black/60 underline"
+              <div className="space-y-6">
+                <div className="border-b border-black/10 pb-6">
+                  <div className="flex items-center justify-between text-sm font-semibold text-[#1c2230]">
+                    <span>Price</span>
+                    <svg
+                      width="18"
+                      height="18"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="text-[#1c2230]"
                     >
-                      View
-                    </Link>
+                      <path
+                        d="M6 9l6 6 6-6"
+                        stroke="currentColor"
+                        strokeWidth="1.5"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
                   </div>
-                ))}
-              </div>
+                  <div className="mt-4">
+                    <input
+                      type="range"
+                      min="0"
+                      max="2000"
+                      value={priceRange[1]}
+                      onChange={(e) =>
+                        setPriceRange([priceRange[0], parseInt(e.target.value)])
+                      }
+                      className="w-full accent-[#6a716a]"
+                    />
+                    <div className="flex justify-between text-xs mt-2 text-black/70">
+                      <span>₹{priceRange[0]}</span>
+                      <span>₹{priceRange[1]}</span>
+                    </div>
+                  </div>
+                </div>
 
-              <div className="mb-8">
-                <h4 className="uppercase tracking-widest text-black/60 mb-3">
-                  Price
-                </h4>
-                <input
-                  type="range"
-                  min="0"
-                  max="2000"
-                  value={priceRange[1]}
-                  onChange={(e) =>
-                    setPriceRange([priceRange[0], parseInt(e.target.value)])
-                  }
-                  className="w-full accent-black"
-                />
-                <div className="flex justify-between text-sm mt-2 text-black/70">
-                  <span>Rs.{priceRange[0]}</span>
-                  <span>Rs.{priceRange[1]}</span>
+                <div className="border-b border-black/10 pb-6">
+                  <div className="flex items-center justify-between text-sm font-semibold text-[#1c2230]">
+                    <span>Product Type</span>
+                    <svg
+                      width="18"
+                      height="18"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="text-[#1c2230]"
+                    >
+                      <path
+                        d="M6 9l6 6 6-6"
+                        stroke="currentColor"
+                        strokeWidth="1.5"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  </div>
+                  <div className="mt-4 space-y-2 text-sm text-black/70">
+                    {categories.map((c) => (
+                      <label
+                        key={c.id}
+                        className="flex items-center gap-2 cursor-pointer"
+                      >
+                        <input
+                          type="radio"
+                          name="category"
+                          checked={selectedCategory === c.id.toString()}
+                          onChange={() => setSelectedCategory(c.id.toString())}
+                          className="accent-[#6a716a]"
+                        />
+                        <span>{c.name}</span>
+                        <Link
+                          href={`/category/${c.slug || c.id}`}
+                          className="ml-auto text-[11px] text-black/40 underline"
+                        >
+                          View
+                        </Link>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="border-b border-black/10 pb-6">
+                  <div className="flex items-center justify-between text-sm font-semibold text-[#1c2230]">
+                    <span>Form</span>
+                    <svg
+                      width="18"
+                      height="18"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="text-[#1c2230]"
+                    >
+                      <path
+                        d="M6 9l6 6 6-6"
+                        stroke="currentColor"
+                        strokeWidth="1.5"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  </div>
+                  <div className="mt-4 text-sm text-black/60">
+                    Loose Leaf, Tea Bags, Samplers
+                  </div>
+                </div>
+
+                <div className="border-b border-black/10 pb-6">
+                  <div className="flex items-center justify-between text-sm font-semibold text-[#1c2230]">
+                    <span>Caffeine</span>
+                    <svg
+                      width="18"
+                      height="18"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="text-[#1c2230]"
+                    >
+                      <path
+                        d="M6 9l6 6 6-6"
+                        stroke="currentColor"
+                        strokeWidth="1.5"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  </div>
+                  <div className="mt-4 text-sm text-black/60">
+                    Low, Medium, Caffeine Free
+                  </div>
+                </div>
+
+                <div className="border-b border-black/10 pb-6">
+                  <div className="flex items-center justify-between text-sm font-semibold text-[#1c2230]">
+                    <span>Collection</span>
+                    <svg
+                      width="18"
+                      height="18"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="text-[#1c2230]"
+                    >
+                      <path
+                        d="M6 9l6 6 6-6"
+                        stroke="currentColor"
+                        strokeWidth="1.5"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  </div>
+                  <div className="mt-4 text-sm text-black/60">
+                    Signature, Wellness, Gifts
+                  </div>
+                </div>
+
+                <div>
+                  <div className="text-sm font-semibold text-[#1c2230]">
+                    Search
+                  </div>
+                  <input
+                    type="text"
+                    placeholder="Search teas..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="mt-3 w-full border-b border-black/20 px-1 py-2 text-sm outline-none placeholder:text-black/40"
+                  />
                 </div>
               </div>
-
-              <input
-                type="text"
-                placeholder="Search teas..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full rounded-full border border-black/20 px-5 py-3"
-              />
             </div>
 
             {/* Product Grid */}
             <div className="flex-1">
-              <div className="flex justify-between items-center mb-8">
-                <p className="text-black/70">
+              <div className="mb-8 flex items-center justify-between">
+                <p className="text-sm text-black/60">
                   Showing {filteredProducts.length} products
                 </p>
-                <select
-                  value={sort}
-                  onChange={(e) => setSort(e.target.value)}
-                  className="border border-black/20 rounded-full px-5 py-2"
-                >
-                  <option value="default">Default sorting</option>
-                  <option value="price-low">Price: Low to High</option>
-                  <option value="price-high">Price: High to Low</option>
-                </select>
+                <div className="flex items-center gap-3 text-sm text-[#4e5a50]">
+                  <span className="font-semibold">Sort By:</span>
+                  <div className="relative">
+                    <select
+                      value={sort}
+                      onChange={(e) => setSort(e.target.value)}
+                      className="appearance-none border-b border-black/20 bg-transparent pr-8 pb-1 text-sm font-semibold text-[#1c2230] focus:outline-none"
+                    >
+                      <option value="default">Default sorting</option>
+                      <option value="price-low">Price: Low to High</option>
+                      <option value="price-high">Price: High to Low</option>
+                    </select>
+                    <svg
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="pointer-events-none absolute right-0 top-1 text-[#1c2230]"
+                    >
+                      <path
+                        d="M6 9l6 6 6-6"
+                        stroke="currentColor"
+                        strokeWidth="1.5"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  </div>
+                </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-8">
