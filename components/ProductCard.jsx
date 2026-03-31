@@ -23,13 +23,13 @@ export default function ProductCard({ product }) {
   };
 
   return (
-    <article className="group flex h-full flex-col overflow-hidden py-4 rounded-sm bg-[#fafafa]  transition hover:-translate-y-1">
+    <article className="group flex h-full flex-col overflow-hidden py-4 rounded-sm bg-[#fafafa] ">
       <div className="flex flex-1 flex-col p-6 pb-4 text-center">
         <Link
           href={`/product/${slugOrId}`}
           className="relative block overflow-hidden rounded-sm"
         >
-          <div className="flex h-50 w-50 items-center justify-center">
+          <div className="flex h-auto w-full items-center justify-center">
             <img
               src={
                 product.images?.[0]?.image_url ||
