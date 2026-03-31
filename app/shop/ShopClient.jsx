@@ -148,13 +148,13 @@ export default function ShopClient() {
           <div className="flex flex-col gap-10 lg:flex-row">
             {/* Sidebar Filters */}
             <div className="w-full lg:w-72">
-              <div className="flex items-center justify-between lg:justify-start lg:gap-6">
+              <div className="flex items-center justify-between lg:gap-6">
                 <h3 className="text-lg font-semibold text-[#4e5a50]">
                   Filters
                 </h3>
                 <button
                   onClick={handleClearFilters}
-                  className="text-xs font-semibold uppercase tracking-[0.2em] text-black/50 transition hover:text-black"
+                  className="text-xs font-semibold uppercase tracking-[0.05em] text-black/50 transition hover:text-black"
                 >
                   Clear
                 </button>
