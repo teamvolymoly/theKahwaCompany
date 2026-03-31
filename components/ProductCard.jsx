@@ -31,7 +31,7 @@ export default function ProductCard({ product }) {
             {product.badge}
           </span>
         )}
-        <div className="flex h-44 items-center justify-center">
+        <div className="flex h-70 items-center justify-center">
           <img
             src={
               product.images?.[0]?.image_url ||
@@ -39,7 +39,7 @@ export default function ProductCard({ product }) {
               "/products/W1.png"
             }
             alt={product.name}
-            className="h-40 w-auto object-contain transition duration-300 group-hover:scale-[1.04]"
+            className="h-full w-auto object-contain object-center transition duration-300 group-hover:scale-[1.04]"
           />
         </div>
         <h3 className="text-base font-semibold text-black line-clamp-2">
