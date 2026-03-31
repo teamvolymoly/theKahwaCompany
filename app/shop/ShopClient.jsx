@@ -326,7 +326,7 @@ export default function ShopClient() {
                     <select
                       value={sort}
                       onChange={(e) => setSort(e.target.value)}
-                      className="appearance-none border-b border-black/20 bg-transparent pr-8 pb-1 text-sm font-semibold text-[#1c2230] focus:outline-none"
+                      className="appearance-none bg-transparent pr-8  text-sm font-semibold text-[#1c2230] focus:outline-none"
                     >
                       <option value="default">Default sorting</option>
                       <option value="price-low">Price: Low to High</option>
