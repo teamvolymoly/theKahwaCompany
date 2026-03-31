@@ -371,7 +371,7 @@ export default function ShopClient() {
 
             {/* Product Grid */}
             <div className="flex-1">
-              <div className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div className="mb-8 mt-[2px] flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <p className="text-sm text-black/60">
                   Showing {filteredProducts.length} products
                 </p>
