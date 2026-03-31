@@ -21,10 +21,10 @@ export default function ProductCard({ product }) {
   };
 
   return (
-    <article className="group rounded-2xl border border-black/10 bg-white p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-2xl">
+    <article className="group rounded-sm  bg-white p-5 transition hover:-translate-y-1 ">
       <Link
         href={`/product/${slugOrId}`}
-        className="relative block overflow-hidden rounded-2xl bg-[#f7f7f7] p-4"
+        className="relative block overflow-hidden rounded-sm bg-[#f7f7f7] p-4"
       >
         {product.badge && (
           <span className="absolute left-0 top-0 rounded-md bg-[#FFBF00] px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-black">

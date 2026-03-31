@@ -216,96 +216,96 @@ export default function NewHeader() {
                 </Link>
               </div>
 
-            {/* Search, login/profile, cart */}
-            <div className="flex items-center gap-3 lg:gap-4">
-              <button
-                type="button"
-                className="hidden sm:inline-flex items-center justify-center cursor-pointer"
-                aria-label="Search"
-              >
-                <img
-                  src="/icons/search.svg"
-                  className="h-8 w-8 lg:h-9 lg:w-9"
-                  alt="Search"
-                />
-              </button>
-
-              <div
-                className="relative hidden sm:flex items-center"
-                ref={profileRef}
-                onMouseEnter={() => {
-                  if (isAuthenticated) setIsProfileOpen(true);
-                }}
-                onMouseLeave={() => setIsProfileOpen(false)}
-              >
+              {/* Search, login/profile, cart */}
+              <div className="flex items-center gap-3 lg:gap-4">
                 <button
                   type="button"
-                  className="inline-flex items-center gap-2 py-2 cursor-pointer"
-                  aria-expanded={isProfileOpen}
-                  aria-haspopup={isAuthenticated ? "menu" : undefined}
-                  onClick={() => {
-                    if (!isAuthenticated) {
-                      router.push("/auth/login");
-                      return;
-                    }
-                    setIsProfileOpen((prev) => !prev);
-                  }}
+                  className="hidden sm:inline-flex items-center justify-center cursor-pointer"
+                  aria-label="Search"
                 >
                   <img
-                    src="/icons/user.svg"
+                    src="/icons/search.svg"
                     className="h-8 w-8 lg:h-9 lg:w-9"
-                    alt="Profile"
+                    alt="Search"
                   />
                 </button>
-                {isAuthenticated ? (
-                  <div
-                    className={`absolute right-0 top-full z-40 w-44 rounded-xl border border-gray-200 bg-white shadow-xl transition ${
-                      isProfileOpen
-                        ? "visible opacity-100"
-                        : "invisible opacity-0"
-                    }`}
-                  >
-                    <div className="py-2 text-sm text-gray-700">
-                      <Link
-                        href="/user/profile"
-                        className="block px-4 py-2 hover:bg-gray-50"
-                      >
-                        Profile
-                      </Link>
-                      <Link
-                        href="/user/dashboard"
-                        className="block px-4 py-2 hover:bg-gray-50"
-                      >
-                        Dashboard
-                      </Link>
-                      <button
-                        type="button"
-                        onClick={handleLogout}
-                        disabled={isLoggingOut || authLoading}
-                        className="block w-full px-4 py-2 text-left hover:bg-gray-50 disabled:opacity-70 text-red-600"
-                      >
-                        {isLoggingOut ? "Logging out..." : "Logout"}
-                      </button>
-                    </div>
-                  </div>
-                ) : null}
-              </div>
 
-              <Link
-                href="/cart"
-                className="relative inline-flex items-center justify-center cursor-pointer"
-                aria-label="Cart"
-              >
-                <img
-                  src="/icons/shop.svg"
-                  className="h-8 w-8 lg:h-9 lg:w-9"
-                  alt="Cart"
-                />
-                <span className="absolute -right-1 -top-1 flex h-5 min-w-[20px] items-center justify-center rounded-full bg-[#FFBF00] px-1 text-[10px] font-semibold text-black">
-                  {cartCount}
-                </span>
-              </Link>
-            </div>
+                <div
+                  className="relative hidden sm:flex items-center"
+                  ref={profileRef}
+                  onMouseEnter={() => {
+                    if (isAuthenticated) setIsProfileOpen(true);
+                  }}
+                  onMouseLeave={() => setIsProfileOpen(false)}
+                >
+                  <button
+                    type="button"
+                    className="inline-flex items-center gap-2 py-2 cursor-pointer"
+                    aria-expanded={isProfileOpen}
+                    aria-haspopup={isAuthenticated ? "menu" : undefined}
+                    onClick={() => {
+                      if (!isAuthenticated) {
+                        router.push("/auth/login");
+                        return;
+                      }
+                      setIsProfileOpen((prev) => !prev);
+                    }}
+                  >
+                    <img
+                      src="/icons/user.svg"
+                      className="h-8 w-8 lg:h-9 lg:w-9"
+                      alt="Profile"
+                    />
+                  </button>
+                  {isAuthenticated ? (
+                    <div
+                      className={`absolute right-0 top-full z-40 w-44 rounded-xl border border-gray-200 bg-white shadow-xl transition ${
+                        isProfileOpen
+                          ? "visible opacity-100"
+                          : "invisible opacity-0"
+                      }`}
+                    >
+                      <div className="py-2 text-sm text-gray-700">
+                        <Link
+                          href="/user/profile"
+                          className="block px-4 py-2 hover:bg-gray-50"
+                        >
+                          Profile
+                        </Link>
+                        <Link
+                          href="/user/dashboard"
+                          className="block px-4 py-2 hover:bg-gray-50"
+                        >
+                          Dashboard
+                        </Link>
+                        <button
+                          type="button"
+                          onClick={handleLogout}
+                          disabled={isLoggingOut || authLoading}
+                          className="block w-full px-4 py-2 text-left hover:bg-gray-50 disabled:opacity-70 text-red-600"
+                        >
+                          {isLoggingOut ? "Logging out..." : "Logout"}
+                        </button>
+                      </div>
+                    </div>
+                  ) : null}
+                </div>
+
+                <Link
+                  href="/cart"
+                  className="relative inline-flex items-center justify-center cursor-pointer"
+                  aria-label="Cart"
+                >
+                  <img
+                    src="/icons/shop.svg"
+                    className="h-8 w-8 lg:h-9 lg:w-9"
+                    alt="Cart"
+                  />
+                  <span className="absolute -right-1 -top-1 flex h-5 min-w-[20px] items-center justify-center rounded-full bg-[#FFBF00] px-1 text-[10px] font-semibold text-black">
+                    {cartCount}
+                  </span>
+                </Link>
+              </div>
             </div>
 
             <div
@@ -315,13 +315,13 @@ export default function NewHeader() {
             >
               <div className="border-t border-gray-200 py-4">
                 <nav className="flex flex-col gap-4 text-sm font-medium">
-                <Link
-                  href="/"
-                  className="hover:text-gray-700"
-                  onClick={closeShopDropdown}
-                >
-                  Home
-                </Link>
+                  <Link
+                    href="/"
+                    className="hover:text-gray-700"
+                    onClick={closeShopDropdown}
+                  >
+                    Home
+                  </Link>
                   <details className="group">
                     <summary className="flex cursor-pointer list-none items-center justify-between hover:text-gray-700">
                       Shop
@@ -426,49 +426,49 @@ export default function NewHeader() {
                       </Link>
                     </div>
                   </details>
-                {!loading && isAuthenticated ? (
-                  <div className="pt-4 border-t border-gray-200">
-                    <Link
-                      href="/user/profile"
-                      className="block py-2 text-gray-700 hover:text-gray-900"
-                    >
-                      Profile
-                    </Link>
-                    <Link
-                      href="/user/dashboard"
-                      className="block py-2 text-gray-700 hover:text-gray-900"
-                    >
-                      Dashboard
-                    </Link>
-                    <button
-                      type="button"
-                      onClick={handleLogout}
-                      disabled={isLoggingOut || authLoading}
-                      className="w-full text-left py-2 text-red-600 disabled:opacity-70"
-                    >
-                      {isLoggingOut ? "Logging out..." : "Logout"}
-                    </button>
-                  </div>
-                ) : null}
+                  {!loading && isAuthenticated ? (
+                    <div className="pt-4 border-t border-gray-200">
+                      <Link
+                        href="/user/profile"
+                        className="block py-2 text-gray-700 hover:text-gray-900"
+                      >
+                        Profile
+                      </Link>
+                      <Link
+                        href="/user/dashboard"
+                        className="block py-2 text-gray-700 hover:text-gray-900"
+                      >
+                        Dashboard
+                      </Link>
+                      <button
+                        type="button"
+                        onClick={handleLogout}
+                        disabled={isLoggingOut || authLoading}
+                        className="w-full text-left py-2 text-red-600 disabled:opacity-70"
+                      >
+                        {isLoggingOut ? "Logging out..." : "Logout"}
+                      </button>
+                    </div>
+                  ) : null}
                 </nav>
               </div>
             </div>
           </div>
           {/* Dropdown Menu  */}
-        <div
-          className={` w-full bg-gray-200 transition duration-150 ${
-            isShopOpen ? "block" : "hidden"
-          }`}
-          style={{ position: "relative", zIndex: 20 }}
-        >
-          <div className=" border border-gray-200 bg-white shadow-xl">
-              <div className="px-10 py-8">
+          <div
+            className={` w-full bg-gray-200 transition duration-150 ${
+              isShopOpen ? "block" : "hidden"
+            }`}
+            style={{ position: "relative", zIndex: 20 }}
+          >
+            <div className=" border border-gray-200 bg-white shadow-xl">
+              <div className="max-w-7xl mx-auto px-10 py-8">
                 <div className=" flex flex-col gap-10 lg:flex-row">
                   <div className="flex-1 max-h-[360px] overflow-y-auto pr-4">
                     <div className="grid grid-cols-2 gap-8 text-sm">
                       {shopLinks.map((group) => (
                         <div key={group.label}>
-                          <p className="mb-4 text-base font-semibold">
+                          <p className="mb-4 text-base font-semibold text-gray-900">
                             {group.label}
                           </p>
                           <ul className="space-y-2 text-gray-700">
@@ -488,37 +488,21 @@ export default function NewHeader() {
                       ))}
                     </div>
                   </div>
-                  <div className="w-full shrink-0 lg:w-[420px]">
-                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-2">
-                      <Link
-                        href="/shop?search=kashmiri-kahwa"
-                        className="overflow-hidden rounded-xl border border-gray-200"
-                        onClick={closeShopDropdown}
-                      >
-                        <img
-                          src="/products/W1.png"
-                          alt="Kashmiri Kahwa"
-                          className="h-40 w-full object-cover"
-                        />
-                        <div className="px-4 py-3 text-sm font-semibold">
-                          Bestsellers
-                        </div>
-                      </Link>
-                      <Link
-                        href="/shop?search=sampler"
-                        className="overflow-hidden rounded-xl border border-gray-200"
-                        onClick={closeShopDropdown}
-                      >
-                        <img
-                          src="/products/W2.png"
-                          alt="Sampler set"
-                          className="h-40 w-full object-cover"
-                        />
-                        <div className="px-4 py-3 text-sm font-semibold">
-                          Samplers
-                        </div>
-                      </Link>
-                    </div>
+                  <div className="w-full shrink-0 lg:w-[340px]">
+                    <p className="mb-5 text-base font-semibold text-gray-900">
+                      Bestsellers
+                    </p>
+                    <Link
+                      href="/shop?search=kashmiri-kahwa"
+                      className="relative block w-[340px] h-[340px] overflow-hidden rounded-sm"
+                      onClick={closeShopDropdown}
+                    >
+                      <img
+                        src="/products/amazon/Resizing_Amazon5.png"
+                        alt="Kashmiri Kahwa"
+                        className="h-full w-full object-cover transition-transform duration-300 hover:scale-105 "
+                      />
+                    </Link>
                   </div>
                 </div>
               </div>
