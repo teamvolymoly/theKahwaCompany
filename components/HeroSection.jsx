@@ -17,7 +17,7 @@ const ITEMS = [
 const GALLERY_ITEMS = [...ITEMS, ...ITEMS, ...ITEMS];
 const COUNT = GALLERY_ITEMS.length;
 
-export default function AnimGsapPage() {
+export default function HeroSection() {
   const containerRef = useRef(null);
   const cardsRef = useRef([]);
 

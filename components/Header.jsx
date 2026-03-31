@@ -192,7 +192,7 @@ export default function Header() {
                   </Link>
 
                   <div
-                    className={`absolute left-1/2 top-8 z-40 w-[95vw] -translate-x-[45%] transition duration-150 ${
+                    className={`absolute -left-22 top-8 z-40 w-[95vw]  transition duration-150 ${
                       isShopOpen ? "visible opacity-100" : "invisible opacity-0"
                     }`}
                   >

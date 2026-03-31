@@ -9,6 +9,7 @@ import { useEffect, useState } from "react";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
+import HeroSection from "@/components/HeroSection";
 
 const toSlug = (value) =>
   value
@@ -170,8 +171,9 @@ export default function Home() {
   return (
     <>
       <main>
-        {/* Hero Section  */}
-        <section id="home" className="w-full">
+        <HeroSection />
+        {/* Hero Section old */}
+        {/* <section id="home" className="w-full">
           <Swiper
             modules={[Navigation, Pagination, EffectFade, Autoplay]}
             slidesPerView={1}
@@ -225,7 +227,7 @@ export default function Home() {
               </SwiperSlide>
             ))}
           </Swiper>
-        </section>
+        </section> */}
 
         {/* About Kahwa Section */}
         <section
