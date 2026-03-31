@@ -55,6 +55,7 @@ export default function NewHeader() {
   const profileRef = useRef(null);
   const { isAuthenticated, user, loading, authLoading, logout } = useAuth();
   const [cartCount, setCartCount] = useState(0);
+  const closeShopDropdown = () => setIsShopOpen(false);
 
   const handleLogout = async () => {
     setIsLoggingOut(true);
@@ -157,20 +158,12 @@ export default function NewHeader() {
           } ${isHome ? "backdrop-blur-sm" : ""}`}
         >
           {isHome && (
-            <>
-              <div
-                className={`pointer-events-none absolute inset-0 backdrop-blur-md transition-opacity duration-200 ${
-                  isShopOpen ? "opacity-100" : "opacity-0"
-                }`}
-                style={{ zIndex: 1 }}
-              />
-              <div
-                className={`pointer-events-none absolute inset-0 bg-white transition-transform duration-350 ease-out origin-left ${
-                  isShopOpen ? "scale-x-100 opacity-100" : "scale-x-0 opacity-0"
-                }`}
-                style={{ zIndex: 2 }}
-              />
-            </>
+            <div
+              className={`pointer-events-none absolute inset-0 bg-white ${
+                isShopOpen ? "opacity-100" : "opacity-0"
+              }`}
+              style={{ zIndex: 1 }}
+            />
           )}
           <div className="relative z-10 container mx-auto px-4 lg:px-8">
             <div className="relative flex items-center justify-between py-4 lg:py-4">
@@ -223,8 +216,20 @@ export default function NewHeader() {
                 </Link>
               </div>
 
-              {/* Search and profile/cart icons  */}
-              <div className="flex items-center gap-3 lg:gap-4">
+            {/* Search, login/profile, cart */}
+            <div className="flex items-center gap-3 lg:gap-4">
+              <button
+                type="button"
+                className="hidden sm:inline-flex items-center justify-center cursor-pointer"
+                aria-label="Search"
+              >
+                <img
+                  src="/icons/search.svg"
+                  className="h-8 w-8 lg:h-9 lg:w-9"
+                  alt="Search"
+                />
+              </button>
+
               <div
                 className="relative hidden sm:flex items-center"
                 ref={profileRef}
@@ -285,33 +290,22 @@ export default function NewHeader() {
                   </div>
                 ) : null}
               </div>
-                <Link
-                  href="/cart"
-                  className="relative inline-flex items-center justify-center cursor-pointer"
-                  aria-label="Cart"
-                >
-                  <img
-                    src="/icons/shop.svg"
-                    className="h-8 w-8 lg:h-9 lg:w-9"
-                    alt="Cart"
-                  />
-                  <span className="absolute -right-1 -top-1 flex h-5 min-w-[20px] items-center justify-center rounded-full bg-[#FFBF00] px-1 text-[10px] font-semibold text-black">
-                    {cartCount}
-                  </span>
-                </Link>
 
-                <button
-                  type="button"
-                  className="hidden sm:inline-flex items-center justify-center cursor-pointer"
-                  aria-label="Search"
-                >
-                  <img
-                    src="/icons/search.svg"
-                    className="h-8 w-8 lg:h-9 lg:w-9"
-                    alt="Search"
-                  />
-                </button>
-              </div>
+              <Link
+                href="/cart"
+                className="relative inline-flex items-center justify-center cursor-pointer"
+                aria-label="Cart"
+              >
+                <img
+                  src="/icons/shop.svg"
+                  className="h-8 w-8 lg:h-9 lg:w-9"
+                  alt="Cart"
+                />
+                <span className="absolute -right-1 -top-1 flex h-5 min-w-[20px] items-center justify-center rounded-full bg-[#FFBF00] px-1 text-[10px] font-semibold text-black">
+                  {cartCount}
+                </span>
+              </Link>
+            </div>
             </div>
 
             <div
@@ -321,9 +315,13 @@ export default function NewHeader() {
             >
               <div className="border-t border-gray-200 py-4">
                 <nav className="flex flex-col gap-4 text-sm font-medium">
-                  <Link href="/" className="hover:text-gray-700">
-                    Home
-                  </Link>
+                <Link
+                  href="/"
+                  className="hover:text-gray-700"
+                  onClick={closeShopDropdown}
+                >
+                  Home
+                </Link>
                   <details className="group">
                     <summary className="flex cursor-pointer list-none items-center justify-between hover:text-gray-700">
                       Shop
@@ -339,7 +337,11 @@ export default function NewHeader() {
                       <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">
                         Bestsellers
                       </p>
-                      <Link href="/shop" className="hover:text-gray-900">
+                      <Link
+                        href="/shop"
+                        className="hover:text-gray-900"
+                        onClick={closeShopDropdown}
+                      >
                         Samplers
                       </Link>
                       <p className="pt-2 text-xs font-semibold uppercase tracking-wide text-gray-500">
@@ -350,6 +352,7 @@ export default function NewHeader() {
                           key={item}
                           href={`/shop?category=${toCategoryParam(item)}`}
                           className="hover:text-gray-900"
+                          onClick={closeShopDropdown}
                         >
                           {item}
                         </Link>
@@ -362,6 +365,7 @@ export default function NewHeader() {
                           key={item}
                           href={`/shop?category=${toCategoryParam(item)}`}
                           className="hover:text-gray-900"
+                          onClick={closeShopDropdown}
                         >
                           {item}
                         </Link>
@@ -374,6 +378,7 @@ export default function NewHeader() {
                           key={item}
                           href={`/shop?category=${toCategoryParam(item)}`}
                           className="hover:text-gray-900"
+                          onClick={closeShopDropdown}
                         >
                           {item}
                         </Link>
@@ -472,6 +477,7 @@ export default function NewHeader() {
                                 <Link
                                   href={`/shop?category=${toCategoryParam(item)}`}
                                   className="hover:text-gray-900"
+                                  onClick={closeShopDropdown}
                                 >
                                   {item}
                                 </Link>
@@ -487,6 +493,7 @@ export default function NewHeader() {
                       <Link
                         href="/shop?search=kashmiri-kahwa"
                         className="overflow-hidden rounded-xl border border-gray-200"
+                        onClick={closeShopDropdown}
                       >
                         <img
                           src="/products/W1.png"
@@ -500,6 +507,7 @@ export default function NewHeader() {
                       <Link
                         href="/shop?search=sampler"
                         className="overflow-hidden rounded-xl border border-gray-200"
+                        onClick={closeShopDropdown}
                       >
                         <img
                           src="/products/W2.png"
