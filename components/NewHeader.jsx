@@ -462,7 +462,7 @@ export default function NewHeader() {
             style={{ position: "relative", zIndex: 20 }}
           >
             <div className=" border border-gray-200 bg-white shadow-xl">
-              <div className="max-w-7xl mx-auto px-10 py-8">
+              <div className="container mx-auto px-4 px-10 py-8">
                 <div className=" flex flex-col gap-10 lg:flex-row">
                   <div className="flex-1 max-h-[360px] overflow-y-auto pr-4">
                     <div className="grid grid-cols-2 gap-8 text-sm">
