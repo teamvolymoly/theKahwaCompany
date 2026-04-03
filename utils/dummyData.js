@@ -58,8 +58,7 @@ export const dummyProducts = [
     image: "/products/tin/BLTIN1.png",
     images: [
       { id: 1, image_url: "/products/tin/BLTIN1.png" },
-      { id: 2, image_url: "/products/W1.png" },
-      { id: 3, image_url: "/products/W2.png" },
+      { id: 2, image_url: "/products/packets/17.png" },
     ],
     variants: [
       { id: 1001, variant_name: "30 Bags", price: 499 },
@@ -80,7 +79,7 @@ export const dummyProducts = [
     image: "/products/tin/HLTIN1.png",
     images: [
       { id: 4, image_url: "/products/tin/HLTIN1.png" },
-      { id: 5, image_url: "/products/W3.png" },
+      { id: 5, image_url: "/products/packets/15.png" },
     ],
     variants: [
       { id: 1003, variant_name: "100g Tin", price: 525 },
@@ -101,7 +100,7 @@ export const dummyProducts = [
     image: "/products/tin/OTTIN1.png",
     images: [
       { id: 6, image_url: "/products/tin/OTTIN1.png" },
-      { id: 7, image_url: "/products/W4.png" },
+      { id: 7, image_url: "/products/packets/13.png" },
     ],
     variants: [{ id: 1005, variant_name: "100g Tin", price: 475 }],
   },
@@ -119,7 +118,7 @@ export const dummyProducts = [
     image: "/products/tin/KLTIN1.png",
     images: [
       { id: 8, image_url: "/products/tin/KLTIN1.png" },
-      { id: 9, image_url: "/products/W5.png" },
+      { id: 9, image_url: "/products/packets/18.png" },
     ],
     variants: [{ id: 1006, variant_name: "Sampler Box", price: 799 }],
   },
@@ -136,7 +135,7 @@ export const dummyProducts = [
     image: "/products/tin/MLTIN1.png",
     images: [
       { id: 10, image_url: "/products/tin/MLTIN1.png" },
-      { id: 11, image_url: "/products/W2.png" },
+      { id: 11, image_url: "/products/packets/12.png" },
     ],
     variants: [{ id: 1007, variant_name: "75g Tin", price: 459 }],
   },

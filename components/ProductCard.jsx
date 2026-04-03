@@ -7,6 +7,23 @@ export default function ProductCard({ product }) {
   const slugOrId = product.slug || product.id;
   const rating = Number.isFinite(product.rating) ? product.rating : 4;
   const fullStars = Math.max(0, Math.min(5, Math.round(rating)));
+  const hoverFallbacks = [
+    "/products/packets/11.png",
+    "/products/packets/12.png",
+    "/products/packets/13.png",
+    "/products/packets/14.png",
+    "/products/packets/15.png",
+    "/products/packets/16.png",
+    "/products/packets/17.png",
+    "/products/packets/18.png",
+    "/products/packets/19.png",
+    "/products/packets/20.png",
+  ];
+  const primaryImage =
+    product.images?.[0]?.image_url || product.image || "/products/W1.png";
+  const secondaryImage =
+    product.images?.[1]?.image_url ||
+    hoverFallbacks[Number(product.id) % hoverFallbacks.length];
   const handleAddToCart = async () => {
     try {
       await apiFetch("/cart", {
@@ -29,15 +46,16 @@ export default function ProductCard({ product }) {
           href={`/product/${slugOrId}`}
           className="relative block overflow-hidden rounded-sm"
         >
-          <div className="flex h-auto w-[70%] mx-auto items-center justify-center">
+          <div className="relative flex h-auto w-[70%] mx-auto items-center justify-center">
             <img
-              src={
-                product.images?.[0]?.image_url ||
-                product.image ||
-                "/products/W1.png"
-              }
+              src={primaryImage}
               alt={product.name}
-              className="h-full w-full w-auto object-contain object-center transition duration-300 group-hover:scale-[1.04]"
+              className="h-full w-auto object-contain object-center transition duration-300 group-hover:opacity-0"
+            />
+            <img
+              src={secondaryImage}
+              alt={`${product.name} alternate`}
+              className="absolute inset-0 mx-auto h-full w-auto object-contain object-center opacity-0 transition duration-300 group-hover:opacity-100"
             />
           </div>
         </Link>
