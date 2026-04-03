@@ -217,6 +217,8 @@ export default function AccountClient() {
   const [loginForm, setLoginForm] = useState({ email: "", password: "" });
   const [loginSuccess, setLoginSuccess] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
+  const [loginErrors, setLoginErrors] = useState({});
+  const [rememberMeLetter, setRememberMeLetter] = useState(false);
 
   const [registerForm, setRegisterForm] = useState({
     name: "",
@@ -230,6 +232,7 @@ export default function AccountClient() {
   const [registerLoading, setRegisterLoading] = useState(false);
   const [registerError, setRegisterError] = useState("");
   const [registerSuccess, setRegisterSuccess] = useState("");
+  const [registerErrors, setRegisterErrors] = useState({});
 
   const onLoginChange = (e) => {
     const { name, value } = e.target;
@@ -247,11 +250,24 @@ export default function AccountClient() {
       }));
       return;
     }
+    if (name === "phone") {
+      const digitsOnly = value.replace(/\D/g, "").slice(0, 15);
+      setRegisterForm((prev) => ({ ...prev, phone: digitsOnly }));
+      return;
+    }
     setRegisterForm((prev) => ({ ...prev, [name]: value }));
   };
 
   const onLoginSubmit = async (e) => {
     e.preventDefault();
+    const nextErrors = {};
+    const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(loginForm.email);
+    if (!emailOk) nextErrors.email = "Enter a valid email address.";
+    if (!loginForm.password || loginForm.password.length < 8) {
+      nextErrors.password = "Password must be at least 8 characters.";
+    }
+    setLoginErrors(nextErrors);
+    if (Object.keys(nextErrors).length > 0) return;
     setLoginSuccess("");
     const result = await login({
       email: loginForm.email,
@@ -265,6 +281,24 @@ export default function AccountClient() {
 
   const onRegisterSubmit = async (e) => {
     e.preventDefault();
+    const nextErrors = {};
+    if (!registerForm.name || registerForm.name.trim().length < 2) {
+      nextErrors.name = "Name must be at least 2 characters.";
+    }
+    const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(registerForm.email);
+    if (!emailOk) nextErrors.email = "Enter a valid email address.";
+    const phoneOk = /^[0-9]{8,15}$/.test(registerForm.phone);
+    if (!phoneOk) {
+      nextErrors.phone = "Please enter a phone number with 8 to 15 digits";
+    }
+    if (!registerForm.password || registerForm.password.length < 8) {
+      nextErrors.password = "Password must be at least 8 characters.";
+    }
+    if (registerForm.password_confirmation !== registerForm.password) {
+      nextErrors.password_confirmation = "Passwords do not match.";
+    }
+    setRegisterErrors(nextErrors);
+    if (Object.keys(nextErrors).length > 0) return;
     setRegisterError("");
     setRegisterSuccess("");
     setRegisterLoading(true);
@@ -313,7 +347,7 @@ export default function AccountClient() {
           </h1>
         </div>
 
-        <div className="mt-12 grid lg:grid-cols-2 ">
+        <div className="mt-12 grid lg:grid-cols-2 gap-10 md:gap-0">
           <div className="lg:pr-14">
             <h2 className="text-2xl font-semibold text-[#4e5a50]">Login</h2>
             <form onSubmit={onLoginSubmit} className="mt-6 space-y-5">
@@ -330,6 +364,11 @@ export default function AccountClient() {
                   className="mt-2 w-full rounded-sm border border-black/15 px-4 py-3 text-sm outline-none focus:border-[#4e5a50]"
                   placeholder="Enter your email address..."
                 />
+                {loginErrors.email && (
+                  <p className="mt-2 text-xs text-red-600">
+                    {loginErrors.email}
+                  </p>
+                )}
               </div>
 
               <div>
@@ -345,6 +384,11 @@ export default function AccountClient() {
                   className="mt-2 w-full rounded-sm border border-black/15 px-4 py-3 text-sm outline-none focus:border-[#4e5a50]"
                   placeholder="Enter your password..."
                 />
+                {loginErrors.password && (
+                  <p className="mt-2 text-xs text-red-600">
+                    {loginErrors.password}
+                  </p>
+                )}
               </div>
 
               <div className="flex flex-wrap items-center justify-between gap-4 text-sm text-black/70">
@@ -353,7 +397,7 @@ export default function AccountClient() {
                     type="checkbox"
                     checked={rememberMe}
                     onChange={(e) => setRememberMe(e.target.checked)}
-                    className="accent-[#7ea36a]"
+                    className="accent-[#4e5a50]"
                   />
                   Remember me
                 </label>
@@ -401,6 +445,11 @@ export default function AccountClient() {
                   className="mt-2 w-full rounded-sm border border-black/15 px-4 py-3 text-sm outline-none focus:border-[#4e5a50]"
                   placeholder="Enter your name..."
                 />
+                {registerErrors.name && (
+                  <p className="mt-2 text-xs text-red-600">
+                    {registerErrors.name}
+                  </p>
+                )}
               </div>
 
               <div>
@@ -416,12 +465,20 @@ export default function AccountClient() {
                   className="mt-2 w-full rounded-sm border border-black/15 px-4 py-3 text-sm outline-none focus:border-[#4e5a50]"
                   placeholder="Enter your email..."
                 />
+                {registerErrors.email && (
+                  <p className="mt-2 text-xs text-red-600">
+                    {registerErrors.email}
+                  </p>
+                )}
               </div>
 
               <div>
                 <label className="text-sm font-thin text-black">
                   Phone <span className="text-red-400">*</span>
                 </label>
+                <div className="mt-1 text-xs text-black/50">
+                  {registerForm.phone.length}/15 digits
+                </div>
                 <div className="mt-2 flex gap-2">
                   <div className="relative w-26">
                     <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center gap-2 px-3 text-sm text-[#4e5a50]">
@@ -477,14 +534,22 @@ export default function AccountClient() {
                     </select>
                   </div>
                   <input
+                    type="tel"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
                     name="phone"
                     value={registerForm.phone}
                     onChange={onRegisterChange}
                     required
                     className="flex-1 rounded-sm border border-black/15 px-4 py-3 text-sm outline-none focus:border-[#4e5a50]"
-                    placeholder="9999999999"
+                    placeholder="Enter your phone number..."
                   />
                 </div>
+                {registerErrors.phone && (
+                  <p className="mt-2 text-xs text-red-600">
+                    {registerErrors.phone}
+                  </p>
+                )}
               </div>
 
               <div>
@@ -500,6 +565,11 @@ export default function AccountClient() {
                   className="mt-2 w-full rounded-sm border border-black/15 px-4 py-3 text-sm outline-none focus:border-[#4e5a50]"
                   placeholder="Enter your password..."
                 />
+                {registerErrors.password && (
+                  <p className="mt-2 text-xs text-red-600">
+                    {registerErrors.password}
+                  </p>
+                )}
               </div>
 
               <div>
@@ -515,12 +585,33 @@ export default function AccountClient() {
                   className="mt-2 w-full rounded-sm border border-black/15 px-4 py-3 text-sm outline-none focus:border-[#4e5a50]"
                   placeholder="Enter your password..."
                 />
+                {registerErrors.password_confirmation && (
+                  <p className="mt-2 text-xs text-red-600">
+                    {registerErrors.password_confirmation}
+                  </p>
+                )}
+              </div>
+
+              <div className="flex flex-wrap items-center justify-between gap-4 text-sm text-black/70">
+                <label className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    checked={rememberMeLetter}
+                    onChange={(e) => setRememberMeLetter(e.target.checked)}
+                    className="accent-[#4e5a50]"
+                  />
+                  Subscribe to our kahwa circle newsletter!
+                </label>
               </div>
 
               <p className="text-sm text-black/70">
                 Your personal data will be used to support your experience
                 throughout this website, to manage access to your account, and
-                for other purposes described in our privacy policy.
+                for other purposes described in our{" "}
+                <a href="#privacy-policy" className="text-blue-600 underline">
+                  privacy policy
+                </a>
+                .
               </p>
 
               {registerError && (
