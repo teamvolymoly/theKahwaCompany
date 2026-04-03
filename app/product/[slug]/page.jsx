@@ -57,7 +57,7 @@ export default function ProductDetail() {
     return total / reviews.length;
   }, [reviews]);
 
-  const stars = Math.round(avgRating);
+  const fullStars = Math.max(0, Math.min(5, Math.round(avgRating)));
 
   const addToCart = async () => {
     if (!selectedVariant) return;
@@ -138,7 +138,7 @@ export default function ProductDetail() {
             </div>
 
             <div className="order-1 lg:order-2">
-              <div className="rounded-[32px] border border-black/10 bg-white p-6 shadow-[0_22px_60px_rgba(0,0,0,0.08)]">
+              <div className="rounded-sm border border-black/10 bg-white p-6 shadow-[0_22px_60px_rgba(0,0,0,0.08)]">
                 {mainImage ? (
                   <img
                     src={mainImage}
@@ -165,50 +165,74 @@ export default function ProductDetail() {
             </div>
 
             <div className="order-3">
+              <div className="w-fit px-4 py-1 mt-4 text-sm bg-[#FFF1C3] text-yellow-600 uppercase tracking-[0.05em] rounded-sm">
+                {product.tag_line || "A delightful blend to brighten your day."}
+              </div>
               <h1
-                className="text-4xl leading-tight lg:text-5xl"
+                className="text-4xl leading-tight lg:text-5xl uppercase tracking-[0.02em] mt-3 text-[#1c2230]"
                 style={{ fontFamily: "var(--font-basker)" }}
               >
                 {product.name}
               </h1>
-              <p className="mt-3 text-lg text-black/60">
+              <p className="mt-3 text-sm text-black uppercase tracking-[0.05em] ">
                 {product.short_description}
               </p>
 
-              <div className="mt-6 flex items-center gap-3 text-black/60">
-                <div className="flex items-center gap-1 text-base text-[#FFBF00]">
-                  {Array.from({ length: stars || 0 }).map((_, i) => (
-                    <span key={i}>*</span>
+              <div className="mt-3 flex gap-3 border-b border-black/10 pb-4 text-black/60">
+                <div className="flex items-center gap-1">
+                  {Array.from({ length: 5 }).map((_, index) => (
+                    <svg
+                      key={`avg-star-${index}`}
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill={index < fullStars ? "currentColor" : "none"}
+                      className={`h-4 w-4 ${index < fullStars ? "text-[#1c2230]" : "text-[#1c2230]/30"}`}
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M12 3.5l2.66 5.39 5.94.86-4.3 4.19 1.02 5.93L12 17.77l-5.32 2.8 1.02-5.93-4.3-4.19 5.94-.86L12 3.5z"
+                        stroke="currentColor"
+                        strokeWidth="1"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
                   ))}
                 </div>
                 <span className="text-sm text-black/50">
+                  (
                   {reviews.length
                     ? `${reviews.length} reviews`
                     : "No reviews yet"}
+                  )
                 </span>
               </div>
 
               <div className="mt-7 flex items-end gap-4">
-                <div className="text-4xl font-semibold">
+                <div
+                  className="text-4xl font-thin tracking-[0.02em] text-[#1c2230]"
+                  style={{ fontFamily: "var(--font-basker)" }}
+                >
                   Rs. {selectedVariant?.price ?? "--"}
                 </div>
                 {selectedVariant?.variant_name && (
-                  <div className="text-xs uppercase tracking-[0.3em] text-[#FFBF00]">
+                  <div className="text-xs uppercase tracking-[0.08em] bg-gray-100 px-4 py-2 rounded-full text-black/60 shadow-sm">
+                    {" "}
                     {selectedVariant.variant_name}
                   </div>
                 )}
               </div>
 
-              <div className="mt-8">
-                <p className="text-xs uppercase tracking-[0.4em] text-black/50 mb-3">
-                  Choose pack size
+              <div className="mt-8 ">
+                <p className="text-xs uppercase tracking-[0.2em] text-black/70">
+                  Choose pack size :
                 </p>
-                <div className="flex flex-wrap gap-3">
+                <div className="flex flex-wrap gap-3 mt-3">
                   {variants.map((v) => (
                     <button
                       key={v.id}
                       onClick={() => setSelectedVariant(v)}
-                      className={`rounded-full border px-6 py-3 text-sm transition ${
+                      className={`rounded-sm border px-6 py-3 text-sm transition ${
                         selectedVariant?.id === v.id
                           ? "border-black bg-black text-white"
                           : "border-black/10 bg-white text-black hover:border-black"
@@ -220,8 +244,11 @@ export default function ProductDetail() {
                 </div>
               </div>
 
-              <div className="mt-8 flex flex-wrap items-center gap-4">
-                <div className="flex items-center gap-3 rounded-full border border-black/10 bg-white px-4 py-3">
+              <div className="mt-6 flex flex-wrap justify-between items-center gap-4">
+                <p className="text-xs uppercase tracking-[0.2em] text-black/70">
+                  Quantity :
+                </p>
+                <div className="flex items-center gap-3 rounded-sm border border-black/10 bg-white px-4 py-3">
                   <button
                     type="button"
                     onClick={() => setQuantity((q) => Math.max(1, q - 1))}
@@ -248,21 +275,21 @@ export default function ProductDetail() {
                     +
                   </button>
                 </div>
+                {/* <button
+                  type="button"
+                  className="rounded-sm border border-black/10 bg-white px-6 py-4 text-xs uppercase tracking-[0.3em] text-black transition hover:border-black"
+                >
+                  Save for later
+                </button> */}
                 <button
                   onClick={addToCart}
-                  className="flex-1 rounded-full bg-black px-8 py-4 text-sm font-semibold uppercase tracking-[0.25em] text-white transition hover:bg-black/80"
+                  className="w-full rounded-sm whitespace-nowrap bg-black px-8 py-4 text-sm font-semibold uppercase tracking-[0.15em] text-white transition hover:bg-black/80"
                 >
                   Add to cart
                 </button>
-                <button
-                  type="button"
-                  className="rounded-full border border-black/10 bg-white px-6 py-4 text-xs uppercase tracking-[0.3em] text-black transition hover:border-black"
-                >
-                  Save for later
-                </button>
               </div>
 
-              <div className="mt-10 grid gap-3 text-sm text-black/60">
+              {/* <div className="mt-10 grid gap-3 text-sm text-black/60">
                 <div className="flex items-center justify-between border-b border-black/10 pb-3">
                   <span>Origin</span>
                   <span>Highland gardens</span>
@@ -275,7 +302,7 @@ export default function ProductDetail() {
                   <span>Serving size</span>
                   <span>2g per cup</span>
                 </div>
-              </div>
+              </div> */}
             </div>
           </div>
         </section>
@@ -325,11 +352,28 @@ export default function ProductDetail() {
                   >
                     <div className="flex items-center justify-between text-xs uppercase tracking-[0.3em] text-black/50">
                       <span>Customer</span>
-                      <span className="text-[#FFBF00]">
-                        {Array.from({ length: r.rating || 0 })
-                          .map(() => "*")
-                          .join("")}
-                      </span>
+                      <div className="flex items-center gap-1">
+                        {Array.from({ length: 5 }).map((_, index) => (
+                          <svg
+                            key={`review-${r.id}-star-${index}`}
+                            width="14"
+                            height="14"
+                            viewBox="0 0 24 24"
+                            fill={
+                              index < (r.rating || 0) ? "currentColor" : "none"
+                            }
+                            className={`h-3 w-3 ${index < (r.rating || 0) ? "text-[#1c2230]" : "text-[#1c2230]/30"}`}
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              d="M12 3.5l2.66 5.39 5.94.86-4.3 4.19 1.02 5.93L12 17.77l-5.32 2.8 1.02-5.93-4.3-4.19 5.94-.86L12 3.5z"
+                              stroke="currentColor"
+                              strokeWidth="1"
+                              strokeLinejoin="round"
+                            />
+                          </svg>
+                        ))}
+                      </div>
                     </div>
                     <p className="mt-3 text-sm text-black/60">{r.review}</p>
                   </div>

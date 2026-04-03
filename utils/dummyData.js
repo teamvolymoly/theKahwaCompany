@@ -48,7 +48,8 @@ export const dummyProducts = [
     id: 101,
     name: "Kashmiri Kahwa",
     slug: "kashmiri-kahwa-premium-green-tea",
-    short_description: "30 Pyramid Tea Bags",
+    short_description: "A MYSTICAL BLEND OF BLUE PEA & BOTANICALS",
+    tag_line: "Citrusy, Cool and Deeply Aromatic",
     description:
       "A fragrant Kashmiri kahwa with saffron, cardamom, and almonds for a warm, aromatic cup.",
     category_id: 1,
