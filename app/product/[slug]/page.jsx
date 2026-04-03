@@ -151,7 +151,7 @@ export default function ProductDetail() {
                   </div>
                 )}
               </div>
-              <div className="mt-6 flex flex-wrap gap-3 text-xs uppercase tracking-[0.3em] text-black/50">
+              {/* <div className="mt-6 flex flex-wrap gap-3 text-xs uppercase tracking-[0.3em] text-black/50">
                 <span className="rounded-full border border-black/10 bg-white px-4 py-2 text-[#FFBF00]">
                   Small batch
                 </span>
@@ -161,7 +161,7 @@ export default function ProductDetail() {
                 <span className="rounded-full border border-black/10 bg-white px-4 py-2 text-[#FFBF00]">
                   Hand picked
                 </span>
-              </div>
+              </div> */}
             </div>
 
             <div className="order-3">
@@ -178,7 +178,7 @@ export default function ProductDetail() {
                 {product.short_description}
               </p>
 
-              <div className="mt-3 flex gap-3 border-b border-black/10 pb-4 text-black/60">
+              <div className="mt-3 flex gap-3 border-b border-black/10 pb-8 text-black/60">
                 <div className="flex items-center gap-1">
                   {Array.from({ length: 5 }).map((_, index) => (
                     <svg
@@ -210,10 +210,10 @@ export default function ProductDetail() {
 
               <div className="mt-7 flex items-end gap-4">
                 <div
-                  className="text-4xl font-thin tracking-[0.02em] text-[#1c2230]"
-                  style={{ fontFamily: "var(--font-basker)" }}
+                  className="text-4xl font-semibold text-[#1c2230]"
+                  // style={{ fontFamily: "var(--font-basker)" }}
                 >
-                  Rs. {selectedVariant?.price ?? "--"}
+                  ₹{selectedVariant?.price ?? "--"}
                 </div>
                 {selectedVariant?.variant_name && (
                   <div className="text-xs uppercase tracking-[0.08em] bg-gray-100 px-4 py-2 rounded-full text-black/60 shadow-sm">
@@ -224,18 +224,18 @@ export default function ProductDetail() {
               </div>
 
               <div className="mt-8 ">
-                <p className="text-xs uppercase tracking-[0.2em] text-black/70">
-                  Choose pack size :
+                <p className="text-sm uppercase tracking-[0.08em] text-black/70">
+                  Net Quantity
                 </p>
                 <div className="flex flex-wrap gap-3 mt-3">
                   {variants.map((v) => (
                     <button
                       key={v.id}
                       onClick={() => setSelectedVariant(v)}
-                      className={`rounded-sm border px-6 py-3 text-sm transition ${
+                      className={`rounded-sm border border-black/10 px-6 py-3 text-sm cursor-pointer transition ${
                         selectedVariant?.id === v.id
-                          ? "border-black bg-black text-white"
-                          : "border-black/10 bg-white text-black hover:border-black"
+                          ? "bg-gradient-to-r from-[#5f665e] to-[#525a53] text-white"
+                          : "border-black/10 bg-white text-black hover:border-black/50"
                       }`}
                     >
                       {v.variant_name}
@@ -245,31 +245,34 @@ export default function ProductDetail() {
               </div>
 
               <div className="mt-6 flex flex-wrap justify-between items-center gap-4">
-                <p className="text-xs uppercase tracking-[0.2em] text-black/70">
-                  Quantity :
+                <p className="text-sm uppercase tracking-[0.08em] text-black/70">
+                  Quantity
                 </p>
                 <div className="flex items-center gap-3 rounded-sm border border-black/10 bg-white px-4 py-3">
                   <button
                     type="button"
                     onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                    className="text-lg"
+                    className="text-lg cursor-pointer"
                     aria-label="Decrease quantity"
                   >
                     -
                   </button>
                   <input
-                    type="number"
+                    type="text"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
                     value={quantity}
                     onChange={(e) => {
-                      const next = parseInt(e.target.value, 10);
+                      const digitsOnly = e.target.value.replace(/\D/g, "");
+                      const next = parseInt(digitsOnly || "1", 10);
                       setQuantity(Number.isFinite(next) && next > 0 ? next : 1);
                     }}
-                    className="w-14 bg-transparent text-center text-sm outline-none"
+                    className="w-14 bg-transparent border-x border-black/10 text-center text-sm outline-none "
                   />
                   <button
                     type="button"
                     onClick={() => setQuantity((q) => q + 1)}
-                    className="text-lg"
+                    className="text-lg cursor-pointer"
                     aria-label="Increase quantity"
                   >
                     +
@@ -283,7 +286,7 @@ export default function ProductDetail() {
                 </button> */}
                 <button
                   onClick={addToCart}
-                  className="w-full rounded-sm whitespace-nowrap bg-black px-8 py-4 text-sm font-semibold uppercase tracking-[0.15em] text-white transition hover:bg-black/80"
+                  className="w-full rounded-sm whitespace-nowrap bg-gradient-to-r from-[#7a8177] to-[#6a716a] px-8 py-4 text-sm font-semibold uppercase tracking-[0.15em] text-white transition hover:from-[#5f665e] hover:to-[#525a53] cursor-pointer"
                 >
                   Add to cart
                 </button>
