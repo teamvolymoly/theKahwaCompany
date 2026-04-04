@@ -282,11 +282,8 @@ export default function ProductDetail() {
             </div>
           </div>
         )}
-        <section className="border-b border-black/10">
-          <div className="max-w-7xl mx-auto px-6 py-8">
-            <p className="text-xs uppercase tracking-[0.4em] text-black/50">
-              Teapoz collection
-            </p>
+        <section className="">
+          <div className="container mx-auto px-4 lg:px-8 mx-auto  pt-8">
             <div className="mt-2 flex flex-wrap items-center gap-2 text-sm text-black/50">
               <span>Home</span>
               <span>/</span>
@@ -298,16 +295,13 @@ export default function ProductDetail() {
         </section>
 
         <section className="relative overflow-hidden">
-          <div className="pointer-events-none absolute -right-32 -top-24 h-80 w-80 rounded-full bg-black/5 blur-3xl" />
-          <div className="pointer-events-none absolute -left-40 bottom-10 h-72 w-72 rounded-full bg-black/5 blur-3xl" />
-
-          <div className="max-w-7xl mx-auto px-6 py-12 lg:py-16 grid gap-10 lg:grid-cols-[110px_1.1fr_1fr]">
-            <div className="order-2 flex gap-3 lg:order-1 lg:flex-col">
+          <div className="container mx-auto px-4 lg:px-8 mx-auto  py-12 lg:py-16 grid gap-10 lg:grid-cols-[110px_1.1fr_1fr]">
+            <div className="order-2 flex gap-3 overflow-x-auto pb-2 lg:order-1 lg:flex-col lg:overflow-visible lg:pb-0">
               {images.map((img, i) => (
                 <button
                   key={img.id ?? i}
                   onClick={() => setActiveImage(i)}
-                  className={`h-20 w-20 overflow-hidden rounded-2xl border bg-white transition ${
+                  className={`h-20 w-20 shrink-0 overflow-hidden rounded-2xl border bg-white transition ${
                     activeImage === i
                       ? "border-black shadow-sm"
                       : "border-black/10"
@@ -329,7 +323,7 @@ export default function ProductDetail() {
                   <img
                     src={mainImage}
                     alt={product.name}
-                    className="h-[420px] w-full object-contain"
+                    className="h-[280px] sm:h-[360px] lg:h-[420px] w-full object-contain"
                   />
                 ) : (
                   <div className="flex h-[420px] items-center justify-center text-sm text-black/50">
@@ -394,7 +388,7 @@ export default function ProductDetail() {
                 </span>
               </div>
 
-              <div className="mt-7 flex items-end gap-4">
+              <div className="mt-7 flex flex-wrap items-end gap-4">
                 <div
                   className="text-4xl font-semibold text-[#1c2230]"
                   // style={{ fontFamily: "var(--font-basker)" }}
@@ -494,18 +488,18 @@ export default function ProductDetail() {
                 </button> */}
                 <button
                   onClick={addToCart}
-                  className="w-full rounded-sm whitespace-nowrap bg-gradient-to-r from-[#7a8177] to-[#6a716a] px-8 py-4 text-sm font-semibold uppercase tracking-[0.15em] text-white transition hover:from-[#5f665e] hover:to-[#525a53] cursor-pointer"
+                  className="w-full sm:w-auto rounded-sm whitespace-nowrap bg-gradient-to-r from-[#7a8177] to-[#6a716a] px-8 py-4 text-sm font-semibold uppercase tracking-[0.15em] text-white transition hover:from-[#5f665e] hover:to-[#525a53] cursor-pointer"
                 >
                   Add to cart
                 </button>
               </div>
 
-              <div className="mt-6 flex flex-wrap items-center gap-3 text-xs uppercase tracking-[0.2em] text-black/60">
+              <div className="mt-6 flex flex-wrap items-center gap-2 text-[10px] sm:text-xs uppercase tracking-[0.2em] text-black/60">
                 <span className="text-black/70">Share:</span>
                 <button
                   type="button"
                   onClick={() => handleShare("facebook")}
-                  className="inline-flex items-center gap-2 rounded-sm border border-black/10 px-3 py-2 text-black/70 transition hover:border-black/40"
+                  className="inline-flex items-center gap-2 rounded-sm border border-black/10 px-2.5 py-2 text-black/70 transition hover:border-black/40"
                   aria-label="Share on Facebook"
                 >
                   <img
@@ -520,7 +514,7 @@ export default function ProductDetail() {
                 <button
                   type="button"
                   onClick={() => handleShare("twitter")}
-                  className="inline-flex items-center gap-2 rounded-sm border border-black/10 px-3 py-2 text-black/70 transition hover:border-black/40"
+                  className="inline-flex items-center gap-2 rounded-sm border border-black/10 px-2.5 py-2 text-black/70 transition hover:border-black/40"
                   aria-label="Share on X"
                 >
                   <img
@@ -535,7 +529,7 @@ export default function ProductDetail() {
                 <button
                   type="button"
                   onClick={() => handleShare("whatsapp")}
-                  className="inline-flex items-center gap-2 rounded-sm border border-black/10 px-3 py-2 text-black/70 transition hover:border-black/40"
+                  className="inline-flex items-center gap-2 rounded-sm border border-black/10 px-2.5 py-2 text-black/70 transition hover:border-black/40"
                   aria-label="Share on WhatsApp"
                 >
                   <img
@@ -550,7 +544,7 @@ export default function ProductDetail() {
                 <button
                   type="button"
                   onClick={() => handleShare("copy")}
-                  className="inline-flex items-center gap-2 rounded-sm border border-black/10 px-3 py-2 text-black/70 transition hover:border-black/40"
+                  className="inline-flex items-center gap-2 rounded-sm border border-black/10 px-2.5 py-2 text-black/70 transition hover:border-black/40"
                   aria-label="Copy link"
                 >
                   <img
@@ -583,7 +577,7 @@ export default function ProductDetail() {
         </section>
 
         <section className="border-t border-black/10 bg-white">
-          <div className="max-w-7xl mx-auto px-6 py-14 space-y-14">
+          <div className="container mx-auto px-4 lg:px-8 mx-auto py-14 space-y-14">
             <div>
               <h2
                 className="text-2xl lg:text-3xl"
@@ -617,7 +611,7 @@ export default function ProductDetail() {
                       })
                     }
                     className="h-9 w-9 rounded-sm border border-black/10 text-black/60"
-                    aria-label="Scroll gallery left"
+                    aria-label="Scroll gallery left cursor-pointer"
                   >
                     ‹
                   </button>
@@ -630,7 +624,7 @@ export default function ProductDetail() {
                       })
                     }
                     className="h-9 w-9 rounded-sm border border-black/10 text-black/60"
-                    aria-label="Scroll gallery right"
+                    aria-label="Scroll gallery right cursor-pointer"
                   >
                     ›
                   </button>
@@ -645,7 +639,7 @@ export default function ProductDetail() {
                     type="button"
                     key={img.id ?? index}
                     onClick={() => setPreviewIndex(index)}
-                    className="min-w-[180px] snap-start rounded-sm border border-black/10 bg-white p-3 transition hover:border-black/40 md:min-w-0"
+                    className="min-w-[180px] snap-start p-3 transition hover:border-black/40 md:min-w-0 cursor-pointer"
                     aria-label={`Open image ${index + 1}`}
                   >
                     <img
@@ -658,8 +652,8 @@ export default function ProductDetail() {
               </div>
             </div>
 
-            <div className="grid gap-8 lg:grid-cols-2">
-              <div className="rounded-sm border border-black/10 bg-white p-6">
+            <div className="grid gap-8 grid-cols-1 md:grid-cols-2 overflow-hidden md:overflow-visible">
+              <div className="w-full rounded-sm border border-black/10 bg-white p-6">
                 <div className="flex items-center justify-between">
                   <h3 className="text-sm uppercase tracking-[0.3em] text-black/50">
                     Brewing Rituals (Hot)
@@ -719,7 +713,7 @@ export default function ProductDetail() {
                   ))}
                 </div>
               </div>
-              <div className="rounded-sm border border-black/10 bg-white p-6">
+              <div className="w-full rounded-sm border border-black/10 bg-white p-6">
                 <div className="flex items-center justify-between">
                   <h3 className="text-sm uppercase tracking-[0.3em] text-black/50">
                     Brewing Rituals (Cold)
@@ -864,7 +858,7 @@ export default function ProductDetail() {
         </section>
 
         <section className="border-t border-black/10 bg-white">
-          <div className="max-w-7xl mx-auto px-6 py-14">
+          <div className="container mx-auto px-4 lg:px-8 mx-auto py-14">
             <div className="rounded-3xl border border-black/10 bg-white p-6">
               <h3
                 className="text-xl"

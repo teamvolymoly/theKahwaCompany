@@ -60,6 +60,10 @@ export const dummyProducts = [
     images: [
       { id: 1, image_url: "/products/tin/BLTIN1.png" },
       { id: 2, image_url: "/products/packets/17.png" },
+      { id: 3, image_url: "/products/amazon/blue/4.png" },
+      { id: 4, image_url: "/products/amazon/blue/B2.png" },
+      { id: 5, image_url: "/products/amazon/blue/Blue.png" },
+      { id: 6, image_url: "/products/amazon/blue/Resizing_Amazon3.png" },
     ],
     variants: [
       { id: 1001, variant_name: "30 Bags", price: 499, weight_g: 60 },
@@ -103,7 +107,9 @@ export const dummyProducts = [
       { id: 6, image_url: "/products/tin/OTTIN1.png" },
       { id: 7, image_url: "/products/packets/13.png" },
     ],
-    variants: [{ id: 1005, variant_name: "100g Tin", price: 475, weight_g: 100 }],
+    variants: [
+      { id: 1005, variant_name: "100g Tin", price: 475, weight_g: 100 },
+    ],
   },
   {
     id: 104,
@@ -121,7 +127,9 @@ export const dummyProducts = [
       { id: 8, image_url: "/products/tin/KLTIN1.png" },
       { id: 9, image_url: "/products/packets/18.png" },
     ],
-    variants: [{ id: 1006, variant_name: "Sampler Box", price: 799, weight_g: 150 }],
+    variants: [
+      { id: 1006, variant_name: "Sampler Box", price: 799, weight_g: 150 },
+    ],
   },
   {
     id: 105,
