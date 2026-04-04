@@ -62,8 +62,8 @@ export const dummyProducts = [
       { id: 2, image_url: "/products/packets/17.png" },
     ],
     variants: [
-      { id: 1001, variant_name: "30 Bags", price: 499 },
-      { id: 1002, variant_name: "60 Bags", price: 899 },
+      { id: 1001, variant_name: "30 Bags", price: 499, weight_g: 60 },
+      { id: 1002, variant_name: "60 Bags", price: 899, weight_g: 120 },
     ],
   },
   {
@@ -83,8 +83,8 @@ export const dummyProducts = [
       { id: 5, image_url: "/products/packets/15.png" },
     ],
     variants: [
-      { id: 1003, variant_name: "100g Tin", price: 525 },
-      { id: 1004, variant_name: "200g Tin", price: 949 },
+      { id: 1003, variant_name: "100g Tin", price: 525, weight_g: 100 },
+      { id: 1004, variant_name: "200g Tin", price: 949, weight_g: 200 },
     ],
   },
   {
@@ -103,7 +103,7 @@ export const dummyProducts = [
       { id: 6, image_url: "/products/tin/OTTIN1.png" },
       { id: 7, image_url: "/products/packets/13.png" },
     ],
-    variants: [{ id: 1005, variant_name: "100g Tin", price: 475 }],
+    variants: [{ id: 1005, variant_name: "100g Tin", price: 475, weight_g: 100 }],
   },
   {
     id: 104,
@@ -121,7 +121,7 @@ export const dummyProducts = [
       { id: 8, image_url: "/products/tin/KLTIN1.png" },
       { id: 9, image_url: "/products/packets/18.png" },
     ],
-    variants: [{ id: 1006, variant_name: "Sampler Box", price: 799 }],
+    variants: [{ id: 1006, variant_name: "Sampler Box", price: 799, weight_g: 150 }],
   },
   {
     id: 105,
@@ -138,7 +138,7 @@ export const dummyProducts = [
       { id: 10, image_url: "/products/tin/MLTIN1.png" },
       { id: 11, image_url: "/products/packets/12.png" },
     ],
-    variants: [{ id: 1007, variant_name: "75g Tin", price: 459 }],
+    variants: [{ id: 1007, variant_name: "75g Tin", price: 459, weight_g: 75 }],
   },
 ];
 

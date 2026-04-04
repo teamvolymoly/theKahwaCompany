@@ -3,6 +3,7 @@
 import Link from "next/link";
 
 import { apiFetch } from "@/utils/api";
+import { dummyProducts } from "@/utils/dummyData";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination, EffectFade, Autoplay } from "swiper/modules";
 import { useEffect, useState } from "react";
@@ -10,6 +11,7 @@ import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 import HeroSection from "@/components/HeroSection";
+import ProductCard from "@/components/ProductCard";
 
 const toSlug = (value) =>
   value
@@ -115,58 +117,7 @@ export default function Home() {
     };
     loadCategories();
   }, []);
-  const products = [
-    {
-      name: "Kashmiri Kahwa Premium Green Tea",
-      subtitle: "30 Pyramid Tea Bags",
-      price: "? 499",
-      oldPrice: "? 599",
-      badge: "10% OFF",
-      rating: 4.8,
-      reviews: 128,
-      image: "./products/tin/BLTIN1.png",
-    },
-    {
-      name: "Saffron & Spices Kahwa Blend",
-      subtitle: "With Almonds & Cardamom",
-      price: "? 525",
-      oldPrice: "? 649",
-      badge: "Bestseller",
-      rating: 4.7,
-      reviews: 96,
-      image: "./products/tin/HLTIN1.png",
-    },
-    {
-      name: "Classic Kashmiri Kahwa",
-      subtitle: "Traditional Herbal Infusion",
-      price: "? 475",
-      oldPrice: "? 599",
-      badge: "New",
-      rating: 4.6,
-      reviews: 74,
-      image: "./products/tin/OTTIN1.png",
-    },
-    {
-      name: "Kahwa Sampler Set",
-      subtitle: "Assorted Signature Blends",
-      price: "? 799",
-      oldPrice: "? 899",
-      badge: "Sampler",
-      rating: 4.5,
-      reviews: 61,
-      image: "./products/tin/KLTIN1.png",
-    },
-    {
-      name: "Mint & Saffron Kahwa",
-      subtitle: "Refreshing Evening Brew",
-      price: "? 459",
-      oldPrice: "? 549",
-      badge: "10% OFF",
-      rating: 4.4,
-      reviews: 52,
-      image: "./products/tin/MLTIN1.png",
-    },
-  ];
+  const products = dummyProducts;
 
   return (
     <>
@@ -326,102 +277,9 @@ export default function Home() {
               }}
               className="kahwa-tiles-swiper mt-10 pb-12"
             >
-              {products.map((product, index) => (
-                <SwiperSlide key={`tiles-${product.name}`}>
-                  <Link
-                    href={`/product/${toSlug(product.name)}`}
-                    className="group h-full rounded-xl bg-white border border-black/10 p-5 transition  hover:shadow-xl flex flex-col "
-                  >
-                    <div className="relative rounded-2xl bg-[#f7f7f7] p-4">
-                      <span className="absolute left-0 top-0 rounded-md bg-[#FFBF00] px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-black">
-                        {product.badge || "30% OFF"}
-                      </span>
-                      <div className="absolute right-4 top-4 flex flex-col gap-2 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition">
-                        <button
-                          type="button"
-                          className="h-9 w-9 rounded-full bg-white shadow-md flex items-center justify-center"
-                          aria-label="Compare"
-                        >
-                          <svg
-                            viewBox="0 0 24 24"
-                            className="h-4 w-4"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="1.8"
-                          >
-                            <path d="M7 17l10-10M7 7h10v10" />
-                          </svg>
-                        </button>
-                        <button
-                          type="button"
-                          className="h-9 w-9 rounded-full bg-white shadow-md flex items-center justify-center"
-                          aria-label="Quick view"
-                        >
-                          <svg
-                            viewBox="0 0 24 24"
-                            className="h-4 w-4"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="1.8"
-                          >
-                            <circle cx="12" cy="12" r="3.2" />
-                            <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z" />
-                          </svg>
-                        </button>
-                      </div>
-                      <div className="relative h-36 sm:h-40 md:h-44 flex items-center justify-center">
-                        <img
-                          src={product.image}
-                          alt={product.name}
-                          className="absolute h-32 sm:h-36 md:h-40 w-auto object-contain transition-opacity duration-300 opacity-100 group-hover:opacity-0"
-                        />
-                        <img
-                          src={
-                            product.images?.[1]?.image_url ||
-                            product.images?.[0]?.image_url ||
-                            product.image
-                          }
-                          alt={product.name}
-                          className="absolute h-32 sm:h-36 md:h-40 w-auto object-contain transition-opacity duration-300 opacity-0 group-hover:opacity-100"
-                        />
-                      </div>
-                    </div>
-                    <div className="mt-4 flex items-center gap-1 text-xs text-[#7aa35a]">
-                      {"?????".split("").map((star, i) => (
-                        <span key={i}>?</span>
-                      ))}
-                    </div>
-                    <h3 className="mt-2 text-base font-semibold text-black line-clamp-2">
-                      {product.name}
-                    </h3>
-                    <p className="mt-2 text-sm text-black/60 line-clamp-2">
-                      {product.subtitle || product.short_description}
-                    </p>
-                    <div className="mt-auto pt-4 flex items-center justify-between text-sm text-black/70">
-                      <span>
-                        Rs.{product.price || product.variants?.[0]?.price} - Rs.
-                        {product.oldPrice ||
-                          (product.price || product.variants?.[0]?.price) + 200}
-                      </span>
-                      <span className="relative group/cart inline-flex h-9 w-9 items-center justify-center rounded-full border border-black/10">
-                        <span className="pointer-events-none absolute -top-9 right-0 whitespace-nowrap rounded-full bg-black px-3 py-1 text-[10px] uppercase tracking-[0.2em] text-white opacity-0 transition group-hover/cart:opacity-100">
-                          Select options
-                        </span>
-                        <svg
-                          viewBox="0 0 24 24"
-                          className="h-4 w-4"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="1.8"
-                        >
-                          <path d="M6 6h15l-1.5 9H8L6 6z" />
-                          <path d="M6 6H4" />
-                          <circle cx="9" cy="20" r="1" />
-                          <circle cx="18" cy="20" r="1" />
-                        </svg>
-                      </span>
-                    </div>
-                  </Link>
+              {products.map((product) => (
+                <SwiperSlide key={`tiles-${product.id}`}>
+                  <ProductCard product={product} />
                 </SwiperSlide>
               ))}
             </Swiper>
@@ -537,9 +395,9 @@ export default function Home() {
                   }),
                   image,
                 }))
-                .map((category) => (
+                .map((category, index) => (
                   <Link
-                    key={category.id}
+                    key={`${category.id}-${index}`}
                     href={`/category/${category.slug || category.id}`}
                     className="group relative overflow-hidden rounded-3xl border border-black/10 bg-white transition hover:-translate-y-1 hover:shadow-2xl"
                   >
