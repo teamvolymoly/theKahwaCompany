@@ -248,15 +248,16 @@ export default function ProductDetail() {
             <button
               type="button"
               onClick={() => setPreviewIndex(null)}
-              className="absolute right-6 top-6 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-xs uppercase tracking-[0.3em] text-white"
+              className="absolute right-6 top-6 flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-white/10 text-lg text-white"
+              aria-label="Close preview"
             >
-              Close
+              ×
             </button>
             <div className="relative max-h-[80vh] w-full max-w-4xl overflow-hidden rounded-lg bg-white p-6">
               <button
                 type="button"
                 onClick={handlePrevPreview}
-                className="absolute left-4 top-1/2 -translate-y-1/2 rounded-full border border-black/10 bg-white/90 px-3 py-2 text-xl text-black/70 hover:text-black"
+                className="absolute left-4 top-1/2 -translate-y-1/2 rounded-full border border-black/10 bg-white/90 px-4 py-3 text-2xl text-black/70 hover:text-black"
                 aria-label="Previous image"
               >
                 ‹
@@ -264,7 +265,7 @@ export default function ProductDetail() {
               <button
                 type="button"
                 onClick={handleNextPreview}
-                className="absolute right-4 top-1/2 -translate-y-1/2 rounded-full border border-black/10 bg-white/90 px-3 py-2 text-xl text-black/70 hover:text-black"
+                className="absolute right-4 top-1/2 -translate-y-1/2 rounded-full border border-black/10 bg-white/90 px-4 py-3 text-2xl text-black/70 hover:text-black"
                 aria-label="Next image"
               >
                 ›
@@ -274,10 +275,27 @@ export default function ProductDetail() {
                 alt={`${product.name} preview`}
                 className="h-[70vh] w-full object-contain"
               />
-              <div className="mt-4 text-center text-xs uppercase tracking-[0.3em] text-black/40">
-                {previewIndex !== null
-                  ? `Image ${previewIndex + 1} of ${galleryImages.length}`
-                  : ""}
+              <div className="mt-4 flex flex-col items-center gap-3">
+                <div className="text-xs uppercase tracking-[0.3em] text-black/40">
+                  {previewIndex !== null
+                    ? `Image ${previewIndex + 1} of ${galleryImages.length}`
+                    : ""}
+                </div>
+                <div className="flex flex-wrap items-center justify-center gap-2">
+                  {galleryImages.map((_, index) => (
+                    <button
+                      key={`dot-${index}`}
+                      type="button"
+                      onClick={() => setPreviewIndex(index)}
+                      className={`h-2.5 w-2.5 rounded-full border transition ${
+                        index === previewIndex
+                          ? "border-black bg-black"
+                          : "border-black/30 bg-transparent"
+                      }`}
+                      aria-label={`Go to image ${index + 1}`}
+                    />
+                  ))}
+                </div>
               </div>
             </div>
           </div>
@@ -636,13 +654,13 @@ export default function ProductDetail() {
                     type="button"
                     key={img.id ?? index}
                     onClick={() => setPreviewIndex(index)}
-                    className="min-w-[160px] h-[290px] snap-start p-3 transition hover:border-black/40 cursor-pointer"
+                    className="min-w-[160px] h-[290px] snap-start transition hover:border-black/40 cursor-pointer "
                     aria-label={`Open image ${index + 1}`}
                   >
                     <img
                       src={img.image_url}
                       alt={`${product.name} gallery ${index + 1}`}
-                      className="h-full w-full object-contain"
+                      className="h-full w-full object-contain rounded-sm"
                     />
                   </button>
                 ))}
