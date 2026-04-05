@@ -5,6 +5,10 @@ import { useParams } from "next/navigation";
 import { apiFetch } from "@/utils/api";
 import { dummyProducts, dummyReviews } from "@/utils/dummyData";
 import ProductCard from "@/components/ProductCard";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Navigation } from "swiper/modules";
+import "swiper/css";
+import "swiper/css/navigation";
 
 export default function ProductDetail() {
   const { slug } = useParams();
@@ -153,8 +157,6 @@ export default function ProductDetail() {
     setPreviewIndex((previewIndex + 1) % galleryImages.length);
   };
 
-  const productStory =
-    "Infused with the vivid hues of butterfly pea flower, this herbal kahwa features a medley of fragrant spices, mint, floral notes, and a gentle citrus twist. A naturally caffeine-free blend that brings together tradition and visual wonder. Sourced from select Indian gardens and hand-blended with whole botanicals, with no tea dust or additives, just pure ingredients and clean taste in every cup.";
 
   const brewingHot = [
     {
@@ -201,18 +203,18 @@ export default function ProductDetail() {
     },
   ];
 
-  const ingredients = [
-    { name: "Butterfly Pea", image: "/products/packets/11.png" },
-    { name: "Mint", image: "/products/packets/12.png" },
-    { name: "Rose Petals", image: "/products/packets/13.png" },
-    { name: "Lemongrass", image: "/products/packets/14.png" },
-    { name: "Black Pepper", image: "/products/packets/15.png" },
-    { name: "Orange Peel", image: "/products/packets/16.png" },
-    { name: "Mango Bits", image: "/products/packets/17.png" },
-    { name: "Ginger", image: "/products/packets/18.png" },
-    { name: "Clove", image: "/products/packets/19.png" },
-    { name: "Cinnamon", image: "/products/packets/20.png" },
+  const ingredientsBase = [
+    { name: "Chamomile Flower", image: "/products/Ingredient/Chamomile_FLower_8047e7b1-6c54-41fe-acbd-18bfb030db44.avif" },
+    { name: "Green Tea", image: "/products/Ingredient/Green_Tea_388daaf2-1c37-4633-87dd-56c85e28b05c.avif" },
+    { name: "Lemongrass", image: "/products/Ingredient/Lemongrass_9ef65a92-6a72-4453-9f4b-43502c336528.avif" },
+    { name: "Orange Peel", image: "/products/Ingredient/Orange_Peel_a61b1d6a-6890-43fd-bef5-86528a0bd763.avif" },
+    { name: "Peppermint", image: "/products/Ingredient/Peppermint_952ac752-d54d-4f23-8f76-d659cd96c75c.avif" },
+    { name: "Spearmint", image: "/products/Ingredient/Spearmint_3cecd63e-bcdd-4904-a59e-bf260f503075.avif" },
   ];
+  const ingredients = Array.from({ length: 10 }).map((_, index) => {
+    const item = ingredientsBase[index % ingredientsBase.length];
+    return { ...item, id: `ing-${index}-${item.name}` };
+  });
 
   const discoverMore = dummyProducts
     .filter((p) => p.id !== product?.id)
@@ -595,7 +597,7 @@ export default function ProductDetail() {
         </section>
 
         <section className=" container mx-auto px-4 lg:px-8 border-t border-black/10 bg-white">
-          <div className=" py-14 space-y-14">
+          <div className=" py-14">
             <div>
               <h2
                 className="text-2xl lg:text-3xl font-semibold"
@@ -603,15 +605,12 @@ export default function ProductDetail() {
               >
                 Product Description
               </h2>
-              <p className="mt-4 text-base leading-relaxed text-black/60">
-                {productStory}
-              </p>
-              <p className="mt-4 text-sm text-black/60">
+              <p className="mt-4 text-base leading-relaxed text-black/80">
                 {product.description}
               </p>
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-4 mt-6">
               {/* <h3 className="text-lg uppercase tracking-[0.2em] text-black/50">
                 Gallery
               </h3> */}
@@ -625,8 +624,8 @@ export default function ProductDetail() {
                         behavior: "smooth",
                       })
                     }
-                    className="h-9 w-9 rounded-sm border border-black/10 text-black/60"
-                    aria-label="Scroll gallery left cursor-pointer"
+                    className="h-10 w-10 rounded-sm border border-black/10 text-black/60"
+                    aria-label="Scroll gallery left"
                   >
                     ‹
                   </button>
@@ -638,8 +637,8 @@ export default function ProductDetail() {
                         behavior: "smooth",
                       })
                     }
-                    className="h-9 w-9 rounded-sm border border-black/10 text-black/60"
-                    aria-label="Scroll gallery right cursor-pointer"
+                    className="h-10 w-10 rounded-sm border border-black/10 text-black/60"
+                    aria-label="Scroll gallery right"
                   >
                     ›
                   </button>
@@ -647,208 +646,177 @@ export default function ProductDetail() {
               </div>
               <div
                 ref={galleryRef}
-                className="flex overflow-x-auto pb-2 snap-x snap-mandatory"
+                className="flex gap-4 overflow-x-auto pb-2 snap-x snap-mandatory"
               >
                 {galleryImages.map((img, index) => (
                   <button
                     type="button"
                     key={img.id ?? index}
                     onClick={() => setPreviewIndex(index)}
-                    className="min-w-[160px] h-[290px] snap-start transition hover:border-black/40 cursor-pointer "
+                    className="min-w-[160px] h-60 snap-start rounded-sm border border-black/10 bg-white transition hover:border-black/40 cursor-pointer"
                     aria-label={`Open image ${index + 1}`}
                   >
                     <img
                       src={img.image_url}
                       alt={`${product.name} gallery ${index + 1}`}
-                      className="h-full w-full object-contain rounded-sm"
+                      className="h-full w-full object-cover "
                     />
                   </button>
                 ))}
               </div>
             </div>
 
-            <div className="grid gap-8 grid-cols-1 md:grid-cols-2 overflow-hidden md:overflow-visible">
-              <div className="w-full rounded-sm border border-black/10 bg-white p-6">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-sm uppercase tracking-[0.3em] text-black/50">
-                    Brewing Rituals (Hot)
-                  </h3>
-                  <div className="flex gap-2">
-                    <button
-                      type="button"
-                      onClick={() =>
-                        brewingHotRef.current?.scrollBy({
-                          left: -240,
-                          behavior: "smooth",
-                        })
-                      }
-                      className="h-9 w-9 rounded-sm border border-black/10 text-black/60"
-                      aria-label="Scroll hot rituals left"
-                    >
-                      ‹
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() =>
-                        brewingHotRef.current?.scrollBy({
-                          left: 240,
-                          behavior: "smooth",
-                        })
-                      }
-                      className="h-9 w-9 rounded-sm border border-black/10 text-black/60"
-                      aria-label="Scroll hot rituals right"
-                    >
-                      ›
-                    </button>
+            <div className="space-y-6 mt-10">
+              <h3 className="text-2xl lg:text-3xl font-semibold">
+                Brewing Rituals
+              </h3>
+              <div className="grid gap-8 grid-cols-1 md:grid-cols-2">
+              <div className="w-full text-black">
+                <h4 className="text-lg">Hot Brew</h4>
+                <div className="mt-4 grid gap-4 sm:grid-cols-2">
+                  <div className="flex items-center gap-3 text-sm text-black">
+                    <span className="flex h-14 w-14 items-center justify-center rounded-full bg-white">
+                      <img
+                        src="/products/br/Place_1_Bag_in_a_Cup.svg"
+                        alt="Place 1 bag in a cup"
+                        className="h-10 w-10 object-contain"
+                      />
+                    </span>
+                    1 Tsp / 2 g
+                  </div>
+                  <div className="flex items-center gap-3 text-sm text-black">
+                    <span className="flex h-14 w-14 items-center justify-center rounded-full bg-white">
+                      <img
+                        src="/products/br/Pour_7fl._oz_200_ml_Freshly_Boiled_Water_over_the_Leaves-40_1.svg"
+                        alt="Pour 200 ml water"
+                        className="h-10 w-10 object-contain"
+                      />
+                    </span>
+                    200ml
+                  </div>
+                  <div className="flex items-center gap-3 text-sm text-black">
+                    <span className="flex h-14 w-14 items-center justify-center rounded-full bg-white">
+                      <img
+                        src="/products/br/Water_Temperature_-_158_F-176_F_-_70_C-80_C_7fd68249-bd73-4395-9d89-ea7dcb877f83.svg"
+                        alt="Water temperature"
+                        className="h-10 w-10 object-contain"
+                      />
+                    </span>
+                    85° - 95°C
+                  </div>
+                  <div className="flex items-center gap-3 text-sm text-black">
+                    <span className="flex h-14 w-14 items-center justify-center rounded-full bg-white">
+                      <img
+                        src="/products/br/Brew_for_2-3_mins_4c4d18ef-6046-4708-9813-79f87a88239e.svg"
+                        alt="Brew time"
+                        className="h-10 w-10 object-contain"
+                      />
+                    </span>
+                    3 - 5 Mins
                   </div>
                 </div>
-                <div
-                  ref={brewingHotRef}
-                  className="mt-4 -mx-6 flex w-screen gap-4 overflow-x-auto pb-2 pl-6 pr-6 snap-x snap-mandatory md:mx-0 md:w-full md:pl-0 md:pr-0"
-                >
-                  {brewingHot.map((item) => (
-                    <div
-                      key={item.title}
-                      className="min-w-[180px] snap-start rounded-sm border border-black/10 bg-black/[0.03] p-4"
-                    >
-                      <div className="h-16 w-full rounded-sm bg-white p-2">
-                        <img
-                          src={item.image}
-                          alt={item.title}
-                          className="h-full w-full object-contain"
-                        />
-                      </div>
-                      <p className="mt-3 text-xs uppercase tracking-[0.2em] text-black/50">
-                        {item.title}
-                      </p>
-                      <p className="mt-2 text-sm text-black/70">
-                        {item.description}
-                      </p>
-                    </div>
-                  ))}
+                <div className="mt-6 inline-flex items-center gap-3 rounded-sm border border-black/10 bg-black/[0.03] px-4 py-3 text-sm text-black">
+                  Cover with a lid while brewing
                 </div>
               </div>
-              <div className="w-full rounded-sm border border-black/10 bg-white p-6">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-sm uppercase tracking-[0.3em] text-black/50">
-                    Brewing Rituals (Cold)
-                  </h3>
-                  <div className="flex gap-2">
-                    <button
-                      type="button"
-                      onClick={() =>
-                        brewingColdRef.current?.scrollBy({
-                          left: -240,
-                          behavior: "smooth",
-                        })
-                      }
-                      className="h-9 w-9 rounded-sm border border-black/10 text-black/60"
-                      aria-label="Scroll cold rituals left"
-                    >
-                      ‹
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() =>
-                        brewingColdRef.current?.scrollBy({
-                          left: 240,
-                          behavior: "smooth",
-                        })
-                      }
-                      className="h-9 w-9 rounded-sm border border-black/10 text-black/60"
-                      aria-label="Scroll cold rituals right"
-                    >
-                      ›
-                    </button>
+              <div className="w-full text-black">
+                <h4 className="text-lg ">Iced Brew</h4>
+                <div className="mt-4 flex flex-wrap gap-3">
+                  <div className="flex items-center gap-3 text-sm text-black">
+                    <span className="flex h-14 w-14 items-center justify-center rounded-full bg-white">
+                      <img
+                        src="/products/br/Refrigerate_for_3-4_hours._Add_ice_cubes_sweetener.svg"
+                        alt="Refrigerate and add ice"
+                        className="h-10 w-10 object-contain"
+                      />
+                    </span>
+                    Refrigerate & add ice
+                  </div>
+                  <div className="flex items-center gap-3 text-sm text-black">
+                    <span className="flex h-14 w-14 items-center justify-center rounded-full bg-white">
+                      <img
+                        src="/products/br/To_be_served_without_milk.svg"
+                        alt="Serve without milk"
+                        className="h-10 w-10 object-contain"
+                      />
+                    </span>
+                    Serve without milk
                   </div>
                 </div>
-                <div
-                  ref={brewingColdRef}
-                  className="mt-4 -mx-6 flex w-screen gap-4 overflow-x-auto pb-2 pl-6 pr-6 snap-x snap-mandatory md:mx-0 md:w-full md:pl-0 md:pr-0"
-                >
-                  {brewingCold.map((item) => (
-                    <div
-                      key={item.title}
-                      className="min-w-[180px] snap-start rounded-sm border border-black/10 bg-black/[0.03] p-4"
-                    >
-                      <div className="h-16 w-full rounded-sm bg-white p-2">
-                        <img
-                          src={item.image}
-                          alt={item.title}
-                          className="h-full w-full object-contain"
-                        />
-                      </div>
-                      <p className="mt-3 text-xs uppercase tracking-[0.2em] text-black/50">
-                        {item.title}
-                      </p>
-                      <p className="mt-2 text-sm text-black/70">
-                        {item.description}
-                      </p>
-                    </div>
-                  ))}
-                </div>
+                <p className="mt-4 text-sm text-black/70">
+                  Brew as above and let it cool.
+                </p>
+                <p className="mt-4 text-sm text-black/70">
+                  Pour over ice. Garnish with mint and add a few drops of lemon
+                  juice to{" "}
+                  <span className="italic text-black">
+                    watch the colour shift magically from blue to purple
+                  </span>
+                  .
+                </p>
+              </div>
               </div>
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-4 mt-10">
               <div className="flex items-center justify-between">
-                <h3 className="text-lg uppercase tracking-[0.2em] text-black/50">
+                <h3 className="text-2xl lg:text-3xl font-semibold">
                   Ingredients
                 </h3>
                 <div className="flex gap-2">
                   <button
                     type="button"
-                    onClick={() =>
-                      ingredientsRef.current?.scrollBy({
-                        left: -240,
-                        behavior: "smooth",
-                      })
-                    }
-                    className="h-9 w-9 rounded-sm border border-black/10 text-black/60"
+                    onClick={() => ingredientsRef.current?.slidePrev()}
+                    className="h-10 w-10 rounded-sm border border-black/10 text-black/60"
                     aria-label="Scroll ingredients left"
                   >
                     ‹
                   </button>
                   <button
                     type="button"
-                    onClick={() =>
-                      ingredientsRef.current?.scrollBy({
-                        left: 240,
-                        behavior: "smooth",
-                      })
-                    }
-                    className="h-9 w-9 rounded-sm border border-black/10 text-black/60"
+                    onClick={() => ingredientsRef.current?.slideNext()}
+                    className="h-10 w-10 rounded-sm border border-black/10 text-black/60"
                     aria-label="Scroll ingredients right"
                   >
                     ›
                   </button>
                 </div>
               </div>
-              <div
-                ref={ingredientsRef}
-                className="flex gap-4 overflow-x-auto pb-2 snap-x snap-mandatory"
+              <Swiper
+                modules={[Navigation]}
+                slidesPerView={1.2}
+                spaceBetween={16}
+                onSwiper={(swiper) => {
+                  ingredientsRef.current = swiper;
+                }}
+                breakpoints={{
+                  480: { slidesPerView: 2.2, spaceBetween: 18 },
+                  768: { slidesPerView: 3.2, spaceBetween: 20 },
+                  1024: { slidesPerView: 4.2, spaceBetween: 22 },
+                  1280: { slidesPerView: 5.2, spaceBetween: 24 },
+                }}
+                className="pb-6"
               >
                 {ingredients.map((item) => (
-                  <div
-                    key={item.name}
-                    className="min-w-[160px] snap-start rounded-sm border border-black/10 bg-white p-4 text-center"
-                  >
-                    <div className="h-28 w-full rounded-sm bg-black/[0.04] p-3">
-                      <img
-                        src={item.image}
-                        alt={item.name}
-                        className="h-full w-full object-contain"
-                      />
+                  <SwiperSlide key={item.id}>
+                    <div className="rounded-sm border border-black/10 bg-white p-5 text-center">
+                      <div className="h-40 w-full rounded-sm bg-black/[0.04] p-4">
+                        <img
+                          src={item.image}
+                          alt={item.name}
+                          className="h-full w-full object-contain"
+                        />
+                      </div>
+                      <p className="mt-4 text-sm uppercase tracking-[0.12em] text-black/70">
+                        {item.name}
+                      </p>
                     </div>
-                    <p className="mt-3 text-sm uppercase tracking-[0.12em] text-black/70">
-                      {item.name}
-                    </p>
-                  </div>
+                  </SwiperSlide>
                 ))}
-              </div>
+              </Swiper>
             </div>
 
-            <div className="space-y-6">
+            <div className="space-y-6 mt-10">
               <div className="flex items-center justify-between">
                 <h3
                   className="text-2xl lg:text-3xl"
