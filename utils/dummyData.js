@@ -60,7 +60,7 @@ export const dummyProducts = [
     images: [
       { id: 1, image_url: "/products/tin/BLTIN1.png" },
       { id: 2, image_url: "/products/packets/17.png" },
-      { id: 3, image_url: "/products/amazon/blue/4.png" },
+      // { id: 3, image_url: "/products/amazon/blue/4.png" },
       { id: 4, image_url: "/products/amazon/blue/B2.png" },
       { id: 5, image_url: "/products/amazon/blue/Blue.png" },
       { id: 6, image_url: "/products/amazon/blue/Resizing_Amazon3.png" },

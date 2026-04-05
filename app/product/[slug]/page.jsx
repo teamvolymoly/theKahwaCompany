@@ -283,7 +283,7 @@ export default function ProductDetail() {
           </div>
         )}
         <section className="">
-          <div className="container mx-auto px-4 lg:px-8 mx-auto  pt-8">
+          <div className="container mx-auto px-4 lg:px-8 mx-auto  pt-6">
             <div className="mt-2 flex flex-wrap items-center gap-2 text-sm text-black/50">
               <span>Home</span>
               <span>/</span>
@@ -580,7 +580,7 @@ export default function ProductDetail() {
           <div className=" py-14 space-y-14">
             <div>
               <h2
-                className="text-2xl lg:text-3xl"
+                className="text-2xl lg:text-3xl font-semibold"
                 style={{ fontFamily: "var(--font-display)" }}
               >
                 Product Description
@@ -594,13 +594,10 @@ export default function ProductDetail() {
             </div>
 
             <div className="space-y-4">
-              <h3 className="text-lg uppercase tracking-[0.2em] text-black/50">
+              {/* <h3 className="text-lg uppercase tracking-[0.2em] text-black/50">
                 Gallery
-              </h3>
+              </h3> */}
               <div className="flex items-center justify-between">
-                <span className="text-xs uppercase tracking-[0.2em] text-black/40">
-                  Tap to preview
-                </span>
                 <div className="flex gap-2 md:hidden">
                   <button
                     type="button"
@@ -632,20 +629,20 @@ export default function ProductDetail() {
               </div>
               <div
                 ref={galleryRef}
-                className="flex gap-4 overflow-x-auto pb-2 snap-x snap-mandatory md:grid md:grid-cols-3 lg:grid-cols-5 md:gap-4 md:overflow-visible md:pb-0 md:snap-none"
+                className="flex overflow-x-auto pb-2 snap-x snap-mandatory"
               >
                 {galleryImages.map((img, index) => (
                   <button
                     type="button"
                     key={img.id ?? index}
                     onClick={() => setPreviewIndex(index)}
-                    className="min-w-[180px] snap-start p-3 transition hover:border-black/40 md:min-w-0 cursor-pointer"
+                    className="min-w-[160px] h-[290px] snap-start p-3 transition hover:border-black/40 cursor-pointer"
                     aria-label={`Open image ${index + 1}`}
                   >
                     <img
                       src={img.image_url}
                       alt={`${product.name} gallery ${index + 1}`}
-                      className="h-40 w-full object-contain"
+                      className="h-full w-full object-contain"
                     />
                   </button>
                 ))}
