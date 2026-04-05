@@ -295,7 +295,7 @@ export default function ProductDetail() {
         </section>
 
         <section className="relative overflow-hidden">
-          <div className="container mx-auto px-4 lg:px-8 mx-auto  py-12 lg:py-16 grid gap-10 lg:grid-cols-[110px_1.1fr_1fr]">
+          <div className="container mx-auto px-4 lg:px-8 mx-auto pt-8  pb-12 lg:pb-16 grid gap-10 lg:grid-cols-[110px_1.1fr_1fr]">
             <div className="order-2 flex gap-3 overflow-x-auto pb-2 lg:order-1 lg:flex-col lg:overflow-visible lg:pb-0">
               {images.map((img, i) => (
                 <button
@@ -488,13 +488,13 @@ export default function ProductDetail() {
                 </button> */}
                 <button
                   onClick={addToCart}
-                  className="w-full sm:w-auto rounded-sm whitespace-nowrap bg-gradient-to-r from-[#7a8177] to-[#6a716a] px-8 py-4 text-sm font-semibold uppercase tracking-[0.15em] text-white transition hover:from-[#5f665e] hover:to-[#525a53] cursor-pointer"
+                  className="sm:w-auto md:w-full rounded-sm whitespace-nowrap bg-gradient-to-r from-[#7a8177] to-[#6a716a] px-8 py-4 text-sm font-semibold uppercase tracking-[0.15em] text-white transition hover:from-[#5f665e] hover:to-[#525a53] cursor-pointer"
                 >
                   Add to cart
                 </button>
               </div>
 
-              <div className="mt-6 flex flex-wrap items-center gap-2 text-[10px] sm:text-xs uppercase tracking-[0.2em] text-black/60">
+              {/* <div className="mt-6 flex flex-wrap items-center gap-2 text-[10px] sm:text-xs uppercase tracking-[0.2em] text-black/60">
                 <span className="text-black/70">Share:</span>
                 <button
                   type="button"
@@ -556,7 +556,7 @@ export default function ProductDetail() {
                   />
                   Copy link
                 </button>
-              </div>
+              </div> */}
 
               {/* <div className="mt-10 grid gap-3 text-sm text-black/60">
                 <div className="flex items-center justify-between border-b border-black/10 pb-3">
@@ -576,8 +576,8 @@ export default function ProductDetail() {
           </div>
         </section>
 
-        <section className="border-t border-black/10 bg-white">
-          <div className="container mx-auto px-4 lg:px-8 mx-auto py-14 space-y-14">
+        <section className=" container mx-auto px-4 lg:px-8 border-t border-black/10 bg-white">
+          <div className=" py-14 space-y-14">
             <div>
               <h2
                 className="text-2xl lg:text-3xl"
@@ -857,9 +857,9 @@ export default function ProductDetail() {
           </div>
         </section>
 
-        <section className="border-t border-black/10 bg-white">
-          <div className="container mx-auto px-4 lg:px-8 mx-auto py-14">
-            <div className="rounded-3xl border border-black/10 bg-white p-6">
+        <section className=" bg-white border-t border-black/10 container mx-auto px-4 lg:px-8">
+          <div className=" py-14 ">
+            <div className="rounded-3xl border border-black/10 bg-white p-6 ">
               <h3
                 className="text-xl"
                 style={{ fontFamily: "var(--font-display)" }}
