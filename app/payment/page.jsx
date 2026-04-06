@@ -60,7 +60,7 @@ export default function PaymentPage() {
             <div className="mt-4 space-y-3 text-sm text-black/70">
               <div className="flex items-center justify-between">
                 <span>Subtotal</span>
-                <span>Rs. 1,499</span>
+                <span>₹ 1,499</span>
               </div>
               <div className="flex items-center justify-between">
                 <span>Shipping</span>
@@ -68,7 +68,7 @@ export default function PaymentPage() {
               </div>
               <div className="flex items-center justify-between border-t border-black/10 pt-3 text-black font-semibold">
                 <span>Total</span>
-                <span>Rs. 1,499</span>
+                <span>₹ 1,499</span>
               </div>
             </div>
             <Link

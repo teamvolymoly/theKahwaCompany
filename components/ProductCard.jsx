@@ -90,11 +90,11 @@ export default function ProductCard({ product }) {
 
         <div className="mt-4 flex items-center justify-center gap-3 text-sm text-[#1c2230]">
           <span className="font-semibold">
-            ₹{product.variants?.[0]?.price || product.price}
+            ₹ {product.variants?.[0]?.price || product.price}
           </span>
           {product.oldPrice && (
             <span className="text-[#1c2230]/40 line-through">
-              ₹{product.oldPrice}
+              ₹ {product.oldPrice}
             </span>
           )}
           {product.badge && (

@@ -75,21 +75,21 @@ const socialLinks = [
 
 export default function Footer() {
   return (
-    <footer className="bg-[#1f1711] text-white">
+    <footer className="bg-[#525a53] text-white">
       <div className="container mx-auto px-4 py-14">
         <div className="grid gap-10 lg:grid-cols-[1.2fr_2fr_1.4fr]">
           <div>
             <img
-              src="/logo/LOGO_TKC-02.png"
+              src="/logo/LOGO_TKC-04.png"
               alt="The Kahwa Company"
-              className="h-14 w-auto object-contain"
+              className="h-18 w-auto object-contain"
             />
-            <div className="mt-6 space-y-2 text-sm text-[#d8c8b6]">
+            <div className="mt-6 space-y-2 text-sm text-white/80">
               <p>info@thekahwacompany.com</p>
               <p>+91 95822 51241</p>
             </div>
             <div className="mt-6">
-              <p className="text-xs uppercase tracking-[0.3em] text-[#d8c8b6]">
+              <p className="text-xs uppercase tracking-[0.08em] text-white/80">
                 Follow us
               </p>
               <div className="mt-3 flex flex-wrap items-center gap-3">
@@ -99,7 +99,7 @@ export default function Footer() {
                     href={link.href}
                     target="_blank"
                     rel="noreferrer"
-                    className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[#3c2a20] text-[#f3d8c6] transition hover:border-[#f3d8c6] hover:text-white"
+                    className="inline-flex h-auto w-5 items-center justify-center text-white/80 transition hover:border-[#f3d8c6] hover:text-white"
                     aria-label={link.label}
                     title={link.label}
                   >
@@ -112,10 +112,10 @@ export default function Footer() {
 
           <div className="grid gap-8 sm:grid-cols-3">
             <div>
-              <p className="text-xs uppercase tracking-[0.3em] text-[#d8c8b6]">
+              <p className="text-sm uppercase tracking-[0.08em] text-white/80">
                 Quick Links
               </p>
-              <div className="mt-4 grid gap-2 text-sm text-[#f3d8c6]">
+              <div className="mt-4 grid gap-2 text-sm text-white/70">
                 {quickLinks.map((link) => (
                   <Link
                     key={link.label}
@@ -128,10 +128,10 @@ export default function Footer() {
               </div>
             </div>
             <div>
-              <p className="text-xs uppercase tracking-[0.3em] text-[#d8c8b6]">
+              <p className="text-sm uppercase tracking-[0.08em] text-white/80">
                 Support
               </p>
-              <div className="mt-4 grid gap-2 text-sm text-[#f3d8c6]">
+              <div className="mt-4 grid gap-2 text-sm text-white/70">
                 {supportLinks.map((link) => (
                   <Link
                     key={link.label}
@@ -144,10 +144,10 @@ export default function Footer() {
               </div>
             </div>
             <div>
-              <p className="text-xs uppercase tracking-[0.3em] text-[#d8c8b6]">
+              <p className="text-sm uppercase tracking-[0.08em] text-white/80">
                 My Account
               </p>
-              <div className="mt-4 grid gap-2 text-sm text-[#f3d8c6]">
+              <div className="mt-4 grid gap-2 text-sm text-white/70">
                 {accountLinks.map((link) => (
                   <Link
                     key={link.label}
@@ -162,10 +162,10 @@ export default function Footer() {
           </div>
 
           <div>
-            <p className="text-xs uppercase tracking-[0.3em] text-[#d8c8b6]">
+            <p className="text-sm uppercase tracking-[0.08em] text-white/80">
               Join the Kahwa Circle
             </p>
-            <p className="mt-4 text-sm text-[#f3d8c6]">
+            <p className="mt-4 text-sm text-white/80">
               Stay updated with exclusive blends, stories and offers.
             </p>
             <form className="mt-6 flex flex-col gap-3">
@@ -173,16 +173,16 @@ export default function Footer() {
                 type="email"
                 required
                 placeholder="E-mail*"
-                className="rounded-full border border-[#3c2a20] bg-[#2a1e17] px-4 py-3 text-sm text-white placeholder:text-[#bfae9d] outline-none focus:border-[#f3d8c6]"
+                className="rounded-full border border-white/10 bg-[#3f453f] px-4 py-3 text-sm text-white placeholder:text-text-white/80 outline-none focus:border-[#f3d8c6]"
               />
               <button
                 type="submit"
-                className="rounded-full bg-[#f3d8c6] px-4 py-3 text-xs font-semibold uppercase tracking-[0.3em] text-[#1f1711]"
+                className="rounded-full bg-white/90 px-4 py-3 text-xs font-semibold uppercase tracking-[0.08em] text-[#1f1711]"
               >
                 Subscribe
               </button>
             </form>
-            <div className="mt-8 flex flex-wrap items-center gap-4 text-xs text-[#bfae9d]">
+            <div className="mt-8 flex flex-wrap items-center gap-4 text-xs text-white/70">
               <Link href="/privacy-policy" className="hover:text-white">
                 Privacy Policy
               </Link>
@@ -194,13 +194,17 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="mt-12 border-t border-[#2d2018] pt-6 text-xs text-[#bfae9d] flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="mt-12 border-t border-white/40 pt-6 text-xs text-white/80 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <p>Copyright (c) 2026 The Kahwa Company by volymoly</p>
           <div className="flex items-center gap-2">
-            <span className="text-[#f3d8c6]">volymoly</span>
-            <span className="inline-flex h-7 w-7 items-center justify-center rounded-full border border-[#f3d8c6] text-[10px]">
-              v
-            </span>
+            <span className="text-white/80">volymoly</span>
+            {/* <span className="inline-flex h-7 w-7 items-center justify-center text-[10px]">
+              <img
+                src="/logo/LOGO_TKC-03.png"
+                alt="The Kahwa Company"
+                className="h-5 w-auto object-contain"
+              />
+            </span> */}
           </div>
         </div>
       </div>

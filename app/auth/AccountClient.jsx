@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/app/context/AuthContext";
 import { apiFetch } from "@/utils/api";
+import { Eye, EyeOff } from "lucide-react";
 
 export default function AccountClient() {
   const router = useRouter();
@@ -219,6 +220,7 @@ export default function AccountClient() {
   const [rememberMe, setRememberMe] = useState(false);
   const [loginErrors, setLoginErrors] = useState({});
   const [rememberMeLetter, setRememberMeLetter] = useState(false);
+  const [showLoginPassword, setShowLoginPassword] = useState(false);
 
   const [registerForm, setRegisterForm] = useState({
     name: "",
@@ -233,6 +235,9 @@ export default function AccountClient() {
   const [registerError, setRegisterError] = useState("");
   const [registerSuccess, setRegisterSuccess] = useState("");
   const [registerErrors, setRegisterErrors] = useState({});
+  const [showRegisterPassword, setShowRegisterPassword] = useState(false);
+  const [showRegisterConfirmPassword, setShowRegisterConfirmPassword] =
+    useState(false);
 
   const onLoginChange = (e) => {
     const { name, value } = e.target;
@@ -375,15 +380,31 @@ export default function AccountClient() {
                 <label className="text-sm font-thin text-black">
                   Password <span className="text-red-400">*</span>
                 </label>
-                <input
-                  type="password"
-                  name="password"
-                  value={loginForm.password}
-                  onChange={onLoginChange}
-                  required
-                  className="mt-2 w-full rounded-sm border border-black/15 px-4 py-3 text-sm outline-none focus:border-[#4e5a50]"
-                  placeholder="Enter your password..."
-                />
+                <div className="relative mt-2">
+                  <input
+                    type={showLoginPassword ? "text" : "password"}
+                    name="password"
+                    value={loginForm.password}
+                    onChange={onLoginChange}
+                    required
+                    className="w-full rounded-sm border border-black/15 px-4 py-3 pr-12 text-sm outline-none focus:border-[#4e5a50]"
+                    placeholder="Enter your password..."
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowLoginPassword((prev) => !prev)}
+                    className="absolute inset-y-0 right-0 flex items-center px-3 text-black/50 hover:text-black"
+                    aria-label={
+                      showLoginPassword ? "Hide password" : "Show password"
+                    }
+                  >
+                    {showLoginPassword ? (
+                      <Eye className="h-4 w-4" />
+                    ) : (
+                      <EyeOff className="h-4 w-4" />
+                    )}
+                  </button>
+                </div>
                 {loginErrors.password && (
                   <p className="mt-2 text-xs text-red-600">
                     {loginErrors.password}
@@ -556,15 +577,31 @@ export default function AccountClient() {
                 <label className="text-sm font-thin text-black">
                   Password <span className="text-red-400">*</span>
                 </label>
-                <input
-                  type="password"
-                  name="password"
-                  value={registerForm.password}
-                  onChange={onRegisterChange}
-                  required
-                  className="mt-2 w-full rounded-sm border border-black/15 px-4 py-3 text-sm outline-none focus:border-[#4e5a50]"
-                  placeholder="Enter your password..."
-                />
+                <div className="relative mt-2">
+                  <input
+                    type={showRegisterPassword ? "text" : "password"}
+                    name="password"
+                    value={registerForm.password}
+                    onChange={onRegisterChange}
+                    required
+                    className="w-full rounded-sm border border-black/15 px-4 py-3 pr-12 text-sm outline-none focus:border-[#4e5a50]"
+                    placeholder="Enter your password..."
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowRegisterPassword((prev) => !prev)}
+                    className="absolute inset-y-0 right-0 flex items-center px-3 text-black/50 hover:text-black"
+                    aria-label={
+                      showRegisterPassword ? "Hide password" : "Show password"
+                    }
+                  >
+                    {showRegisterPassword ? (
+                      <Eye className="h-4 w-4" />
+                    ) : (
+                      <EyeOff className="h-4 w-4" />
+                    )}
+                  </button>
+                </div>
                 {registerErrors.password && (
                   <p className="mt-2 text-xs text-red-600">
                     {registerErrors.password}
@@ -576,15 +613,35 @@ export default function AccountClient() {
                 <label className="text-sm font-thin text-black">
                   Confirm password <span className="text-red-400">*</span>
                 </label>
-                <input
-                  type="password"
-                  name="password_confirmation"
-                  value={registerForm.password_confirmation}
-                  onChange={onRegisterChange}
-                  required
-                  className="mt-2 w-full rounded-sm border border-black/15 px-4 py-3 text-sm outline-none focus:border-[#4e5a50]"
-                  placeholder="Enter your password..."
-                />
+                <div className="relative mt-2">
+                  <input
+                    type={showRegisterConfirmPassword ? "text" : "password"}
+                    name="password_confirmation"
+                    value={registerForm.password_confirmation}
+                    onChange={onRegisterChange}
+                    required
+                    className="w-full rounded-sm border border-black/15 px-4 py-3 pr-12 text-sm outline-none focus:border-[#4e5a50]"
+                    placeholder="Enter your password..."
+                  />
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setShowRegisterConfirmPassword((prev) => !prev)
+                    }
+                    className="absolute inset-y-0 right-0 flex items-center px-3 text-black/50 hover:text-black"
+                    aria-label={
+                      showRegisterConfirmPassword
+                        ? "Hide password"
+                        : "Show password"
+                    }
+                  >
+                    {showRegisterConfirmPassword ? (
+                      <Eye className="h-4 w-4" />
+                    ) : (
+                      <EyeOff className="h-4 w-4" />
+                    )}
+                  </button>
+                </div>
                 {registerErrors.password_confirmation && (
                   <p className="mt-2 text-xs text-red-600">
                     {registerErrors.password_confirmation}

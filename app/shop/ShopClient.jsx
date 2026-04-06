@@ -201,8 +201,8 @@ export default function ShopClient() {
                         className="w-full accent-[#6a716a] h-1"
                       />
                       <div className="mt-2 flex justify-between text-xs text-black/70">
-                        <span>₹{priceRange[0]}</span>
-                        <span>₹{priceRange[1]}</span>
+                        <span>₹ {priceRange[0]}</span>
+                        <span>₹ {priceRange[1]}</span>
                       </div>
                     </div>
                   )}

@@ -20,19 +20,19 @@ export default function DashboardPage() {
       id: "TKC-1042",
       date: "Mar 12, 2026",
       status: "Delivered",
-      total: "Rs. 1,499",
+      total: "₹  1,499",
     },
     {
       id: "TKC-1037",
       date: "Feb 28, 2026",
       status: "In transit",
-      total: "Rs. 899",
+      total: "₹  899",
     },
     {
       id: "TKC-1029",
       date: "Feb 10, 2026",
       status: "Delivered",
-      total: "Rs. 2,120",
+      total: "₹  2,120",
     },
   ];
 

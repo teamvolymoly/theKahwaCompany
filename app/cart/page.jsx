@@ -27,8 +27,13 @@ export default function CartPage() {
     () => items.reduce((sum, item) => sum + item.price * item.qty, 0),
     [items],
   );
-  const shipping = subtotal > 999 ? 0 : 120;
+  const freeShippingThreshold = 500;
+  const shipping = subtotal > freeShippingThreshold ? 0 : 120;
   const total = subtotal + shipping;
+  const amountForFreeShipping =
+    subtotal > freeShippingThreshold
+      ? 0
+      : Math.max(0, freeShippingThreshold + 1 - subtotal);
 
   const updateQty = (id, delta) => {
     setItems((prev) =>
@@ -72,7 +77,7 @@ export default function CartPage() {
         </div>
 
         <div className="mt-10 grid gap-8 lg:grid-cols-[1.4fr_0.6fr]">
-          <div className="rounded-3xl border border-black/10 bg-white p-6 shadow-sm">
+          <div className="rounded-sm border border-black/10 bg-white p-6 shadow-sm">
             {items.length === 0 ? (
               <p className="text-black/60">Your cart is empty.</p>
             ) : (
@@ -82,7 +87,7 @@ export default function CartPage() {
                     key={item.id}
                     className="flex flex-col gap-4 border-b border-black/10 pb-6 md:flex-row md:items-center"
                   >
-                    <div className="h-24 w-24 overflow-hidden rounded-2xl bg-black/5 p-3">
+                    <div className="h-24 w-24 overflow-hidden rounded-sm bg-black/5 p-3">
                       <img
                         src={item.image}
                         alt={item.name}
@@ -103,7 +108,7 @@ export default function CartPage() {
                       </button>
                     </div>
                     <div className="flex items-center gap-4">
-                      <div className="flex items-center gap-3 rounded-full border border-black/10 px-4 py-2">
+                      <div className="flex items-center gap-3 rounded-sm border border-black/10 px-4 py-2">
                         <button
                           type="button"
                           onClick={() => updateQty(item.id, -1)}
@@ -121,7 +126,7 @@ export default function CartPage() {
                         </button>
                       </div>
                       <div className="text-sm font-semibold">
-                        Rs.{item.price * item.qty}
+                        ₹ {item.price * item.qty}
                       </div>
                     </div>
                   </div>
@@ -130,42 +135,47 @@ export default function CartPage() {
             )}
           </div>
 
-          <div className="rounded-3xl border border-black/10 bg-white p-6 shadow-sm">
-            <p className="text-xs uppercase tracking-[0.3em] text-black/50">
+          <div className="rounded-sm border border-black/10 bg-white p-6 shadow-sm">
+            <p className="text-xs uppercase tracking-[0.08em] text-black/50">
               Order summary
             </p>
+            <div className="mt-4 rounded-sm border border-dashed border-black/20 bg-black/5 px-4 py-3 text-xs uppercase tracking-[0.08em] text-black/70">
+              {subtotal > freeShippingThreshold
+                ? "You got free delivery."
+                : `Add ₹ ${amountForFreeShipping} more for free delivery above ₹ ${freeShippingThreshold}.`}
+            </div>
             <div className="mt-6 grid gap-3 text-sm text-black/70">
               <div className="flex items-center justify-between">
                 <span>Subtotal</span>
-                <span>Rs.{subtotal}</span>
+                <span>₹ {subtotal}</span>
               </div>
               <div className="flex items-center justify-between">
                 <span>Shipping</span>
-                <span>{shipping === 0 ? "Free" : `Rs.${shipping}`}</span>
+                <span>{shipping === 0 ? "Free" : `₹ ${shipping}`}</span>
               </div>
               <div className="flex items-center justify-between border-t border-black/10 pt-3 text-black font-semibold">
                 <span>Total</span>
-                <span>Rs.{total}</span>
+                <span>₹ {total}</span>
               </div>
             </div>
 
             <div className="mt-6">
-              <label className="text-xs uppercase tracking-[0.3em] text-black/50">
-                Promo code
+              <label className="text-xs uppercase tracking-[0.08em] text-black/50">
+                Coupon code
               </label>
               <div className="mt-3 flex gap-2">
                 <input
                   type="text"
                   placeholder="KAHWA10"
-                  className="flex-1 rounded-full border border-black/20 px-4 py-2 text-sm outline-none focus:border-black"
+                  className="flex-1 rounded-sm border border-black/20 px-4 py-2 text-sm outline-none focus:border-black"
                 />
-                <button className="rounded-full border border-black px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-black">
+                <button className="rounded-sm border border-black px-4 py-2 text-xs font-semibold uppercase tracking-[0.1em] text-black">
                   Apply
                 </button>
               </div>
             </div>
             <Link href="/checkout">
-              <button className="mt-8 w-full rounded-full bg-black px-4 py-3 text-xs font-semibold uppercase tracking-[0.3em] text-white">
+              <button className="mt-8 w-full rounded-full bg-black px-4 py-3 text-xs font-semibold uppercase tracking-[0.08em] text-white">
                 Proceed to checkout
               </button>
             </Link>

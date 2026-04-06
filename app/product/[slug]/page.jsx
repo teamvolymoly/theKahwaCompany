@@ -552,11 +552,11 @@ export default function ProductDetail() {
                   className="text-4xl font-semibold text-[#1c2230]"
                   // style={{ fontFamily: "var(--font-basker)" }}
                 >
-                  ₹{selectedVariant?.price ?? "--"}
+                  ₹ {selectedVariant?.price ?? "--"}
                 </div>
                 {product.oldPrice && (
                   <div className="text-lg text-[#1c2230]/40 line-through">
-                    ₹{product.oldPrice}
+                    ₹ {product.oldPrice}
                   </div>
                 )}
               </div>
