@@ -779,7 +779,7 @@ export default function ProductDetail() {
                 <button
                   type="button"
                   onClick={() => ingredientsRef.current?.slidePrev()}
-                  className="h-10 w-fit rounded-sm border border-black/10 text-black/60"
+                  className="h-10 w-fit text-black/60 cursor-pointer"
                   aria-label="Scroll ingredients left"
                 >
                   <ChevronLeftIcon />
@@ -824,7 +824,7 @@ export default function ProductDetail() {
                 <button
                   type="button"
                   onClick={() => ingredientsRef.current?.slideNext()}
-                  className="h-10 w-fit rounded-sm border border-black/10 text-black/60"
+                  className="h-10 w-fit text-black/60 cursor-pointer"
                   aria-label="Scroll ingredients right"
                 >
                   <ChevronRightIcon />
