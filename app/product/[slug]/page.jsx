@@ -796,11 +796,11 @@ export default function ProductDetail() {
                     ingredientsRef.current = swiper;
                   }}
                   breakpoints={{
-                    480: { slidesPerView: 2.2, spaceBetween: 18 },
-                    768: { slidesPerView: 3.2, spaceBetween: 20 },
-                    1024: { slidesPerView: 4.2, spaceBetween: 22 },
+                    480: { slidesPerView: 2.2, spaceBetween: 10 },
+                    768: { slidesPerView: 3.2, spaceBetween: 10 },
+                    1024: { slidesPerView: 4.2, spaceBetween: 10 },
                     1280: { slidesPerView: 4.2, spaceBetween: 10 },
-                    1536: { slidesPerView: 5.2, spaceBetween: 26 },
+                    1536: { slidesPerView: 5.2, spaceBetween: 10 },
                   }}
                   className="pb-6"
                 >
