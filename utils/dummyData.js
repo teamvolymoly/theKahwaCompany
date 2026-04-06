@@ -150,9 +150,101 @@ export const dummyProducts = [
 ];
 
 export const dummyReviews = [
-  { id: 1, rating: 5, review: "Aromatic and soothing, perfect for evenings." },
-  { id: 2, rating: 4, review: "Loved the saffron notes and warm finish." },
-  { id: 3, rating: 5, review: "Great balance of spices, very comforting." },
+  {
+    id: 1,
+    rating: 5,
+    review:
+      "I rarely post reviews but I gotta say, I was so impressed by the taste and quality that I had to do one. The packaging was beautiful and the tea bags looked premium which is quite unusual for teas as they look quite simple but this one looked like fairy potions. I loved it and so did quite a few of my friends and office mates and would highly recommend it.",
+    title: "The quality and taste won my heart",
+    name: "Anukriti Kumar",
+    location: "India",
+    date: "14 February 2026",
+    variant: "30 Tea Bags",
+    flavor: "Blue Kahwa",
+    verified: true,
+    helpful: 2,
+    images: [
+      "/products/amazon/blue/B2.png",
+      "/products/amazon/blue/Blue.png",
+      "/products/amazon/blue/Resizing_Amazon3.png",
+      "/products/packets/18.png",
+    ],
+  },
+  {
+    id: 2,
+    rating: 4,
+    review:
+      "Loved the saffron notes and warm finish. The aroma is soothing and the flavor stays clean even on the second steep.",
+    title: "Warm, fragrant, and calming",
+    name: "Rohit Sharma",
+    location: "India",
+    date: "03 March 2026",
+    variant: "60 Tea Bags",
+    flavor: "Kashmiri Kahwa",
+    verified: true,
+    helpful: 1,
+    images: [
+      "/products/tin/BLTIN1.png",
+      "/products/packets/17.png",
+      "/products/packets/16.png",
+    ],
+  },
+  {
+    id: 3,
+    rating: 5,
+    review:
+      "Great balance of spices, very comforting. The mint finish is fresh and not overpowering.",
+    title: "Comforting with a fresh finish",
+    name: "Neha Verma",
+    location: "India",
+    date: "21 January 2026",
+    variant: "100g Tin",
+    flavor: "Mint Kahwa",
+    verified: true,
+    helpful: 0,
+    images: [
+      "/products/packets/11.png",
+      "/products/packets/12.png",
+      "/products/packets/13.png",
+    ],
+  },
+  {
+    id: 4,
+    rating: 4,
+    review:
+      "Smooth and clean, with a gentle citrus lift. I like it most in the evening when I want something light.",
+    title: "Light, citrusy, and smooth",
+    name: "Aditi Singh",
+    location: "India",
+    date: "29 February 2026",
+    variant: "75g Tin",
+    flavor: "Hibiscus Kahwa",
+    verified: true,
+    helpful: 0,
+    images: [
+      "/products/packets/14.png",
+      "/products/packets/15.png",
+    ],
+  },
+  {
+    id: 5,
+    rating: 5,
+    review:
+      "Beautiful aroma and the color is stunning. Served it to guests and everyone asked for seconds.",
+    title: "A stunning tea for guests",
+    name: "Karan Mehta",
+    location: "India",
+    date: "08 April 2026",
+    variant: "Sampler Box",
+    flavor: "Signature Kahwa",
+    verified: true,
+    helpful: 0,
+    images: [
+      "/products/packets/19.png",
+      "/products/packets/20.png",
+      "/products/tin/MLTIN1.png",
+    ],
+  },
 ];
 
 export const dummySubcategories = [

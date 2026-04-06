@@ -25,6 +25,7 @@ export default function ProductDetail() {
   const brewingHotRef = useRef(null);
   const brewingColdRef = useRef(null);
   const [previewIndex, setPreviewIndex] = useState(null);
+  const [reviewPreview, setReviewPreview] = useState(null);
 
   useEffect(() => {
     const load = async () => {
@@ -69,6 +70,28 @@ export default function ProductDetail() {
   }, [reviews]);
 
   const fullStars = Math.max(0, Math.min(5, Math.round(avgRating)));
+  const ratingStats = useMemo(() => {
+    const counts = [0, 0, 0, 0, 0];
+    reviews.forEach((r) => {
+      const score = Math.round(r.rating || 0);
+      if (score >= 1 && score <= 5) counts[score - 1] += 1;
+    });
+    const total = reviews.length || 1;
+    const percents = counts.map((c) => Math.round((c / total) * 100));
+    return { counts, percents, totalReviews: reviews.length };
+  }, [reviews]);
+
+  const reviewImageStrip = useMemo(() => {
+    const images = [];
+    reviews.forEach((r) => {
+      if (Array.isArray(r.images)) {
+        r.images.forEach((img) => {
+          if (img) images.push(img);
+        });
+      }
+    });
+    return images.slice(0, 8);
+  }, [reviews]);
 
   const getWeightMeta = (variant) => {
     if (!variant) return null;
@@ -145,6 +168,9 @@ export default function ProductDetail() {
   const isPreviewOpen = previewIndex !== null;
   const currentPreview =
     previewIndex !== null ? galleryImages[previewIndex] : null;
+  const isReviewPreviewOpen = reviewPreview !== null;
+  const reviewImages = reviewPreview?.images || [];
+  const reviewImageIndex = reviewPreview?.index ?? 0;
 
   const handlePrevPreview = () => {
     if (previewIndex === null) return;
@@ -156,6 +182,30 @@ export default function ProductDetail() {
   const handleNextPreview = () => {
     if (previewIndex === null) return;
     setPreviewIndex((previewIndex + 1) % galleryImages.length);
+  };
+
+  const handleOpenReviewPreview = (images, index) => {
+    if (!images?.length) return;
+    setReviewPreview({ images, index });
+  };
+
+  const handlePrevReviewPreview = () => {
+    if (!reviewImages.length) return;
+    setReviewPreview((prev) => {
+      if (!prev) return prev;
+      const nextIndex =
+        (prev.index - 1 + prev.images.length) % prev.images.length;
+      return { ...prev, index: nextIndex };
+    });
+  };
+
+  const handleNextReviewPreview = () => {
+    if (!reviewImages.length) return;
+    setReviewPreview((prev) => {
+      if (!prev) return prev;
+      const nextIndex = (prev.index + 1) % prev.images.length;
+      return { ...prev, index: nextIndex };
+    });
   };
 
   const brewingHot = [
@@ -326,6 +376,71 @@ export default function ProductDetail() {
             </div>
           </div>
         )}
+        {isReviewPreviewOpen && (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-6"
+            role="dialog"
+            aria-modal="true"
+          >
+            <button
+              type="button"
+              onClick={() => setReviewPreview(null)}
+              className="absolute right-6 top-6 flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-white/10 text-lg text-white"
+              aria-label="Close review preview"
+            >
+              ×
+            </button>
+            <div className="relative max-h-[80vh] w-full max-w-3xl overflow-hidden rounded-lg bg-white p-6">
+              <button
+                type="button"
+                onClick={handlePrevReviewPreview}
+                className="absolute left-4 top-1/2 -translate-y-1/2 rounded-full border border-black/10 bg-white/90 px-4 py-3 text-2xl text-black/70 hover:text-black"
+                aria-label="Previous review image"
+              >
+                ‹
+              </button>
+              <button
+                type="button"
+                onClick={handleNextReviewPreview}
+                className="absolute right-4 top-1/2 -translate-y-1/2 rounded-full border border-black/10 bg-white/90 px-4 py-3 text-2xl text-black/70 hover:text-black"
+                aria-label="Next review image"
+              >
+                ›
+              </button>
+              <img
+                src={reviewImages[reviewImageIndex]}
+                alt={`Customer review image ${reviewImageIndex + 1}`}
+                className="h-[65vh] w-full object-contain"
+              />
+              <div className="mt-4 flex flex-col items-center gap-3">
+                <div className="text-xs uppercase tracking-[0.3em] text-black/40">
+                  {reviewImages.length
+                    ? `Image ${reviewImageIndex + 1} of ${reviewImages.length}`
+                    : ""}
+                </div>
+                <div className="flex flex-wrap items-center justify-center gap-2">
+                  {reviewImages.map((_, index) => (
+                    <button
+                      key={`review-dot-${index}`}
+                      type="button"
+                      onClick={() =>
+                        setReviewPreview((prev) =>
+                          prev ? { ...prev, index } : prev,
+                        )
+                      }
+                      className={`h-2.5 w-2.5 rounded-full border transition ${
+                        index === reviewImageIndex
+                          ? "border-black bg-black"
+                          : "border-black/30 bg-transparent"
+                      }`}
+                      aria-label={`Go to review image ${index + 1}`}
+                    />
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
         <section className="">
           <div className="container mx-auto px-4 lg:px-8 mx-auto  pt-6">
             <div className="mt-2 flex flex-wrap items-center gap-2 text-sm text-black/50">
@@ -345,7 +460,7 @@ export default function ProductDetail() {
                 <button
                   key={img.id ?? i}
                   onClick={() => setActiveImage(i)}
-                  className={`h-20 w-20 shrink-0 overflow-hidden rounded-2xl border bg-white transition ${
+                  className={`h-20 w-20 shrink-0 overflow-hidden rounded-sm border bg-white transition ${
                     activeImage === i
                       ? "border-black shadow-sm"
                       : "border-black/10"
@@ -858,52 +973,198 @@ export default function ProductDetail() {
 
         <section className=" bg-white border-t border-black/10 container mx-auto px-4 lg:px-8">
           <div className=" py-14 ">
-            <div className="rounded-3xl border border-black/10 bg-white p-6 ">
+            <div className="rounded-3xl">
               <h3
-                className="text-xl"
+                className="text-2xl lg:text-3xl font-semibold"
                 style={{ fontFamily: "var(--font-display)" }}
               >
                 Customer reviews
               </h3>
-              <div className="mt-6 space-y-5">
-                {reviews.length === 0 && (
-                  <p className="text-sm text-black/50">
-                    Share your first sip and review this tea.
+
+              <div className="mt-6 grid gap-8 lg:grid-cols-[280px_1fr]">
+                <div className="rounded-sm h-fit border border-black/10 bg-white p-5">
+                  <div className="text-4xl font-semibold text-[#1c2230]">
+                    {avgRating.toFixed(1)}
+                    <span className="text-base text-black/50"> / 5</span>
+                  </div>
+                  <div className="mt-2 flex items-center gap-1">
+                    {Array.from({ length: 5 }).map((_, index) => (
+                      <svg
+                        key={`avg-breakdown-${index}`}
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill={index < fullStars ? "currentColor" : "none"}
+                        className={`h-4 w-4 ${index < fullStars ? "text-[#1c2230]" : "text-[#1c2230]/30"}`}
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M12 3.5l2.66 5.39 5.94.86-4.3 4.19 1.02 5.93L12 17.77l-5.32 2.8 1.02-5.93-4.3-4.19 5.94-.86L12 3.5z"
+                          stroke="currentColor"
+                          strokeWidth="1"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                    ))}
+                  </div>
+                  <p className="mt-2 text-sm text-black/60">
+                    {ratingStats.totalReviews} global ratings
                   </p>
-                )}
-                {reviews.map((r) => (
-                  <div
-                    key={r.id}
-                    className="rounded-2xl border border-black/10 bg-black/5 p-4"
-                  >
-                    <div className="flex items-center justify-between text-xs uppercase tracking-[0.3em] text-black/50">
-                      <span>Customer</span>
-                      <div className="flex items-center gap-1">
-                        {Array.from({ length: 5 }).map((_, index) => (
-                          <svg
-                            key={`review-${r.id}-star-${index}`}
-                            width="14"
-                            height="14"
-                            viewBox="0 0 24 24"
-                            fill={
-                              index < (r.rating || 0) ? "currentColor" : "none"
-                            }
-                            className={`h-3 w-3 ${index < (r.rating || 0) ? "text-[#1c2230]" : "text-[#1c2230]/30"}`}
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <path
-                              d="M12 3.5l2.66 5.39 5.94.86-4.3 4.19 1.02 5.93L12 17.77l-5.32 2.8 1.02-5.93-4.3-4.19 5.94-.86L12 3.5z"
-                              stroke="currentColor"
-                              strokeWidth="1"
-                              strokeLinejoin="round"
+
+                  <div className="mt-6 space-y-3">
+                    {[5, 4, 3, 2, 1].map((star) => {
+                      const index = star - 1;
+                      const percent = ratingStats.percents[index] ?? 0;
+                      const count = ratingStats.counts[index] ?? 0;
+                      return (
+                        <div
+                          key={`rating-${star}`}
+                          className="grid grid-cols-[30px_1fr_40px] items-center gap-3 text-xs text-black/60"
+                        >
+                          <span>{star}★</span>
+                          <div className="h-2 w-full overflow-hidden rounded-full bg-black/10">
+                            <div
+                              className="h-full rounded-full bg-[#1c2230]"
+                              style={{ width: `${percent}%` }}
                             />
-                          </svg>
+                          </div>
+                          <span className="text-right">{count}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  <button
+                    type="button"
+                    className="mt-6 w-full rounded-sm border border-black/20 bg-white px-4 py-3 text-xs uppercase tracking-[0.08em] font-semibold text-black/80 transition hover:border-black/40 cursor-pointer"
+                  >
+                    Write a review
+                  </button>
+                </div>
+
+                <div className="space-y-5">
+                  {reviewImageStrip.length > 0 && (
+                    <div className="rounded-sm border border-black/10 bg-white p-5">
+                      <div className="flex items-center justify-between">
+                        <p className="text-sm uppercase font-semibold tracking-[0.08em] text-black">
+                          Customer images
+                        </p>
+                        {/* <button
+                          type="button"
+                          className="text-[10px] uppercase tracking-[0.08em] text-black/50"
+                        >
+                          See all
+                        </button> */}
+                      </div>
+                      <div className="mt-4 flex flex-wrap gap-3">
+                        {reviewImageStrip.map((img, index) => (
+                          <button
+                            key={`review-strip-${index}`}
+                            type="button"
+                            onClick={() =>
+                              handleOpenReviewPreview(reviewImageStrip, index)
+                            }
+                            className="h-20 w-20 overflow-hidden rounded-sm border border-black/10 bg-white cursor-pointer"
+                            aria-label={`Open customer image ${index + 1}`}
+                          >
+                            <img
+                              src={img}
+                              alt={`Customer image ${index + 1}`}
+                              className="h-full w-full object-cover"
+                            />
+                          </button>
                         ))}
                       </div>
                     </div>
-                    <p className="mt-3 text-sm text-black/60">{r.review}</p>
-                  </div>
-                ))}
+                  )}
+                  {reviews.length === 0 && (
+                    <p className="text-sm text-black/50">
+                      Share your first sip and review this tea.
+                    </p>
+                  )}
+                  {reviews.map((r) => (
+                    <div
+                      key={r.id}
+                      className="rounded-sm border border-black/10 bg-white p-5"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-black/10 text-sm font-semibold text-black/60">
+                          {(r.name || "Customer").slice(0, 1)}
+                        </div>
+                        <div>
+                          <p className="text-sm font-semibold text-black">
+                            {r.name || "Customer"}
+                          </p>
+                          <p className="text-xs text-black/60">
+                            {r.location ? `Reviewed in ${r.location}` : ""}
+                            {r.date ? ` on ${r.date}` : ""}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="mt-3 flex flex-wrap items-center gap-2">
+                        <div className="flex items-center gap-1">
+                          {Array.from({ length: 5 }).map((_, index) => (
+                            <svg
+                              key={`review-${r.id}-star-${index}`}
+                              width="14"
+                              height="14"
+                              viewBox="0 0 24 24"
+                              fill={
+                                index < (r.rating || 0)
+                                  ? "currentColor"
+                                  : "none"
+                              }
+                              className={`h-4 w-4 ${index < (r.rating || 0) ? "text-[#1c2230]" : "text-[#1c2230]/30"}`}
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                d="M12 3.5l2.66 5.39 5.94.86-4.3 4.19 1.02 5.93L12 17.77l-5.32 2.8 1.02-5.93-4.3-4.19 5.94-.86L12 3.5z"
+                                stroke="currentColor"
+                                strokeWidth="1"
+                                strokeLinejoin="round"
+                              />
+                            </svg>
+                          ))}
+                        </div>
+                        {r.title && (
+                          <span className="text-sm font-semibold text-black">
+                            {r.title}
+                          </span>
+                        )}
+                      </div>
+
+                      <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-black/70">
+                        {r.flavor && <span>Flavour Name: {r.flavor}</span>}
+                        {r.variant && <span>| Size: {r.variant}</span>}
+                      </div>
+
+                      <p className="mt-3 text-sm text-black/90">{r.review}</p>
+
+                      {Array.isArray(r.images) && r.images.length > 0 && (
+                        <div className="mt-4 flex flex-wrap gap-3">
+                          {r.images.map((img, index) => (
+                            <button
+                              key={`${r.id}-img-${index}`}
+                              type="button"
+                              onClick={() =>
+                                handleOpenReviewPreview(r.images, index)
+                              }
+                              className="h-20 w-20 overflow-hidden rounded-sm border border-black/10 bg-white cursor-pointer"
+                              aria-label={`Open review image ${index + 1}`}
+                            >
+                              <img
+                                src={img}
+                                alt={`Customer review ${index + 1}`}
+                                className="h-full w-full object-cover"
+                              />
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
