@@ -157,7 +157,6 @@ export default function ProductDetail() {
     setPreviewIndex((previewIndex + 1) % galleryImages.length);
   };
 
-
   const brewingHot = [
     {
       title: "Measure",
@@ -204,12 +203,36 @@ export default function ProductDetail() {
   ];
 
   const ingredientsBase = [
-    { name: "Chamomile Flower", image: "/products/Ingredient/Chamomile_FLower_8047e7b1-6c54-41fe-acbd-18bfb030db44.avif" },
-    { name: "Green Tea", image: "/products/Ingredient/Green_Tea_388daaf2-1c37-4633-87dd-56c85e28b05c.avif" },
-    { name: "Lemongrass", image: "/products/Ingredient/Lemongrass_9ef65a92-6a72-4453-9f4b-43502c336528.avif" },
-    { name: "Orange Peel", image: "/products/Ingredient/Orange_Peel_a61b1d6a-6890-43fd-bef5-86528a0bd763.avif" },
-    { name: "Peppermint", image: "/products/Ingredient/Peppermint_952ac752-d54d-4f23-8f76-d659cd96c75c.avif" },
-    { name: "Spearmint", image: "/products/Ingredient/Spearmint_3cecd63e-bcdd-4904-a59e-bf260f503075.avif" },
+    {
+      name: "Chamomile Flower",
+      image:
+        "/products/Ingredient/Chamomile_FLower_8047e7b1-6c54-41fe-acbd-18bfb030db44.avif",
+    },
+    {
+      name: "Green Tea",
+      image:
+        "/products/Ingredient/Green_Tea_388daaf2-1c37-4633-87dd-56c85e28b05c.avif",
+    },
+    {
+      name: "Lemongrass",
+      image:
+        "/products/Ingredient/Lemongrass_9ef65a92-6a72-4453-9f4b-43502c336528.avif",
+    },
+    {
+      name: "Orange Peel",
+      image:
+        "/products/Ingredient/Orange_Peel_a61b1d6a-6890-43fd-bef5-86528a0bd763.avif",
+    },
+    {
+      name: "Peppermint",
+      image:
+        "/products/Ingredient/Peppermint_952ac752-d54d-4f23-8f76-d659cd96c75c.avif",
+    },
+    {
+      name: "Spearmint",
+      image:
+        "/products/Ingredient/Spearmint_3cecd63e-bcdd-4904-a59e-bf260f503075.avif",
+    },
   ];
   const ingredients = Array.from({ length: 10 }).map((_, index) => {
     const item = ingredientsBase[index % ingredientsBase.length];
@@ -454,7 +477,7 @@ export default function ProductDetail() {
                               {primaryLabel}
                             </span>
                             {secondaryLabel && (
-                              <span className="text-[11px] uppercase tracking-[0.1em] ">
+                              <span className="text-[11px] uppercase font-semibold tracking-[0.1em] ">
                                 {secondaryLabel}
                               </span>
                             )}
@@ -671,90 +694,76 @@ export default function ProductDetail() {
                 Brewing Rituals
               </h3>
               <div className="grid gap-8 grid-cols-1 md:grid-cols-2">
-              <div className="w-full text-black">
-                <h4 className="text-lg">Hot Brew</h4>
-                <div className="mt-4 grid gap-4 sm:grid-cols-2">
-                  <div className="flex items-center gap-3 text-sm text-black">
-                    <span className="flex h-14 w-14 items-center justify-center rounded-full bg-white">
-                      <img
-                        src="/products/br/Place_1_Bag_in_a_Cup.svg"
-                        alt="Place 1 bag in a cup"
-                        className="h-10 w-10 object-contain"
-                      />
-                    </span>
-                    1 Tsp / 2 g
-                  </div>
-                  <div className="flex items-center gap-3 text-sm text-black">
-                    <span className="flex h-14 w-14 items-center justify-center rounded-full bg-white">
-                      <img
-                        src="/products/br/Pour_7fl._oz_200_ml_Freshly_Boiled_Water_over_the_Leaves-40_1.svg"
-                        alt="Pour 200 ml water"
-                        className="h-10 w-10 object-contain"
-                      />
-                    </span>
-                    200ml
-                  </div>
-                  <div className="flex items-center gap-3 text-sm text-black">
-                    <span className="flex h-14 w-14 items-center justify-center rounded-full bg-white">
-                      <img
-                        src="/products/br/Water_Temperature_-_158_F-176_F_-_70_C-80_C_7fd68249-bd73-4395-9d89-ea7dcb877f83.svg"
-                        alt="Water temperature"
-                        className="h-10 w-10 object-contain"
-                      />
-                    </span>
-                    85° - 95°C
-                  </div>
-                  <div className="flex items-center gap-3 text-sm text-black">
-                    <span className="flex h-14 w-14 items-center justify-center rounded-full bg-white">
-                      <img
-                        src="/products/br/Brew_for_2-3_mins_4c4d18ef-6046-4708-9813-79f87a88239e.svg"
-                        alt="Brew time"
-                        className="h-10 w-10 object-contain"
-                      />
-                    </span>
-                    3 - 5 Mins
-                  </div>
-                </div>
-                <div className="mt-6 inline-flex items-center gap-3 rounded-sm border border-black/10 bg-black/[0.03] px-4 py-3 text-sm text-black">
-                  Cover with a lid while brewing
-                </div>
-              </div>
-              <div className="w-full text-black">
-                <h4 className="text-lg ">Iced Brew</h4>
-                <div className="mt-4 flex flex-wrap gap-3">
-                  <div className="flex items-center gap-3 text-sm text-black">
-                    <span className="flex h-14 w-14 items-center justify-center rounded-full bg-white">
-                      <img
-                        src="/products/br/Refrigerate_for_3-4_hours._Add_ice_cubes_sweetener.svg"
-                        alt="Refrigerate and add ice"
-                        className="h-10 w-10 object-contain"
-                      />
-                    </span>
-                    Refrigerate & add ice
-                  </div>
-                  <div className="flex items-center gap-3 text-sm text-black">
-                    <span className="flex h-14 w-14 items-center justify-center rounded-full bg-white">
-                      <img
-                        src="/products/br/To_be_served_without_milk.svg"
-                        alt="Serve without milk"
-                        className="h-10 w-10 object-contain"
-                      />
-                    </span>
-                    Serve without milk
+                <div className="w-full text-black">
+                  <h4 className="text-lg font-semibold">Hot Brew</h4>
+                  <div className="mt-4 grid gap-4 sm:grid-cols-2">
+                    <div className="flex items-center gap-3 text-base text-black">
+                      <span className="flex h-14 w-14 items-center justify-center rounded-full bg-white">
+                        <img
+                          src="/products/br/Place_1_Bag_in_a_Cup.svg"
+                          alt="Place 1 bag in a cup"
+                          className="h-10 w-10 object-contain"
+                        />
+                      </span>
+                      1 Tsp / 2 g
+                    </div>
+                    <div className="flex items-center gap-3 text-base text-black">
+                      <span className="flex h-14 w-14 items-center justify-center rounded-full bg-white">
+                        <img
+                          src="/products/br/Pour_7fl._oz_200_ml_Freshly_Boiled_Water_over_the_Leaves-40_1.svg"
+                          alt="Pour 200 ml water"
+                          className="h-10 w-10 object-contain"
+                        />
+                      </span>
+                      200ml
+                    </div>
+                    <div className="flex items-center gap-3 text-base text-black">
+                      <span className="flex h-14 w-14 items-center justify-center rounded-full bg-white">
+                        <img
+                          src="/products/br/Water_Temperature_-_158_F-176_F_-_70_C-80_C_7fd68249-bd73-4395-9d89-ea7dcb877f83.svg"
+                          alt="Water temperature"
+                          className="h-10 w-10 object-contain"
+                        />
+                      </span>
+                      85° - 95°C
+                    </div>
+                    <div className="flex items-center gap-3 text-base text-black">
+                      <span className="flex h-14 w-14 items-center justify-center rounded-full bg-white">
+                        <img
+                          src="/products/br/Brew_for_2-3_mins_4c4d18ef-6046-4708-9813-79f87a88239e.svg"
+                          alt="Brew time"
+                          className="h-10 w-10 object-contain"
+                        />
+                      </span>
+                      3 - 5 Mins
+                    </div>
                   </div>
                 </div>
-                <p className="mt-4 text-sm text-black/70">
-                  Brew as above and let it cool.
-                </p>
-                <p className="mt-4 text-sm text-black/70">
-                  Pour over ice. Garnish with mint and add a few drops of lemon
-                  juice to{" "}
-                  <span className="italic text-black">
-                    watch the colour shift magically from blue to purple
-                  </span>
-                  .
-                </p>
-              </div>
+                <div className="w-full text-black">
+                  <h4 className="text-lg font-semibold">Iced Brew</h4>
+                  <div className="mt-4 flex flex-wrap gap-3">
+                    <div className="flex items-center gap-3 text-base text-black">
+                      <span className="flex h-14 w-14 items-center justify-center rounded-full bg-white">
+                        <img
+                          src="/products/br/Refrigerate_for_3-4_hours._Add_ice_cubes_sweetener.svg"
+                          alt="Refrigerate and add ice"
+                          className="h-10 w-10 object-contain"
+                        />
+                      </span>
+                      Refrigerate & add ice
+                    </div>
+                    <div className="flex items-center gap-3 text-base text-black">
+                      <span className="flex h-14 w-14 items-center justify-center rounded-full bg-white">
+                        <img
+                          src="/products/br/To_be_served_without_milk.svg"
+                          alt="Serve without milk"
+                          className="h-10 w-10 object-contain"
+                        />
+                      </span>
+                      Serve without milk
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -799,15 +808,15 @@ export default function ProductDetail() {
               >
                 {ingredients.map((item) => (
                   <SwiperSlide key={item.id}>
-                    <div className="rounded-sm border border-black/10 bg-white p-5 text-center">
-                      <div className="h-40 w-full rounded-sm bg-black/[0.04] p-4">
+                    <div className="">
+                      <div className="h-60 w-60 p-4">
                         <img
                           src={item.image}
                           alt={item.name}
-                          className="h-full w-full object-contain"
+                          className="h-full w-full object-contain rounded-sm"
                         />
                       </div>
-                      <p className="mt-4 text-sm uppercase tracking-[0.12em] text-black/70">
+                      <p className="mt-4 ms-4 text-sm uppercase tracking-[0.08em] text-black">
                         {item.name}
                       </p>
                     </div>
@@ -819,7 +828,7 @@ export default function ProductDetail() {
             <div className="space-y-6 mt-10">
               <div className="flex items-center justify-between">
                 <h3
-                  className="text-2xl lg:text-3xl"
+                  className="text-2xl lg:text-3xl font-semibold"
                   style={{ fontFamily: "var(--font-display)" }}
                 >
                   Discover More
