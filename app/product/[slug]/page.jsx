@@ -9,6 +9,7 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
+import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 
 export default function ProductDetail() {
   const { slug } = useParams();
@@ -772,57 +773,63 @@ export default function ProductDetail() {
                 <h3 className="text-2xl lg:text-3xl font-semibold">
                   Ingredients
                 </h3>
-                <div className="flex gap-2">
-                  <button
-                    type="button"
-                    onClick={() => ingredientsRef.current?.slidePrev()}
-                    className="h-10 w-10 rounded-sm border border-black/10 text-black/60"
-                    aria-label="Scroll ingredients left"
-                  >
-                    ‹
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => ingredientsRef.current?.slideNext()}
-                    className="h-10 w-10 rounded-sm border border-black/10 text-black/60"
-                    aria-label="Scroll ingredients right"
-                  >
-                    ›
-                  </button>
-                </div>
               </div>
-              <Swiper
-                modules={[Navigation]}
-                slidesPerView={1.2}
-                spaceBetween={16}
-                onSwiper={(swiper) => {
-                  ingredientsRef.current = swiper;
-                }}
-                breakpoints={{
-                  480: { slidesPerView: 2.2, spaceBetween: 18 },
-                  768: { slidesPerView: 3.2, spaceBetween: 20 },
-                  1024: { slidesPerView: 4.2, spaceBetween: 22 },
-                  1280: { slidesPerView: 5.2, spaceBetween: 24 },
-                }}
-                className="pb-6"
-              >
-                {ingredients.map((item) => (
-                  <SwiperSlide key={item.id}>
-                    <div className="">
-                      <div className="h-60 w-60 p-4">
-                        <img
-                          src={item.image}
-                          alt={item.name}
-                          className="h-full w-full object-contain rounded-sm"
-                        />
+
+              <div className="flex items-center justify-between gap-2">
+                <button
+                  type="button"
+                  onClick={() => ingredientsRef.current?.slidePrev()}
+                  className="h-10 w-fit rounded-sm border border-black/10 text-black/60"
+                  aria-label="Scroll ingredients left"
+                >
+                  <ChevronLeftIcon />
+                </button>
+                <Swiper
+                  modules={[Navigation]}
+                  slidesPerView={1.2}
+                  spaceBetween={16}
+                  navigation={false}
+                  pagination={{ clickable: true }}
+                  scrollbar={{ draggable: true }}
+                  loop={true}
+                  onSwiper={(swiper) => {
+                    ingredientsRef.current = swiper;
+                  }}
+                  breakpoints={{
+                    480: { slidesPerView: 2.2, spaceBetween: 18 },
+                    768: { slidesPerView: 3.2, spaceBetween: 20 },
+                    1024: { slidesPerView: 4.2, spaceBetween: 22 },
+                    1280: { slidesPerView: 4.2, spaceBetween: 10 },
+                    1536: { slidesPerView: 5.2, spaceBetween: 26 },
+                  }}
+                  className="pb-6"
+                >
+                  {ingredients.map((item) => (
+                    <SwiperSlide key={item.id}>
+                      <div className="w-full mr-0">
+                        <div className="w-full aspect-square p-4">
+                          <img
+                            src={item.image}
+                            alt={item.name}
+                            className="h-full w-full object-contain rounded-sm"
+                          />
+                        </div>
+                        <p className=" ms-4 text-sm uppercase tracking-[0.08em] text-black">
+                          {item.name}
+                        </p>
                       </div>
-                      <p className="mt-4 ms-4 text-sm uppercase tracking-[0.08em] text-black">
-                        {item.name}
-                      </p>
-                    </div>
-                  </SwiperSlide>
-                ))}
-              </Swiper>
+                    </SwiperSlide>
+                  ))}
+                </Swiper>
+                <button
+                  type="button"
+                  onClick={() => ingredientsRef.current?.slideNext()}
+                  className="h-10 w-fit rounded-sm border border-black/10 text-black/60"
+                  aria-label="Scroll ingredients right"
+                >
+                  <ChevronRightIcon />
+                </button>
+              </div>
             </div>
 
             <div className="space-y-6 mt-10">
@@ -835,7 +842,7 @@ export default function ProductDetail() {
                 </h3>
                 <button
                   type="button"
-                  className="text-xs uppercase tracking-[0.3em] text-black/60"
+                  className="text-xs uppercase tracking-[0.08em] text-black/60"
                 >
                   View all
                 </button>
