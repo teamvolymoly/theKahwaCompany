@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/app/context/AuthContext";
+import Link from "next/link";
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -10,9 +11,9 @@ export default function DashboardPage() {
 
   const stats = [
     { label: "Total orders", value: "14" },
-    { label: "Active subscriptions", value: "2" },
-    { label: "Loyalty points", value: "1,240" },
-    { label: "Saved blends", value: "6" },
+    { label: "Orders in transit", value: "2" },
+    { label: "Delivered orders", value: "11" },
+    { label: "Amount spent", value: "₹ 12,840" },
   ];
 
   const recentOrders = [
@@ -36,18 +37,32 @@ export default function DashboardPage() {
     },
   ];
 
-  const subscriptions = [
+  const addresses = [
     {
-      name: "Signature Kahwa",
-      cadence: "Every 2 weeks",
-      next: "Mar 22, 2026",
+      id: 1,
+      label: "Home",
+      address_line1: "House 18, Boulevard Road",
+      address_line2: "Dal Lake",
+      city: "Srinagar",
+      state: "Kashmir",
+      pincode: "190001",
+      country: "India",
+      is_default: true,
     },
     {
-      name: "Seasonal Harvest Box",
-      cadence: "Monthly",
-      next: "Apr 05, 2026",
+      id: 2,
+      label: "Studio",
+      address_line1: "42 Heritage Lane",
+      address_line2: "Old City",
+      city: "Srinagar",
+      state: "Kashmir",
+      pincode: "190002",
+      country: "India",
+      is_default: false,
     },
   ];
+  const defaultAddress =
+    addresses.find((address) => address.is_default) || addresses[0];
 
   useEffect(() => {
     if (!loading && !isAuthenticated) {
@@ -57,11 +72,11 @@ export default function DashboardPage() {
 
   return (
     <>
-      <main className="min-h-screen bg-white text-black mt-12">
-        <section className="max-w-6xl mx-auto px-6 py-14">
+      <main className="min-h-screen bg-white text-black mt-14">
+        <section className="container max-w-7xl mx-auto px-6 md:px-12 py-14">
           <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
             <div>
-              <p className="text-xs uppercase tracking-[0.4em] text-black/60">
+              <p className="text-xs uppercase tracking-[0.094em] text-black/60">
                 My account
               </p>
               <h1
@@ -71,7 +86,7 @@ export default function DashboardPage() {
                 Dashboard
               </h1>
             </div>
-            <button className="self-start rounded-full border border-black/60 px-5 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-black hover:border-black">
+            <button className="self-start rounded-sm border border-black/60 px-5 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-black hover:border-black cursor-pointer">
               View orders
             </button>
           </div>
@@ -80,9 +95,9 @@ export default function DashboardPage() {
             {stats.map((stat) => (
               <div
                 key={stat.label}
-                className="rounded-2xl border border-black/10 bg-black/5 p-5"
+                className="rounded-sm shadow-sm bg-gray-50 p-5"
               >
-                <p className="text-xs uppercase tracking-[0.3em] text-black/50">
+                <p className="text-xs uppercase tracking-[0.093em] text-black/80">
                   {stat.label}
                 </p>
                 <p className="mt-3 text-2xl font-semibold">{stat.value}</p>
@@ -91,17 +106,17 @@ export default function DashboardPage() {
           </div>
 
           <div className="mt-10 grid gap-6 lg:grid-cols-[1.4fr_0.6fr]">
-            <div className="rounded-3xl border border-black/10 bg-white p-8 shadow-sm">
+            <div className=" py-8">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-xs uppercase tracking-[0.3em] text-black/50">
+                  <p className="text-xs uppercase tracking-[0.093em] text-black/80">
                     Recent orders
                   </p>
                   <h2 className="mt-2 text-xl font-semibold">
                     Latest activity
                   </h2>
                 </div>
-                <button className="rounded-full border border-black/60 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-black hover:border-black">
+                <button className="rounded-sm border border-black/60 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-black hover:border-black cursor-pointer">
                   View all
                 </button>
               </div>
@@ -109,7 +124,7 @@ export default function DashboardPage() {
                 {recentOrders.map((order) => (
                   <div
                     key={order.id}
-                    className="rounded-2xl border border-black/10 bg-black/5 p-4 flex flex-col gap-2 md:flex-row md:items-center md:justify-between"
+                    className="rounded-sm shadow-sm bg-gray-50 p-4 flex flex-col gap-2 md:flex-row md:items-center md:justify-between"
                   >
                     <div>
                       <p className="text-sm font-semibold">{order.id}</p>
@@ -122,27 +137,33 @@ export default function DashboardPage() {
               </div>
             </div>
 
-            <div className="rounded-3xl border border-black/10 bg-white p-8 shadow-sm">
-              <p className="text-xs uppercase tracking-[0.3em] text-black/50">
-                Subscriptions
+            <div className="py-6">
+              <p className="text-xs uppercase tracking-[0.093em] text-black/80">
+                Saved address
               </p>
-              <div className="mt-4 grid gap-4">
-                {subscriptions.map((plan) => (
-                  <div
-                    key={plan.name}
-                    className="rounded-2xl border border-black/10 bg-black/5 p-4"
-                  >
-                    <p className="text-sm font-semibold">{plan.name}</p>
-                    <p className="mt-2 text-xs text-black/60">{plan.cadence}</p>
-                    <p className="mt-1 text-xs text-black/60">
-                      Next delivery: {plan.next}
-                    </p>
-                  </div>
-                ))}
-              </div>
-              <button className="mt-6 w-full rounded-full border border-black px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-black hover:bg-black hover:text-white">
-                Manage subscriptions
-              </button>
+              {defaultAddress ? (
+                <div className="mt-4 rounded-sm shadow-sm bg-gray-50 p-4">
+                  <p className="text-xs uppercase tracking-[0.093em] text-black/70">
+                    {defaultAddress.label}
+                  </p>
+                  <p className="mt-2 text-sm">{defaultAddress.address_line1}</p>
+                  <p className="text-sm">{defaultAddress.address_line2}</p>
+                  <p className="text-sm">
+                    {defaultAddress.city}, {defaultAddress.state}{" "}
+                    {defaultAddress.pincode}
+                  </p>
+                  <p className="text-sm">{defaultAddress.country}</p>
+                </div>
+              ) : (
+                <p className="mt-4 text-sm text-black/60">
+                  No saved addresses yet.
+                </p>
+              )}
+              <Link href="/user/profile">
+                <button className="mt-6 w-full rounded-sm border border-black/60 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-black hover:bg-black hover:text-white cursor-pointer">
+                  Manage addresses
+                </button>
+              </Link>
             </div>
           </div>
         </section>

@@ -20,6 +20,7 @@ const COUNT = GALLERY_ITEMS.length;
 export default function HeroSection() {
   const containerRef = useRef(null);
   const cardsRef = useRef([]);
+  const prefersReducedMotion = useRef(false);
 
   // Stable mutable refs — no re-renders on change
   const stateRef = useRef({
@@ -40,6 +41,10 @@ export default function HeroSection() {
     const container = containerRef.current;
     const cards = cardsRef.current.filter(Boolean);
     if (!container || cards.length !== COUNT) return;
+
+    prefersReducedMotion.current = window.matchMedia?.(
+      "(prefers-reduced-motion: reduce)",
+    )?.matches;
 
     // --- Promote all cards to their own GPU layer once ---
     cards.forEach((card) => {
@@ -120,7 +125,7 @@ export default function HeroSection() {
 
       const center = containerWidth / 2;
       const CURVE_DEPTH = Math.min(70, containerWidth * 0.07);
-      const MAX_ROTATE = 7;
+      const MAX_ROTATE = 22;
       const MAX_SCALE_LOSS = 0.16;
 
       for (let i = 0; i < COUNT; i++) {
@@ -139,7 +144,8 @@ export default function HeroSection() {
         // Smooth parabolic curve: deepest at centre, flat at edges
         const t = Math.max(0, 1 - absDist * 0.9);
         const y = -CURVE_DEPTH * t * t;
-        const rotation = dist * MAX_ROTATE;
+        const rotation =
+          dist * MAX_ROTATE * (1 + 0.6 * Math.max(0, 1 - absDist));
         const scale = 1 - Math.min(MAX_SCALE_LOSS, absDist * 0.1);
 
         // Single gsap.set call per card per frame — minimal overhead
@@ -153,7 +159,11 @@ export default function HeroSection() {
       }
     };
 
-    gsap.ticker.add(tick);
+    if (!prefersReducedMotion.current) {
+      gsap.ticker.add(tick);
+    } else {
+      tick();
+    }
 
     // ─── Drag ────────────────────────────────────────────────────────────────
     const onPointerDown = (e) => {
@@ -189,7 +199,9 @@ export default function HeroSection() {
     container.style.cursor = "grab";
 
     return () => {
-      gsap.ticker.remove(tick);
+      if (!prefersReducedMotion.current) {
+        gsap.ticker.remove(tick);
+      }
       clearTimeout(resizeTimer);
       window.removeEventListener("resize", onResize);
       container.removeEventListener("pointerdown", onPointerDown);
@@ -200,23 +212,36 @@ export default function HeroSection() {
     };
   }, []);
 
+  const nudge = (dir) => {
+    const state = stateRef.current;
+    if (!state.step) return;
+    state.offset += dir * state.step;
+    state.drag.velocity = dir * 6;
+  };
+
   return (
     <div
-      className="relative w-full min-h-[1080px] max-h-[1080px] bg-center bg-cover flex flex-col justify-end items-center gap-4"
+      className="relative w-full min-h-[680px] md:min-h-[820px] lg:min-h-[980px] xl:min-h-[1080px] bg-center bg-cover flex flex-col justify-end items-center gap-4"
       style={{
         backgroundImage: "url('/bg/beautiful-view-mountains-sunny-day.jpg')",
       }}
     >
+      <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/5 to-white/80" />
       {/* Hero text */}
-      <div className="text-center mt-34 flex flex-col gap-4 max-w-3xl px-4">
-        <div className="font-(family-name:--font-basker) uppercase text-4xl md:text-5xl mt-10 mb-10">
+      <div className="relative z-10 text-center mt-20 sm:mt-24 lg:mt-28 flex flex-col gap-4 max-w-3xl px-4">
+        <div className="font-(family-name:--font-basker) uppercase text-3xl sm:text-4xl md:text-5xl mt-6 mb-6 text-[#1c2230] drop-shadow-sm">
           <h2 className="mb-2">Where tradition</h2>
           <h2>meets imagination</h2>
         </div>
-        <p className="font-thin text-xl">
+        <p className="font-thin text-base sm:text-lg md:text-xl text-black/80">
           Experience a Magical variety of Kahwa with different flavors and
           contribute to a social cause
         </p>
+        <div className="mt-2 flex justify-center">
+          <Link href="/shop" className="cursor-pointer">
+            <ShopNowButton className="cursor-pointer" />
+          </Link>
+        </div>
       </div>
 
       {/* Carousel */}
@@ -225,9 +250,14 @@ export default function HeroSection() {
         className="
           relative w-full overflow-hidden select-none touch-pan-y
           bg-gradient-to-t from-white to-transparent
-          h-[600px] md:h-[700px] lg:h-[900px] xl:h-[1080px] max-h-[1080px]
+          h-[420px] sm:h-[520px] md:h-[640px] lg:h-[820px] xl:h-[980px] max-h-[1080px]
         "
         aria-label="Product carousel"
+        tabIndex={0}
+        onKeyDown={(e) => {
+          if (e.key === "ArrowLeft") nudge(1);
+          if (e.key === "ArrowRight") nudge(-1);
+        }}
       >
         {galleryItems.map((item, i) => (
           <article

@@ -233,7 +233,7 @@ export default function ProfilePage() {
   return (
     <>
       <main className="min-h-screen bg-white text-black mt-10 sm:mt-12">
-        <section className="max-w-6xl mx-auto px-4 sm:px-6 py-10 sm:py-14">
+        <section className="container max-w-7xl mx-auto px-4 sm:px-6 md:px-12 py-10 sm:py-14">
           <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
             <div>
               <p className="text-xs uppercase tracking-[0.094em] text-black/60">
@@ -282,9 +282,7 @@ export default function ProfilePage() {
                   <p className="text-xs uppercase tracking-[0.3em] text-black/50">
                     Member since
                   </p>
-                  <p className="mt-2 text-sm">
-                    {profile.memberSince || "—"}
-                  </p>
+                  <p className="mt-2 text-sm">{profile.memberSince || "—"}</p>
                 </div>
                 {/* <div className="rounded-sm border border-black/10 bg-gray-50 p-4">
                   <p className="text-xs uppercase tracking-[0.3em] text-black/50">
@@ -530,7 +528,9 @@ export default function ProfilePage() {
             )}
             <div className="mt-6 grid gap-4 sm:grid-cols-2">
               {addressLoading && (
-                <div className="text-sm text-black/60">Loading addresses...</div>
+                <div className="text-sm text-black/60">
+                  Loading addresses...
+                </div>
               )}
               {addresses.map((address) => (
                 <div
