@@ -259,6 +259,7 @@ export default function HeroSection() {
           if (e.key === "ArrowRight") nudge(-1);
         }}
       >
+        {" "}
         {galleryItems.map((item, i) => (
           <article
             key={`${item.text}-${i}`}
