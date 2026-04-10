@@ -66,8 +66,7 @@ export default function HeroSection() {
       // - small: 1.5 cards
       // - medium: 2.5 cards
       // - large+: ~3.2 cards (slightly smaller cards to prevent bottom overflow)
-      const cardsVisible =
-        W < 640 ? 1.7 : W < 1024 ? 2.8 : W < 1280 ? 3.3 : 3.6;
+      const cardsVisible = W < 640 ? 1.5 : W < 1024 ? 2.5 : W < 1280 ? 3 : 3.6;
 
       const baseCardWidth =
         (W - outerGap * 2 - innerGap * (cardsVisible - 1)) / cardsVisible;
@@ -75,7 +74,8 @@ export default function HeroSection() {
       const maxCardHeight = H * 0.78;
       const maxCardWidth = maxCardHeight * (3 / 4); // aspect-[3/4]
       const cardWidth = Math.min(baseCardWidth, maxCardWidth);
-      const step = cardWidth + innerGap;
+      const positionScale = W < 640 ? 0.93 : W < 1024 ? 0.95 : 0.96;
+      const step = (cardWidth + innerGap) * positionScale;
       const total = COUNT * step;
 
       // Seed offset so the real (middle) set is centred on screen
@@ -116,7 +116,9 @@ export default function HeroSection() {
       const { step, total, cardWidth, containerWidth } = state;
       if (!step || !total) return;
       const center = containerWidth / 2;
-      const rawIndex = Math.round((state.offset + center - cardWidth / 2) / step);
+      const rawIndex = Math.round(
+        (state.offset + center - cardWidth / 2) / step,
+      );
       const targetBase = rawIndex * step;
       let targetOffset = targetBase + cardWidth / 2 - center;
       targetOffset = ((targetOffset % total) + total) % total;
@@ -124,7 +126,7 @@ export default function HeroSection() {
       snapTweenRef.current?.kill();
       snapTweenRef.current = gsap.to(state, {
         offset: targetOffset,
-        duration: 0.6,
+        duration: 0.3,
         ease: "power2.out",
         onComplete: () => {
           snapTweenRef.current = null;
