@@ -21,6 +21,9 @@ export default function HeroSection() {
   const containerRef = useRef(null);
   const cardsRef = useRef([]);
   const prefersReducedMotion = useRef(false);
+  const snapTweenRef = useRef(null);
+  const snapTimerRef = useRef(null);
+  const snapIntervalRef = useRef(null);
 
   // Stable mutable refs — no re-renders on change
   const stateRef = useRef({
@@ -63,12 +66,13 @@ export default function HeroSection() {
       // - small: 1.5 cards
       // - medium: 2.5 cards
       // - large+: ~3.2 cards (slightly smaller cards to prevent bottom overflow)
-      const cardsVisible = W < 640 ? 1.7 : W < 1024 ? 2.8 : W < 1280 ? 3.3 : 3.6;
+      const cardsVisible =
+        W < 640 ? 1.7 : W < 1024 ? 2.8 : W < 1280 ? 3.3 : 3.6;
 
       const baseCardWidth =
         (W - outerGap * 2 - innerGap * (cardsVisible - 1)) / cardsVisible;
       // Cap card height so the carousel never overflows on large screens
-      const maxCardHeight = H * 0.7;
+      const maxCardHeight = H * 0.78;
       const maxCardWidth = maxCardHeight * (3 / 4); // aspect-[3/4]
       const cardWidth = Math.min(baseCardWidth, maxCardWidth);
       const step = cardWidth + innerGap;
@@ -107,6 +111,28 @@ export default function HeroSection() {
     // ─── Ticker ──────────────────────────────────────────────────────────────
     const FRICTION = 0.93;
 
+    const snapToNearest = () => {
+      const state = stateRef.current;
+      const { step, total, cardWidth, containerWidth } = state;
+      if (!step || !total) return;
+      const center = containerWidth / 2;
+      const rawIndex = Math.round((state.offset + center - cardWidth / 2) / step);
+      const targetBase = rawIndex * step;
+      let targetOffset = targetBase + cardWidth / 2 - center;
+      targetOffset = ((targetOffset % total) + total) % total;
+
+      snapTweenRef.current?.kill();
+      snapTweenRef.current = gsap.to(state, {
+        offset: targetOffset,
+        duration: 0.6,
+        ease: "power2.out",
+        onComplete: () => {
+          snapTweenRef.current = null;
+          state.drag.velocity = 0;
+        },
+      });
+    };
+
     const tick = () => {
       const state = stateRef.current;
       const { step, total, cardWidth, containerWidth, drag, basePositions } =
@@ -118,6 +144,7 @@ export default function HeroSection() {
         state.offset += drag.velocity;
         drag.velocity *= FRICTION;
         if (Math.abs(drag.velocity) < 0.01) drag.velocity = 0;
+        // Let inertia breathe; snapping is handled after pointer up
       }
 
       // Keep offset in [0, total) — modulo wrapping
@@ -168,6 +195,10 @@ export default function HeroSection() {
     // ─── Drag ────────────────────────────────────────────────────────────────
     const onPointerDown = (e) => {
       const drag = stateRef.current.drag;
+      snapTweenRef.current?.kill();
+      snapTweenRef.current = null;
+      clearTimeout(snapTimerRef.current);
+      clearInterval(snapIntervalRef.current);
       drag.isDown = true;
       drag.startX = e.clientX;
       drag.lastX = e.clientX;
@@ -189,6 +220,28 @@ export default function HeroSection() {
     const onPointerUp = () => {
       stateRef.current.drag.isDown = false;
       container.style.cursor = "grab";
+      if (!prefersReducedMotion.current) {
+        clearTimeout(snapTimerRef.current);
+        clearInterval(snapIntervalRef.current);
+        snapTimerRef.current = setTimeout(() => {
+          let checks = 0;
+          snapIntervalRef.current = setInterval(() => {
+            const { velocity, isDown } = stateRef.current.drag;
+            if (isDown) {
+              clearInterval(snapIntervalRef.current);
+              return;
+            }
+            if (Math.abs(velocity) < 0.2) {
+              clearInterval(snapIntervalRef.current);
+              snapToNearest();
+            }
+            checks += 1;
+            if (checks > 12) {
+              clearInterval(snapIntervalRef.current);
+            }
+          }, 80);
+        }, 220);
+      }
     };
 
     container.addEventListener("pointerdown", onPointerDown);
@@ -199,6 +252,10 @@ export default function HeroSection() {
     container.style.cursor = "grab";
 
     return () => {
+      snapTweenRef.current?.kill();
+      snapTweenRef.current = null;
+      clearTimeout(snapTimerRef.current);
+      clearInterval(snapIntervalRef.current);
       if (!prefersReducedMotion.current) {
         gsap.ticker.remove(tick);
       }
