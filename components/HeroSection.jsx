@@ -282,10 +282,9 @@ export default function HeroSection() {
     <div
       className="relative w-full min-h-[680px] md:min-h-[820px] lg:min-h-[980px] xl:min-h-[1080px] bg-center bg-cover flex flex-col justify-end items-center gap-4"
       style={{
-        backgroundImage: "url('/bg/beautiful-view-mountains-sunny-day.jpg')",
+        backgroundImage: "url('/bg/beautiful-view-mountains-sunny-day.png')",
       }}
     >
-      <div className="absolute inset-0 bg-gradient-to-b from-black/25 via-white/70 to-white/90" />
       {/* Hero text */}
       <div className="relative z-10 text-center mt-20 sm:mt-24 lg:mt-28 flex flex-col gap-4 max-w-3xl px-4">
         <div className="font-(family-name:--font-basker) uppercase text-3xl sm:text-4xl md:text-5xl mt-6 mb-6 text-[#1c2230] drop-shadow-sm">
@@ -296,11 +295,11 @@ export default function HeroSection() {
           Experience a Magical variety of Kahwa with different flavors and
           contribute to a social cause
         </p>
-        <div className="mt-2 flex justify-center">
+        {/* <div className="mt-2 flex justify-center">
           <Link href="/shop" className="cursor-pointer">
             <ShopNowButton className="cursor-pointer" />
           </Link>
-        </div>
+        </div> */}
       </div>
 
       {/* Carousel */}
@@ -345,9 +344,9 @@ export default function HeroSection() {
             <p className="mt-2 mb-1 text-sm font-medium tracking-wide opacity-80">
               {item.text}
             </p>
-            <Link href="#" className="mt-1 mb-4 cursor-pointer">
+            {/* <Link href="#" className="mt-1 mb-4 cursor-pointer">
               <ShopNowButton className="cursor-pointer" />
-            </Link>
+            </Link> */}
           </article>
         ))}
       </section>
