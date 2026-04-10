@@ -6,11 +6,11 @@ import ShopNowButton from "@/components/ShopNowButton";
 import Link from "next/link";
 
 const ITEMS = [
-  { image: "/products/tin/KLTIN1.png", text: "Kashmiri Lavender" },
-  { image: "/products/tin/HLTIN1.png", text: "Honey Lemon" },
-  { image: "/products/tin/BLTIN1.png", text: "Blue Lotus" },
-  { image: "/products/tin/OTTIN1.png", text: "Orange Tulsi" },
-  { image: "/products/tin/MLTIN1.png", text: "Mint Lemongrass" },
+  { image: "/products/tin/KLTIN1.png", text: "Kashmiri Kahwa" },
+  { image: "/products/tin/HLTIN1.png", text: "Hibiscus Kahwa" },
+  { image: "/products/tin/BLTIN1.png", text: "Blue Kahwa" },
+  { image: "/products/tin/OTTIN1.png", text: "Oolonge Kahwa" },
+  { image: "/products/tin/MLTIN1.png", text: "Mint Kahwa" },
 ];
 
 // Triple-clone for seamless infinite loop (prev | real | next)
@@ -295,11 +295,6 @@ export default function HeroSection() {
           Experience a Magical variety of Kahwa with different flavors and
           contribute to a social cause
         </p>
-        {/* <div className="mt-2 flex justify-center">
-          <Link href="/shop" className="cursor-pointer">
-            <ShopNowButton className="cursor-pointer" />
-          </Link>
-        </div> */}
       </div>
 
       {/* Carousel */}
@@ -341,7 +336,7 @@ export default function HeroSection() {
                 draggable={false} /* prevent ghost drag image */
               />
             </div>
-            <p className="mt-2 mb-1 text-sm font-medium tracking-wide opacity-80">
+            <p className="mt-1 mb-1 text-md md:text-xl text-black font-medium tracking-wide opacity-80">
               {item.text}
             </p>
             {/* <Link href="#" className="mt-1 mb-4 cursor-pointer">
@@ -350,6 +345,11 @@ export default function HeroSection() {
           </article>
         ))}
       </section>
+      <div className="absolute bottom-0 sm:bottom-0 md:bottom-10 lg:bottom-20 xl:bottom-30 z-10">
+        <Link href="/shop" className="cursor-pointer">
+          <ShopNowButton className="cursor-pointer" />
+        </Link>
+      </div>
     </div>
   );
 }
