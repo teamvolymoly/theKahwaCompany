@@ -75,7 +75,7 @@ const socialLinks = [
 
 export default function Footer() {
   return (
-    <footer className="bg-[#525a53] text-white">
+    <footer className="bg-[#2C4530] text-white">
       <div className="container mx-auto px-4 py-14">
         <div className="grid gap-10 lg:grid-cols-[1.2fr_2fr_1.4fr]">
           <div>
@@ -89,7 +89,7 @@ export default function Footer() {
               <p>+91 95822 51241</p>
             </div>
             <div className="mt-6">
-              <p className="text-xs uppercase tracking-[0.08em] text-white/80">
+              <p className="text-xs uppercase tracking-[0.08em] text-white">
                 Follow us
               </p>
               <div className="mt-3 flex flex-wrap items-center gap-3">
@@ -112,7 +112,7 @@ export default function Footer() {
 
           <div className="grid gap-8 sm:grid-cols-3">
             <div>
-              <p className="text-sm uppercase tracking-[0.08em] text-white/80">
+              <p className="text-sm uppercase tracking-[0.08em] text-white">
                 Quick Links
               </p>
               <div className="mt-4 grid gap-2 text-sm text-white/70">
@@ -128,7 +128,7 @@ export default function Footer() {
               </div>
             </div>
             <div>
-              <p className="text-sm uppercase tracking-[0.08em] text-white/80">
+              <p className="text-sm uppercase tracking-[0.08em] text-white">
                 Support
               </p>
               <div className="mt-4 grid gap-2 text-sm text-white/70">
@@ -144,7 +144,7 @@ export default function Footer() {
               </div>
             </div>
             <div>
-              <p className="text-sm uppercase tracking-[0.08em] text-white/80">
+              <p className="text-sm uppercase tracking-[0.08em] text-white">
                 My Account
               </p>
               <div className="mt-4 grid gap-2 text-sm text-white/70">
@@ -162,7 +162,7 @@ export default function Footer() {
           </div>
 
           <div>
-            <p className="text-sm uppercase tracking-[0.08em] text-white/80">
+            <p className="text-sm uppercase tracking-[0.08em] text-white">
               Join the Kahwa Circle
             </p>
             <p className="mt-4 text-sm text-white/80">
@@ -173,7 +173,7 @@ export default function Footer() {
                 type="email"
                 required
                 placeholder="E-mail*"
-                className="rounded-full border border-white/10 bg-[#3f453f] px-4 py-3 text-sm text-white placeholder:text-text-white/80 outline-none focus:border-[#f3d8c6]"
+                className="rounded-full border border-white/10 bg-[#456e4c] px-4 py-3 text-sm text-white placeholder:text-text-white/80 outline-none focus:border-[#f3d8c6]"
               />
               <button
                 type="submit"
