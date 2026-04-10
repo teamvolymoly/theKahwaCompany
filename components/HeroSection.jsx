@@ -285,7 +285,7 @@ export default function HeroSection() {
         backgroundImage: "url('/bg/beautiful-view-mountains-sunny-day.jpg')",
       }}
     >
-      <div className="absolute inset-0 bg-gradient-to-b from-black/25 via-black/10 to-white/90" />
+      <div className="absolute inset-0 bg-gradient-to-b from-black/25 via-white/70 to-white/90" />
       {/* Hero text */}
       <div className="relative z-10 text-center mt-20 sm:mt-24 lg:mt-28 flex flex-col gap-4 max-w-3xl px-4">
         <div className="font-(family-name:--font-basker) uppercase text-3xl sm:text-4xl md:text-5xl mt-6 mb-6 text-[#1c2230] drop-shadow-sm">
