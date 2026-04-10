@@ -56,19 +56,19 @@ export default function HeroSection() {
       const W = container.clientWidth;
       const H = container.clientHeight;
       // Control outer padding and inner spacing separately for tighter layout
-      const outerGap = W < 640 ? 8 : W < 1024 ? 12 : 16;
-      const innerGap = W < 640 ? 4 : W < 1024 ? 8 : 10;
+      const outerGap = W < 640 ? 4 : W < 1024 ? 8 : 12;
+      const innerGap = W < 640 ? 1 : W < 1024 ? 4 : 6;
 
       // Responsive visible cards:
       // - small: 1.5 cards
       // - medium: 2.5 cards
       // - large+: ~3.2 cards (slightly smaller cards to prevent bottom overflow)
-      const cardsVisible = W < 640 ? 1.5 : W < 1024 ? 2.5 : W < 1280 ? 3 : 3.2;
+      const cardsVisible = W < 640 ? 1.7 : W < 1024 ? 2.8 : W < 1280 ? 3.3 : 3.6;
 
       const baseCardWidth =
         (W - outerGap * 2 - innerGap * (cardsVisible - 1)) / cardsVisible;
       // Cap card height so the carousel never overflows on large screens
-      const maxCardHeight = H * 0.78;
+      const maxCardHeight = H * 0.7;
       const maxCardWidth = maxCardHeight * (3 / 4); // aspect-[3/4]
       const cardWidth = Math.min(baseCardWidth, maxCardWidth);
       const step = cardWidth + innerGap;
@@ -226,7 +226,7 @@ export default function HeroSection() {
         backgroundImage: "url('/bg/beautiful-view-mountains-sunny-day.jpg')",
       }}
     >
-      <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/5 to-white/80" />
+      <div className="absolute inset-0 bg-gradient-to-b from-black/25 via-black/10 to-white/90" />
       {/* Hero text */}
       <div className="relative z-10 text-center mt-20 sm:mt-24 lg:mt-28 flex flex-col gap-4 max-w-3xl px-4">
         <div className="font-(family-name:--font-basker) uppercase text-3xl sm:text-4xl md:text-5xl mt-6 mb-6 text-[#1c2230] drop-shadow-sm">
@@ -249,7 +249,7 @@ export default function HeroSection() {
         ref={containerRef}
         className="
           relative w-full overflow-hidden select-none touch-pan-y
-          bg-gradient-to-t from-white to-transparent
+          bg-gradient-to-t from-white via-white/70 to-transparent
           h-[420px] sm:h-[520px] md:h-[640px] lg:h-[820px] xl:h-[980px] max-h-[1080px]
         "
         aria-label="Product carousel"
