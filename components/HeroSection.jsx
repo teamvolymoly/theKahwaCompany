@@ -153,8 +153,8 @@ export default function HeroSection() {
       state.offset = ((state.offset % total) + total) % total;
 
       const center = containerWidth / 2;
-      const CURVE_DEPTH = Math.min(70, containerWidth * 0.07);
-      const MAX_ROTATE = 22;
+      const CURVE_DEPTH = Math.min(80, containerWidth * 0.07);
+      const MAX_ROTATE = 25;
       const MAX_SCALE_LOSS = 0.16;
 
       for (let i = 0; i < COUNT; i++) {
@@ -336,7 +336,7 @@ export default function HeroSection() {
                 draggable={false} /* prevent ghost drag image */
               />
             </div>
-            <p className="mt-1 mb-1 text-md md:text-xl text-black font-medium tracking-wide opacity-80">
+            <p className="mt-1 mb-1 text-md md:text-xl text-black uppercase font-medium tracking-wide opacity-80">
               {item.text}
             </p>
             {/* <Link href="#" className="mt-1 mb-4 cursor-pointer">
