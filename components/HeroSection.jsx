@@ -1,23 +1,39 @@
 "use client";
 
-import { useEffect, useRef, useMemo } from "react";
+import { useEffect, useRef, useMemo, useState } from "react";
 import gsap from "gsap";
 import ShopNowButton from "@/components/ShopNowButton";
 import Link from "next/link";
+import { apiFetch } from "@/utils/api";
 
-const ITEMS = [
-  { image: "/products/tin/KLTIN1.png", text: "Kashmiri Kahwa" },
-  { image: "/products/tin/HLTIN1.png", text: "Hibiscus Kahwa" },
-  { image: "/products/tin/BLTIN1.png", text: "Blue Kahwa" },
-  { image: "/products/tin/OTTIN1.png", text: "Oolong Kahwa" },
-  { image: "/products/tin/MLTIN1.png", text: "Mint Kahwa" },
+const FALLBACK_ITEMS = [
+  {
+    image: "/products/tin/KLTIN1.png",
+    text: "Kashmiri Kahwa",
+    slug: "kashmiri-kahwa",
+  },
+  {
+    image: "/products/tin/HLTIN1.png",
+    text: "Hibiscus Kahwa",
+    slug: "hibiscus-kahwa",
+  },
+  {
+    image: "/products/tin/BLTIN1.png",
+    text: "Blue Kahwa",
+    slug: "kashmiri-kahwa",
+  },
+  {
+    image: "/products/tin/OTTIN1.png",
+    text: "Oolong Kahwa",
+    slug: "oolong-kahwa",
+  },
+  { image: "/products/tin/MLTIN1.png", text: "Mint Kahwa", slug: "mint-kahwa" },
 ];
 
-// Triple-clone for seamless infinite loop (prev | real | next)
-const GALLERY_ITEMS = [...ITEMS, ...ITEMS, ...ITEMS];
-const COUNT = GALLERY_ITEMS.length;
-
 export default function HeroSection() {
+  const [items, setItems] = useState(FALLBACK_ITEMS);
+  const [apiReady, setApiReady] = useState(false);
+  const [readyTick, setReadyTick] = useState(0);
   const containerRef = useRef(null);
   const cardsRef = useRef([]);
   const prefersReducedMotion = useRef(false);
@@ -37,13 +53,57 @@ export default function HeroSection() {
     basePositions: /** @type {number[]} */ ([]),
   });
 
-  // Memoize so JSX array never re-creates between renders
-  const galleryItems = useMemo(() => GALLERY_ITEMS, []);
+  useEffect(() => {
+    let active = true;
+    const load = async () => {
+      setApiReady(false);
+      try {
+        const data = await apiFetch("/home/hero-sections");
+        // const data = null; // TODO: remove after testing
+        const mapped = (Array.isArray(data) ? data : [])
+          .filter((item) => item?.status !== false)
+          .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0))
+          .map((item) => ({
+            image: item.product_image_url,
+            text: item.product_name,
+            slug: item.product_slug,
+          }));
+        if (active && mapped.length) {
+          setItems(mapped);
+          setApiReady(true);
+          return;
+        }
+      } catch {
+        // keep fallback
+      }
+      if (active) {
+        setItems(FALLBACK_ITEMS);
+        setApiReady(true);
+      }
+    };
+    load();
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  // Triple-clone for seamless infinite loop (prev | real | next)
+  const galleryItems = useMemo(() => [...items, ...items, ...items], [items]);
+  const count = galleryItems.length;
+
+  useEffect(() => {
+    cardsRef.current = Array.from({ length: count }, () => null);
+  }, [count]);
 
   useEffect(() => {
     const container = containerRef.current;
-    const cards = cardsRef.current.filter(Boolean);
-    if (!container || cards.length !== COUNT) return;
+    const cards = cardsRef.current.filter(Boolean).slice(0, count);
+    if (!apiReady || !container || cards.length !== count) {
+      const id = requestAnimationFrame(() =>
+        setReadyTick((tick) => tick + 1),
+      );
+      return () => cancelAnimationFrame(id);
+    }
 
     prefersReducedMotion.current = window.matchMedia?.(
       "(prefers-reduced-motion: reduce)",
@@ -76,13 +136,15 @@ export default function HeroSection() {
       const cardWidth = Math.min(baseCardWidth, maxCardWidth);
       const positionScale = W < 640 ? 0.93 : W < 1024 ? 0.95 : 0.96;
       const step = (cardWidth + innerGap) * positionScale;
-      const total = COUNT * step;
+      const total = count * step;
 
       // Seed offset so the real (middle) set is centred on screen
-      const centerSet = ITEMS.length; // index of first "real" item
+      const centerSet = items.length; // index of first "real" item
       const centreOffset = centerSet * step - (W / 2 - cardWidth / 2);
 
       const state = stateRef.current;
+      state.drag.velocity = 0;
+      state.drag.isDown = false;
       state.cardWidth = cardWidth;
       state.step = step;
       state.total = total;
@@ -157,7 +219,7 @@ export default function HeroSection() {
       const MAX_ROTATE = 25;
       const MAX_SCALE_LOSS = 0.16;
 
-      for (let i = 0; i < COUNT; i++) {
+      for (let i = 0; i < count; i++) {
         const card = cards[i];
         // Shift raw base position by current offset
         let x = basePositions[i] - state.offset;
@@ -269,7 +331,7 @@ export default function HeroSection() {
       container.removeEventListener("pointercancel", onPointerUp);
       cards.forEach((card) => (card.style.willChange = "auto"));
     };
-  }, []);
+  }, [count, items.length, readyTick, apiReady]);
 
   const nudge = (dir) => {
     const state = stateRef.current;
@@ -295,56 +357,57 @@ export default function HeroSection() {
           Experience a Magical variety of Kahwa with different flavors and
           contribute to a social cause
         </p>
-      </div>
+      </div>      {/* Carousel */}
+      {apiReady ? (
+        <section
+          ref={containerRef}
+          className="
+            relative w-full overflow-hidden select-none touch-pan-y
+            bg-gradient-to-t from-white via-white/70 to-transparent
+            h-[420px] sm:h-[520px] md:h-[640px] lg:h-[820px] xl:h-[980px] max-h-[1080px]
+          "
+          aria-label="Product carousel"
+          tabIndex={0}
+          onKeyDown={(e) => {
+            if (e.key === "ArrowLeft") nudge(1);
+            if (e.key === "ArrowRight") nudge(-1);
+          }}
+        >
+          {galleryItems.map((item, i) => (
+            <article
+              key={`${item.text}-${i}`}
+              ref={(el) => {
+                cardsRef.current[i] = el || null;
+              }}
+              className="
+                absolute left-0
+                top-1/2 -translate-y-1/2
+                flex flex-col items-center justify-end
+                /* aspect ratio driven by CSS ? no JS height */
+                aspect-[3/4]
+              "
+              aria-label={item.text}
+            >
+              <div className="flex h-full w-full items-center justify-center">
+                <img
+                  src={item.image}
+                  alt={item.text}
+                  className="max-h-full max-w-full object-contain drop-shadow-[0_18px_35px_rgba(0,0,0,0.18)]"
+                  draggable={false}
+                />
+              </div>
+              <p className="mt-1 mb-1 text-md md:text-xl text-black uppercase font-medium tracking-wide opacity-80">
+                {item.text}
+              </p>
+            </article>
+          ))}
+        </section>
+      ) : (
+        <div className="h-[420px] sm:h-[520px] md:h-[640px] lg:h-[820px] xl:h-[980px] w-full flex items-center justify-center text-sm text-black/60">
+          Loading hero...
+        </div>
+      )}
 
-      {/* Carousel */}
-      <section
-        ref={containerRef}
-        className="
-          relative w-full overflow-hidden select-none touch-pan-y
-          bg-gradient-to-t from-white via-white/70 to-transparent
-          h-[420px] sm:h-[520px] md:h-[640px] lg:h-[820px] xl:h-[980px] max-h-[1080px]
-        "
-        aria-label="Product carousel"
-        tabIndex={0}
-        onKeyDown={(e) => {
-          if (e.key === "ArrowLeft") nudge(1);
-          if (e.key === "ArrowRight") nudge(-1);
-        }}
-      >
-        {" "}
-        {galleryItems.map((item, i) => (
-          <article
-            key={`${item.text}-${i}`}
-            ref={(el) => {
-              if (el) cardsRef.current[i] = el;
-            }}
-            className="
-              absolute left-0
-              top-1/2 -translate-y-1/2
-              flex flex-col items-center justify-end
-              /* aspect ratio driven by CSS — no JS height */
-              aspect-[3/4]
-            "
-            aria-label={item.text}
-          >
-            <div className="flex h-full w-full items-center justify-center">
-              <img
-                src={item.image}
-                alt={item.text}
-                className="max-h-full max-w-full object-contain drop-shadow-[0_18px_35px_rgba(0,0,0,0.18)]"
-                draggable={false} /* prevent ghost drag image */
-              />
-            </div>
-            <p className="mt-1 mb-1 text-md md:text-xl text-black uppercase font-medium tracking-wide opacity-80">
-              {item.text}
-            </p>
-            {/* <Link href="#" className="mt-1 mb-4 cursor-pointer">
-              <ShopNowButton className="cursor-pointer" />
-            </Link> */}
-          </article>
-        ))}
-      </section>
       <div className="absolute bottom-0 sm:bottom-0 md:bottom-10 lg:bottom-20 xl:bottom-30 z-10">
         <Link href="/shop" className="cursor-pointer">
           <ShopNowButton className="cursor-pointer" />
