@@ -9,7 +9,7 @@ const ITEMS = [
   { image: "/products/tin/KLTIN1.png", text: "Kashmiri Kahwa" },
   { image: "/products/tin/HLTIN1.png", text: "Hibiscus Kahwa" },
   { image: "/products/tin/BLTIN1.png", text: "Blue Kahwa" },
-  { image: "/products/tin/OTTIN1.png", text: "Oolonge Kahwa" },
+  { image: "/products/tin/OTTIN1.png", text: "Oolong Kahwa" },
   { image: "/products/tin/MLTIN1.png", text: "Mint Kahwa" },
 ];
 

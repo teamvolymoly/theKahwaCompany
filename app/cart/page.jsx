@@ -1,5 +1,6 @@
 "use client";
 
+import { Delete, DeleteIcon, Trash2, X } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 
@@ -85,7 +86,7 @@ export default function CartPage() {
                 {items.map((item) => (
                   <div
                     key={item.id}
-                    className="flex flex-col gap-4 border-b border-black/10 pb-6 md:flex-row md:items-center"
+                    className="relative flex flex-col gap-4 border-b border-black/10 pb-6 md:flex-row md:items-center"
                   >
                     <div className="h-24 w-24 overflow-hidden rounded-sm bg-black/5 p-3">
                       <img
@@ -94,25 +95,27 @@ export default function CartPage() {
                         className="h-full w-full object-contain"
                       />
                     </div>
-                    <div className="flex-1">
+                    <div className="flex-1 ">
                       <h3 className="text-base font-semibold">{item.name}</h3>
                       <p className="mt-2 text-sm text-black/60">
                         {item.variant}
                       </p>
-                      <button
+                    
+                    </div>
+                      
+                    <div className="flex items-center gap-4">
+                    <button
                         type="button"
                         onClick={() => removeItem(item.id)}
-                        className="mt-3 text-xs uppercase tracking-[0.2em] text-black/50 hover:text-black"
+                        className=" text-xs uppercase tracking-[0.08em] text-black/70 hover:text-black flex items-center gap-1 cursor-pointer"
                       >
-                        Remove
+                        <Trash2 size={15} /> 
                       </button>
-                    </div>
-                    <div className="flex items-center gap-4">
                       <div className="flex items-center gap-3 rounded-sm border border-black/10 px-4 py-2">
                         <button
                           type="button"
                           onClick={() => updateQty(item.id, -1)}
-                          className="text-lg"
+                          className="text-lg cursor-pointer"
                         >
                           -
                         </button>
@@ -120,7 +123,7 @@ export default function CartPage() {
                         <button
                           type="button"
                           onClick={() => updateQty(item.id, 1)}
-                          className="text-lg"
+                          className="text-lg cursor-pointer"
                         >
                           +
                         </button>
@@ -163,13 +166,13 @@ export default function CartPage() {
               <label className="text-xs uppercase tracking-[0.08em] text-black/50">
                 Coupon code
               </label>
-              <div className="mt-3 flex gap-2">
+              <div className="mt-3 flex items-center gap-2">
                 <input
                   type="text"
                   placeholder="KAHWA10"
-                  className="flex-1 rounded-sm border border-black/20 px-4 py-2 text-sm outline-none focus:border-black"
+                  className="flex-1 rounded-sm border  border-black/20 px-4 py-2 text-sm outline-none focus:border-black"
                 />
-                <button className="rounded-sm border border-black px-4 py-2 text-xs font-semibold uppercase tracking-[0.1em] text-black">
+                <button className="rounded-sm border border-black/20 px-4 py-2 text-sm font-semibold uppercase tracking-[0.1em] text-black cursor-pointer hover:bg-black hover:text-white transition">
                   Apply
                 </button>
               </div>

@@ -80,7 +80,7 @@ export default function Footer() {
         <div className="grid gap-10 lg:grid-cols-[1.2fr_2fr_1.4fr]">
           <div>
             <img
-              src="/logo/LOGO_TKC-04.png"
+              src="/logo/LOGO_TKC-03.png"
               alt="The Kahwa Company"
               className="h-18 w-auto object-contain"
             />
