@@ -321,7 +321,7 @@ export default function CheckoutPage() {
         </div>
 
         <div className="mt-10 grid gap-8 lg:grid-cols-[1fr_1fr]">
-          <div className="rounded-sm border border-black/10 bg-white p-6 sm:p-8 shadow-sm">
+          <div className="rounded-sm border border-black/10 bg-white p-6 sm:p-8 shadow-sm h-fit">
             <div className="flex items-center gap-3">
               <span className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-black/10 bg-black/5 text-black/70">
                 <User className="h-4 w-4" />
@@ -699,38 +699,6 @@ export default function CheckoutPage() {
                   </p>
                 )}
               </div>
-
-              <div className="rounded-sm border border-black/10 bg-white p-6 sm:p-8">
-                <p className="text-xs uppercase tracking-[0.2em] text-black/50">
-                  Secure payment
-                </p>
-                <div className="mt-4 flex flex-wrap items-center gap-3">
-                  <div className=" px-3 py-2 bg-gray-50 rounded-sm">
-                    <img
-                      src="/icons/payment/razorpay-icon.png"
-                      alt="Razorpay"
-                      className="h-10 w-auto object-contain"
-                    />
-                  </div>
-                  <div className=" px-3 py-2 bg-gray-50 rounded-sm">
-                    <img
-                      src="/icons/payment/upi-icon.png"
-                      alt="UPI"
-                      className="h-10 w-auto object-contain"
-                    />
-                  </div>
-                  <div className=" px-3 py-2 bg-gray-50 rounded-sm ">
-                    <img
-                      src="/icons/payment/icons8-card-100.png"
-                      alt="Cards"
-                      className="h-10 w-auto object-contain"
-                    />
-                  </div>
-                </div>
-                <p className="mt-4 text-sm text-black/60">
-                  Click Pay Now to open the Razorpay secure payment window.
-                </p>
-              </div>
             </div>
           </div>
 
@@ -808,7 +776,8 @@ export default function CheckoutPage() {
                 <span>₹ {total}</span>
               </div>
             </div>
-            <p className="mt-6 text-xs text-black/50">
+
+            <p className="mt-4 text-xs text-black/50">
               By placing this order you agree to the Terms & Conditions.
             </p>
             {paymentError && (
@@ -818,10 +787,42 @@ export default function CheckoutPage() {
               type="button"
               onClick={handlePayNow}
               disabled={processingPayment}
-              className="mt-6 inline-flex w-full items-center justify-center rounded-full bg-black px-6 py-3 text-xs uppercase tracking-[0.01em] text-white hover:bg-black/90 transition disabled:opacity-60"
+              className="mt-6 inline-flex w-full items-center justify-center rounded-full bg-black px-6 py-3 text-xs uppercase tracking-[0.01em] text-white hover:bg-black/90 transition disabled:opacity-60 cursor-pointer"
             >
               {processingPayment ? "Processing..." : "Pay now"}
             </button>
+
+            <div className="mt-6 rounded-sm border border-black/10 bg-white p-5">
+              <p className="text-xs uppercase tracking-[0.2em] text-black/50">
+                Secure payment
+              </p>
+              <div className="mt-4 flex flex-wrap items-center gap-3">
+                <div className="px-3 py-2 bg-gray-50 rounded-sm">
+                  <img
+                    src="/icons/payment/razorpay-icon.png"
+                    alt="Razorpay"
+                    className="h-10 w-auto object-contain"
+                  />
+                </div>
+                <div className="px-3 py-2 bg-gray-50 rounded-sm">
+                  <img
+                    src="/icons/payment/upi-icon.png"
+                    alt="UPI"
+                    className="h-10 w-auto object-contain"
+                  />
+                </div>
+                <div className="px-3 py-2 bg-gray-50 rounded-sm">
+                  <img
+                    src="/icons/payment/icons8-card-100.png"
+                    alt="Cards"
+                    className="h-10 w-auto object-contain"
+                  />
+                </div>
+              </div>
+              <p className="mt-4 text-sm text-black/60">
+                Click Pay Now to open the Razorpay secure payment window.
+              </p>
+            </div>
           </div>
         </div>
       </section>
