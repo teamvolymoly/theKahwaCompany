@@ -250,10 +250,10 @@ export default function Home() {
             <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
               <div>
                 <p className="text-xs uppercase tracking-[0.4em] text-black/60 mb-3">
-                  Bestselling teas
+                  KAHWA BLENDS
                 </p>
                 <h2 className="text-3xl md:text-4xl font-semibold text-black">
-                  Bestselling Teas
+                  Explore Our Range
                 </h2>
               </div>
               <Link

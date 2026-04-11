@@ -107,7 +107,7 @@ export default function ProductCard({ product }) {
 
       <button
         onClick={handleAddToCart}
-        className="w-full bg-[#2C4530] py-3 text-xs font-semibold uppercase tracking-[0.12em] text-white transition hover:from-[#5f665e] hover:to-[#525a53]"
+        className="w-full bg-gradient-to-r from-[#7a8177] to-[#6a716a] py-3 text-xs font-semibold uppercase tracking-[0.12em] text-white transition hover:from-[#5f665e] hover:to-[#525a53]"
       >
         Add To Cart
       </button>

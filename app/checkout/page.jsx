@@ -4,11 +4,11 @@ import Link from "next/link";
 
 export default function CheckoutPage() {
   return (
-    <main className="min-h-screen bg-white text-black mt-12">
+    <main className="min-h-screen bg-white text-black mt-16">
       <section className="max-w-6xl mx-auto px-6 py-14">
         <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
           <div>
-            <p className="text-xs uppercase tracking-[0.4em] text-black/60">
+            <p className="text-xs uppercase tracking-[0.09em] text-black/60">
               Checkout
             </p>
             <h1
@@ -27,62 +27,62 @@ export default function CheckoutPage() {
         </div>
 
         <div className="mt-10 grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
-          <div className="rounded-3xl border border-black/10 bg-white p-8 shadow-sm">
-            <p className="text-xs uppercase tracking-[0.3em] text-black/50">
+          <div className="rounded-sm border border-black/10 bg-white p-8 shadow-sm">
+            <p className="text-xs uppercase tracking-[0.09em] text-black/50">
               Shipping information
             </p>
             <div className="mt-6 grid gap-4">
               <div className="grid gap-4 md:grid-cols-2">
                 <input
-                  className="rounded-full border border-black/20 px-4 py-3 text-sm"
+                  className="rounded-sm border border-black/20 px-4 py-3 text-sm"
                   placeholder="First name"
                 />
                 <input
-                  className="rounded-full border border-black/20 px-4 py-3 text-sm"
+                  className="rounded-sm border border-black/20 px-4 py-3 text-sm"
                   placeholder="Last name"
                 />
               </div>
               <input
-                className="rounded-full border border-black/20 px-4 py-3 text-sm"
+                className="rounded-sm border border-black/20 px-4 py-3 text-sm"
                 placeholder="Email address"
               />
               <input
-                className="rounded-full border border-black/20 px-4 py-3 text-sm"
+                className="rounded-sm border border-black/20 px-4 py-3 text-sm"
                 placeholder="Phone number"
               />
               <input
-                className="rounded-full border border-black/20 px-4 py-3 text-sm"
+                className="rounded-sm border border-black/20 px-4 py-3 text-sm"
                 placeholder="Address line 1"
               />
               <input
-                className="rounded-full border border-black/20 px-4 py-3 text-sm"
+                className="rounded-sm border border-black/20 px-4 py-3 text-sm"
                 placeholder="Address line 2"
               />
               <div className="grid gap-4 md:grid-cols-3">
                 <input
-                  className="rounded-full border border-black/20 px-4 py-3 text-sm"
+                  className="rounded-sm border border-black/20 px-4 py-3 text-sm"
                   placeholder="City"
                 />
                 <input
-                  className="rounded-full border border-black/20 px-4 py-3 text-sm"
+                  className="rounded-sm border border-black/20 px-4 py-3 text-sm"
                   placeholder="State"
                 />
                 <input
-                  className="rounded-full border border-black/20 px-4 py-3 text-sm"
+                  className="rounded-sm border border-black/20 px-4 py-3 text-sm"
                   placeholder="Postal code"
                 />
               </div>
               <Link
                 href="/payment"
-                className="rounded-full bg-black px-6 py-3 text-xs font-semibold uppercase tracking-[0.3em] text-white text-center"
+                className="rounded-full bg-black px-6 py-3 text-xs font-semibold uppercase tracking-[0.08em] text-white text-center cursor-pointer hover:bg-black/90 transition"
               >
                 Continue to payment
               </Link>
             </div>
           </div>
 
-          <div className="rounded-3xl border border-black/10 bg-black/5 p-8">
-            <p className="text-xs uppercase tracking-[0.3em] text-black/50">
+          <div className="rounded-sm border border-black/10 bg-green-100 p-8 h-fit">
+            <p className="text-xs uppercase tracking-[0.09em] text-black/50">
               Order summary
             </p>
             <div className="mt-4 space-y-3 text-sm text-black/70">
