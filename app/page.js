@@ -3,7 +3,6 @@
 import Link from "next/link";
 
 import { apiFetch } from "@/utils/api";
-import { dummyProducts } from "@/utils/dummyData";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination, EffectFade, Autoplay } from "swiper/modules";
 import { useEffect, useState } from "react";
@@ -20,51 +19,10 @@ const toSlug = (value) =>
     .replace(/(^-|-$)/g, "");
 
 export default function Home() {
-  const dummyCategories = [
-    {
-      id: "signature-kahwa",
-      name: "Signature Kahwa",
-      slug: "signature-kahwa",
-      description: "Classic blends with saffron, cardamom, and almonds.",
-      image: "/products/tin/BLTIN1.png",
-    },
-    {
-      id: "herbal-infusions",
-      name: "Herbal Infusions",
-      slug: "herbal-infusions",
-      description: "Caffeine-free comforts for calm evenings.",
-      image: "/products/tin/HLTIN1.png",
-    },
-    {
-      id: "spiced-blends",
-      name: "Spiced Blends",
-      slug: "spiced-blends",
-      description: "Warming notes with cinnamon, clove, and ginger.",
-      image: "/products/tin/OTTIN1.png",
-    },
-    {
-      id: "gift-sets",
-      name: "Gift Sets",
-      slug: "gift-sets",
-      description: "Curated kahwa collections for gifting.",
-      image: "/products/tin/KLTIN1.png",
-    },
-    {
-      id: "seasonal",
-      name: "Seasonal Harvests",
-      slug: "seasonal",
-      description: "Limited batches inspired by the seasons.",
-      image: "/products/tin/MLTIN1.png",
-    },
-    {
-      id: "tea-accessories",
-      name: "Tea Accessories",
-      slug: "tea-accessories",
-      description: "Infusers, mugs, and steeping essentials.",
-      image: "/products/W2.png",
-    },
-  ];
-  const [categories, setCategories] = useState(dummyCategories);
+  const [categories, setCategories] = useState([]);
+  const [products, setProducts] = useState([]);
+  const [loadingProducts, setLoadingProducts] = useState(false);
+  const [loadingCategories, setLoadingCategories] = useState(false);
   const slides = [
     { title: "Slider 1", image: "./products/W1.png" },
     { title: "Slider 2", image: "./products/W2.png" },
@@ -102,22 +60,49 @@ export default function Home() {
   ];
 
   useEffect(() => {
-    const loadCategories = async () => {
+    const loadData = async () => {
       try {
-        const data = await apiFetch("/categories");
-        if (Array.isArray(data) && data.length) {
-          setCategories(data);
-        } else {
-          setCategories(dummyCategories);
-        }
+        setLoadingCategories(true);
+        setLoadingProducts(true);
+        const [filtersData, productsData] = await Promise.all([
+          apiFetch("/products/filters"),
+          apiFetch("/products?limit=8"),
+        ]);
+        const nextCategories = Array.isArray(filtersData?.categories)
+          ? filtersData.categories
+          : [];
+        setCategories(nextCategories);
+
+        const items = Array.isArray(productsData?.items)
+          ? productsData.items
+          : [];
+        const normalized = items.map((item) => {
+          const images = Array.isArray(item.images)
+            ? item.images
+            : (item.images
+                ? Object.values(item.images).filter(Boolean)
+                : []
+              ).map((url, index) => ({
+                id: `img-${item.id}-${index}`,
+                image_url: url,
+              }));
+          return {
+            ...item,
+            images,
+            oldPrice: item.compare_price,
+          };
+        });
+        setProducts(normalized);
       } catch (e) {
-        console.error(e);
-        setCategories(dummyCategories);
+        setCategories([]);
+        setProducts([]);
+      } finally {
+        setLoadingCategories(false);
+        setLoadingProducts(false);
       }
     };
-    loadCategories();
+    loadData();
   }, []);
-  const products = dummyProducts;
 
   return (
     <>
@@ -277,11 +262,26 @@ export default function Home() {
               }}
               className="kahwa-tiles-swiper mt-10 pb-12"
             >
-              {products.map((product) => (
-                <SwiperSlide key={`tiles-${product.id}`}>
-                  <ProductCard product={product} />
+              {loadingProducts && (
+                <SwiperSlide key="tiles-loading">
+                  <div className="rounded-sm border border-black/10 bg-white p-6 text-sm text-black/60">
+                    Loading products...
+                  </div>
                 </SwiperSlide>
-              ))}
+              )}
+              {!loadingProducts && products.length === 0 && (
+                <SwiperSlide key="tiles-empty">
+                  <div className="rounded-sm border border-black/10 bg-white p-6 text-sm text-black/60">
+                    No products available right now.
+                  </div>
+                </SwiperSlide>
+              )}
+              {!loadingProducts &&
+                products.map((product) => (
+                  <SwiperSlide key={`tiles-${product.id}`}>
+                    <ProductCard product={product} />
+                  </SwiperSlide>
+                ))}
             </Swiper>
           </div>
         </section>
@@ -375,53 +375,52 @@ export default function Home() {
             </div>
 
             <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {[
-                "/products/W3.png",
-                "/products/W4.png",
-                "/products/W5.png",
-                "/products/W6.png",
-                "/products/W7.png",
-                "/products/W8.png",
-              ]
-                .map((image, index) => ({
-                  ...((categories.length
-                    ? categories
-                    : [{ id: "all", name: "All", description: "" }]
-                  ).slice(0, 6)[index] || {
-                    id: index,
-                    name: "Category",
-                    description:
-                      "Explore the best sellers and seasonal favorites.",
-                  }),
-                  image,
-                }))
-                .map((category, index) => (
-                  <Link
-                    key={`${category.id}-${index}`}
-                    href={`/category/${category.slug || category.id}`}
-                    className="group relative overflow-hidden rounded-3xl border border-black/10 bg-white transition hover:-translate-y-1 hover:shadow-2xl"
-                  >
-                    <div
-                      className="h-44 bg-center bg-cover"
-                      style={{ backgroundImage: `url(${category.image})` }}
+              {loadingCategories && (
+                <div className="col-span-full rounded-sm border border-black/10 bg-white p-6 text-sm text-black/60">
+                  Loading categories...
+                </div>
+              )}
+              {!loadingCategories && categories.length === 0 && (
+                <div className="col-span-full rounded-sm border border-black/10 bg-white p-6 text-sm text-black/60">
+                  No categories available right now.
+                </div>
+              )}
+              {!loadingCategories &&
+                categories.slice(0, 6).map((category, index) => {
+                  const fallbackImage =
+                    products[index]?.images?.[0]?.image_url || "";
+                  return (
+                    <Link
+                      key={`${category.id}-${index}`}
+                      href={`/shop?category=${category.slug || category.id}`}
+                      className="group relative overflow-hidden rounded-3xl border border-black/10 bg-white transition hover:-translate-y-1 hover:shadow-2xl"
                     >
-                      <div className="h-full w-full bg-gradient-to-b from-black/10 via-black/30 to-black/80" />
-                    </div>
-                    <div className="p-6">
-                      <div className="flex items-center justify-between text-xs uppercase tracking-[0.3em] text-black/60">
-                        <span>Category</span>
-                        <span>View</span>
+                      <div
+                        className="h-44 bg-center bg-cover"
+                        style={{
+                          backgroundImage: fallbackImage
+                            ? `url(${fallbackImage})`
+                            : "none",
+                        }}
+                      >
+                        <div className="h-full w-full bg-gradient-to-b from-black/10 via-black/30 to-black/80" />
                       </div>
-                      <h3 className="mt-4 text-2xl font-semibold text-black">
-                        {category.name}
-                      </h3>
-                      <p className="mt-3 text-sm text-black/70 line-clamp-2">
-                        {category.description ||
-                          "Explore the best sellers and seasonal favorites."}
-                      </p>
-                    </div>
-                  </Link>
-                ))}
+                      <div className="p-6">
+                        <div className="flex items-center justify-between text-xs uppercase tracking-[0.3em] text-black/60">
+                          <span>Category</span>
+                          <span>View</span>
+                        </div>
+                        <h3 className="mt-4 text-2xl font-semibold text-black">
+                          {category.name}
+                        </h3>
+                        <p className="mt-3 text-sm text-black/70 line-clamp-2">
+                          {category.description ||
+                            "Explore the best sellers and seasonal favorites."}
+                        </p>
+                      </div>
+                    </Link>
+                  );
+                })}
             </div>
           </div>
         </section>

@@ -26,16 +26,56 @@ export default function ProductCard({ product }) {
     hoverFallbacks[Number(product.id) % hoverFallbacks.length];
   const handleAddToCart = async () => {
     try {
+      const variantId =
+        product.variants?.[0]?.id || product.default_variant_id || null;
+      if (!variantId) {
+        window.dispatchEvent(
+          new CustomEvent("toast", {
+            detail: {
+              message: "Select a size on the product page.",
+              type: "error",
+            },
+          }),
+        );
+        return;
+      }
+      const cart = await apiFetch("/cart");
+      const cartItems = Array.isArray(cart?.items) ? cart.items : [];
+      const alreadyInCart = cartItems.some(
+        (item) =>
+          item.product_name === product.name &&
+          (item.variant_name || "") ===
+            (product.variants?.[0]?.variant_name || ""),
+      );
+      if (alreadyInCart) {
+        window.dispatchEvent(
+          new CustomEvent("toast", {
+            detail: { message: "Product is already in cart.", type: "error" },
+          }),
+        );
+        return;
+      }
       await apiFetch("/cart", {
         method: "POST",
         body: JSON.stringify({
-          variant_id: product.variants?.[0]?.id || 1,
+          variant_id: variantId,
           quantity: 1,
         }),
       });
-      alert("Added to cart!");
+      const current = Number(localStorage.getItem("cart_count")) || 0;
+      localStorage.setItem("cart_count", String(current + 1));
+      window.dispatchEvent(new Event("cartchange"));
+      window.dispatchEvent(
+        new CustomEvent("toast", {
+          detail: { message: "Added to cart.", type: "success" },
+        }),
+      );
     } catch (e) {
-      alert("Please login first");
+      window.dispatchEvent(
+        new CustomEvent("toast", {
+          detail: { message: "Please login first.", type: "error" },
+        }),
+      );
     }
   };
 

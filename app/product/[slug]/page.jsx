@@ -175,14 +175,45 @@ export default function ProductDetail() {
   const addToCart = async () => {
     if (!selectedVariant) return;
     const safeQty = Number.isFinite(quantity) && quantity > 0 ? quantity : 1;
-    await apiFetch("/cart", {
-      method: "POST",
-      body: JSON.stringify({
-        variant_id: selectedVariant.id,
-        quantity: safeQty,
-      }),
-    });
-    alert("Added to cart!");
+    try {
+      const cart = await apiFetch("/cart");
+      const cartItems = Array.isArray(cart?.items) ? cart.items : [];
+      const alreadyInCart = cartItems.some(
+        (item) =>
+          item.product_name === product?.name &&
+          (item.variant_name || "") ===
+            (selectedVariant?.variant_name || selectedVariant?.name || ""),
+      );
+      if (alreadyInCart) {
+        window.dispatchEvent(
+          new CustomEvent("toast", {
+            detail: { message: "Product is already in cart.", type: "error" },
+          }),
+        );
+        return;
+      }
+      await apiFetch("/cart", {
+        method: "POST",
+        body: JSON.stringify({
+          variant_id: selectedVariant.id,
+          quantity: safeQty,
+        }),
+      });
+      const current = Number(localStorage.getItem("cart_count")) || 0;
+      localStorage.setItem("cart_count", String(current + safeQty));
+      window.dispatchEvent(new Event("cartchange"));
+      window.dispatchEvent(
+        new CustomEvent("toast", {
+          detail: { message: "Added to cart.", type: "success" },
+        }),
+      );
+    } catch (err) {
+      window.dispatchEvent(
+        new CustomEvent("toast", {
+          detail: { message: "Please login first.", type: "error" },
+        }),
+      );
+    }
   };
 
   const shareUrl = typeof window !== "undefined" ? window.location.href : "";
@@ -263,53 +294,28 @@ export default function ProductDetail() {
     });
   };
 
-  const brewingHot = [
-    {
-      title: "Measure",
-      description: "1 tsp / 2g",
-      image: "/products/packets/11.png",
-    },
-    {
-      title: "Water",
-      description: "200ml",
-      image: "/products/packets/12.png",
-    },
-    {
-      title: "Temperature",
-      description: "85°–95°C",
-      image: "/products/packets/13.png",
-    },
-    {
-      title: "Steep",
-      description: "3–5 mins",
-      image: "/products/packets/14.png",
-    },
-  ];
-  const brewingCold = [
-    {
-      title: "Brew",
-      description: "Brew as above and let it cool",
-      image: "/products/packets/15.png",
-    },
-    {
-      title: "Cover",
-      description: "Cover with a lid while brewing",
-      image: "/products/packets/16.png",
-    },
-    {
-      title: "Ice",
-      description: "Pour over ice",
-      image: "/products/packets/17.png",
-    },
-    {
-      title: "Finish",
-      description: "Mint + lemon for a color shift",
-      image: "/products/packets/18.png",
-    },
-  ];
   const productBrewingRituals = selectedVariant?.brewing_rituals?.length
     ? selectedVariant.brewing_rituals
     : product?.brewing_rituals || [];
+  const findRitualGroup = (matcher) =>
+    productBrewingRituals.find((group) => {
+      const key = String(group?.key || "").toLowerCase();
+      const title = String(group?.title || "").toLowerCase();
+      return matcher(key, title);
+    });
+  const hotGroup = findRitualGroup(
+    (key, title) => key.includes("hot") || title.includes("hot"),
+  );
+  const icedGroup = findRitualGroup(
+    (key, title) =>
+      key.includes("iced") ||
+      key.includes("cold") ||
+      title.includes("iced") ||
+      title.includes("cold"),
+  );
+  const hotRitualItems = hotGroup?.items || [];
+  const icedRitualItems = icedGroup?.items || [];
+  const hasRituals = productBrewingRituals.length > 0;
 
   const ingredientsBase = [
     {
@@ -891,106 +897,69 @@ export default function ProductDetail() {
               </div>
             </div>
 
-            <div className="space-y-6 mt-10">
-              <h3 className="text-2xl lg:text-3xl font-semibold">
-                Brewing Rituals
-              </h3>
-              {productBrewingRituals.length > 0 && (
-                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                  {productBrewingRituals.map((ritual, index) => (
-                    <div
-                      key={`${ritual.ritual || ritual.text}-${index}`}
-                      className="flex items-center gap-3 rounded-sm border border-black/10 bg-white p-4"
-                    >
-                      {ritual.image_url && (
-                        <span className="flex h-12 w-12 items-center justify-center rounded-full bg-white">
-                          <img
-                            src={ritual.image_url}
-                            alt={ritual.ritual || ritual.text || "Ritual"}
-                            className="h-8 w-8 object-contain"
-                          />
-                        </span>
-                      )}
-                      <p className="text-sm text-black">
-                        {ritual.ritual || ritual.text}
-                      </p>
+            {hasRituals && (
+              <div className="space-y-6 mt-10">
+                <h3 className="text-2xl lg:text-3xl font-semibold">
+                  Brewing Rituals
+                </h3>
+                <div className="grid gap-8 grid-cols-1 md:grid-cols-2">
+                  {hotRitualItems.length > 0 && (
+                    <div className="w-full text-black">
+                      <h4 className="text-lg font-semibold">
+                        {hotGroup?.title || "Hot Brew"}
+                      </h4>
+                      <div className="mt-4 grid gap-4 sm:grid-cols-2">
+                        {hotRitualItems.map((item, index) => (
+                          <div
+                            key={`hot-ritual-${index}`}
+                            className="flex items-center gap-3 text-base text-black"
+                          >
+                            <span className="flex h-14 w-14 items-center justify-center rounded-full bg-white">
+                              <img
+                                src={item.image_url || item.image}
+                                alt={
+                                  item.text || item.description || "Hot ritual"
+                                }
+                                className="h-10 w-10 object-contain"
+                              />
+                            </span>
+                            {item.text || item.description}
+                          </div>
+                        ))}
+                      </div>
                     </div>
-                  ))}
-                </div>
-              )}
-              <div className="grid gap-8 grid-cols-1 md:grid-cols-2">
-                <div className="w-full text-black">
-                  <h4 className="text-lg font-semibold">Hot Brew</h4>
-                  <div className="mt-4 grid gap-4 sm:grid-cols-2">
-                    <div className="flex items-center gap-3 text-base text-black">
-                      <span className="flex h-14 w-14 items-center justify-center rounded-full bg-white">
-                        <img
-                          src="/products/br/Place_1_Bag_in_a_Cup.svg"
-                          alt="Place 1 bag in a cup"
-                          className="h-10 w-10 object-contain"
-                        />
-                      </span>
-                      1 Tsp / 2 g
+                  )}
+                  {icedRitualItems.length > 0 && (
+                    <div className="w-full text-black">
+                      <h4 className="text-lg font-semibold">
+                        {icedGroup?.title || "Iced Brew"}
+                      </h4>
+                      <div className="mt-4 flex flex-wrap gap-3">
+                        {icedRitualItems.map((item, index) => (
+                          <div
+                            key={`iced-ritual-${index}`}
+                            className="flex items-center gap-3 text-base text-black"
+                          >
+                            <span className="flex h-14 w-14 items-center justify-center rounded-full bg-white">
+                              <img
+                                src={item.image_url || item.image}
+                                alt={
+                                  item.text ||
+                                  item.description ||
+                                  "Iced ritual"
+                                }
+                                className="h-10 w-10 object-contain"
+                              />
+                            </span>
+                            {item.text || item.description}
+                          </div>
+                        ))}
+                      </div>
                     </div>
-                    <div className="flex items-center gap-3 text-base text-black">
-                      <span className="flex h-14 w-14 items-center justify-center rounded-full bg-white">
-                        <img
-                          src="/products/br/Pour_7fl._oz_200_ml_Freshly_Boiled_Water_over_the_Leaves-40_1.svg"
-                          alt="Pour 200 ml water"
-                          className="h-10 w-10 object-contain"
-                        />
-                      </span>
-                      200ml
-                    </div>
-                    <div className="flex items-center gap-3 text-base text-black">
-                      <span className="flex h-14 w-14 items-center justify-center rounded-full bg-white">
-                        <img
-                          src="/products/br/Water_Temperature_-_158_F-176_F_-_70_C-80_C_7fd68249-bd73-4395-9d89-ea7dcb877f83.svg"
-                          alt="Water temperature"
-                          className="h-10 w-10 object-contain"
-                        />
-                      </span>
-                      85° - 95°C
-                    </div>
-                    <div className="flex items-center gap-3 text-base text-black">
-                      <span className="flex h-14 w-14 items-center justify-center rounded-full bg-white">
-                        <img
-                          src="/products/br/Brew_for_2-3_mins_4c4d18ef-6046-4708-9813-79f87a88239e.svg"
-                          alt="Brew time"
-                          className="h-10 w-10 object-contain"
-                        />
-                      </span>
-                      3 - 5 Mins
-                    </div>
-                  </div>
-                </div>
-                <div className="w-full text-black">
-                  <h4 className="text-lg font-semibold">Iced Brew</h4>
-                  <div className="mt-4 flex flex-wrap gap-3">
-                    <div className="flex items-center gap-3 text-base text-black">
-                      <span className="flex h-14 w-14 items-center justify-center rounded-full bg-white">
-                        <img
-                          src="/products/br/Refrigerate_for_3-4_hours._Add_ice_cubes_sweetener.svg"
-                          alt="Refrigerate and add ice"
-                          className="h-10 w-10 object-contain"
-                        />
-                      </span>
-                      Refrigerate & add ice
-                    </div>
-                    <div className="flex items-center gap-3 text-base text-black">
-                      <span className="flex h-14 w-14 items-center justify-center rounded-full bg-white">
-                        <img
-                          src="/products/br/To_be_served_without_milk.svg"
-                          alt="Serve without milk"
-                          className="h-10 w-10 object-contain"
-                        />
-                      </span>
-                      Serve without milk
-                    </div>
-                  </div>
+                  )}
                 </div>
               </div>
-            </div>
+            )}
 
             <div className="space-y-4 mt-10">
               <div className="flex items-center justify-between">

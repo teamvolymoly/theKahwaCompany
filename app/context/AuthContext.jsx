@@ -46,8 +46,7 @@ export function AuthProvider({ children }) {
 
     try {
       const data =
-        (await apiFetch("/api/auth/me")) ??
-        (await apiFetch("/api/users/me"));
+        (await apiFetch("/auth/profile")) ?? (await apiFetch("/users/me"));
       setUser(data || null);
       setLoading(false);
       return data;
@@ -72,7 +71,7 @@ export function AuthProvider({ children }) {
     setAuthLoading(true);
     setError(null);
     try {
-      const res = await apiFetch("/api/auth/login", {
+      const res = await apiFetch("/auth/login", {
         method: "POST",
         body: JSON.stringify({ email, password }),
       });
@@ -96,7 +95,7 @@ export function AuthProvider({ children }) {
   const logout = async () => {
     setAuthLoading(true);
     try {
-      await apiFetch("/api/auth/logout", { method: "POST" });
+      await apiFetch("/auth/logout", { method: "POST" });
     } catch (err) {
       // ignore logout failure
     }
@@ -108,7 +107,7 @@ export function AuthProvider({ children }) {
   const refresh = async () => {
     setAuthLoading(true);
     try {
-      const res = await apiFetch("/api/auth/refresh", { method: "POST" });
+      const res = await apiFetch("/auth/refresh", { method: "POST" });
       const nextToken = extractToken(res);
       if (nextToken) setToken(nextToken);
       setAuthLoading(false);

@@ -5,35 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/app/context/AuthContext";
 import { Squash as Hamburger, Squash } from "hamburger-react";
-
-const shopLinks = [
-  {
-    label: "Kahwa Loose Leaf",
-    items: [
-      "All Kahwa Loose Leaf",
-      "Kashmiri Kahwa",
-      "Hibiscus Kahwa",
-      "Blue Kahwa",
-      "Mint Kahwa",
-      "Oolong Kahwa",
-    ],
-  },
-  {
-    label: "Kahwa Bags",
-    items: [
-      "All Kahwa Bags",
-      "Kashmiri Kahwa",
-      "Hibiscus Kahwa",
-      "Blue Kahwa",
-      "Mint Kahwa",
-      "Oolong Kahwa",
-    ],
-  },
-  {
-    label: "Teaware",
-    items: ["All", "Loose kahwa infusers", "Travel mugs and bottles"],
-  },
-];
+import { apiFetch } from "@/utils/api";
 
 const toCategoryParam = (value) =>
   value
@@ -55,6 +27,7 @@ export default function NewHeader() {
   const profileRef = useRef(null);
   const { isAuthenticated, user, loading, authLoading, logout } = useAuth();
   const [cartCount, setCartCount] = useState(0);
+  const [headerCategories, setHeaderCategories] = useState([]);
   const closeShopDropdown = () => setIsShopOpen(false);
 
   const handleLogout = async () => {
@@ -90,6 +63,31 @@ export default function NewHeader() {
       window.removeEventListener("storage", syncCartCount);
       window.removeEventListener("cartchange", syncCartCount);
     };
+  }, []);
+
+  useEffect(() => {
+    const loadHeader = async () => {
+      try {
+        const data = await apiFetch("/header");
+        const items = Array.isArray(data) ? data : [];
+        const normalized = items.map((cat) => ({
+          id: cat.id,
+          name: cat.name,
+          slug: cat.slug || toCategoryParam(cat.name || "category"),
+          subcategories: Array.isArray(cat.subcategories)
+            ? cat.subcategories.map((sub) => ({
+                id: sub.id,
+                name: sub.name,
+                slug: sub.slug || toCategoryParam(sub.name || "subcategory"),
+              }))
+            : [],
+        }));
+        setHeaderCategories(normalized);
+      } catch (e) {
+        setHeaderCategories([]);
+      }
+    };
+    loadHeader();
   }, []);
 
   return (
@@ -333,55 +331,39 @@ export default function NewHeader() {
                         <path d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 11.17l3.71-3.94a.75.75 0 1 1 1.08 1.04l-4.25 4.5a.75.75 0 0 1-1.08 0l-4.25-4.5a.75.75 0 0 1 .02-1.06Z" />
                       </svg>
                     </summary>
-                    <div className="mt-3 grid gap-3 text-gray-700">
-                      <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">
-                        Bestsellers
-                      </p>
-                      <Link
-                        href="/shop"
-                        className="hover:text-gray-900"
-                        onClick={closeShopDropdown}
-                      >
-                        Samplers
-                      </Link>
-                      <p className="pt-2 text-xs font-semibold uppercase tracking-wide text-gray-500">
-                        Kahwa Loose Leaf
-                      </p>
-                      {shopLinks[0].items.map((item) => (
+                    <div className="mt-3 grid gap-4 text-gray-700">
+                      {headerCategories.length === 0 && (
                         <Link
-                          key={item}
-                          href={`/shop?category=${toCategoryParam(item)}`}
+                          href="/shop"
                           className="hover:text-gray-900"
                           onClick={closeShopDropdown}
                         >
-                          {item}
+                          Shop all
                         </Link>
-                      ))}
-                      <p className="pt-2 text-xs font-semibold uppercase tracking-wide text-gray-500">
-                        Kahwa Bags
-                      </p>
-                      {shopLinks[1].items.map((item) => (
-                        <Link
-                          key={item}
-                          href={`/shop?category=${toCategoryParam(item)}`}
-                          className="hover:text-gray-900"
-                          onClick={closeShopDropdown}
-                        >
-                          {item}
-                        </Link>
-                      ))}
-                      <p className="pt-2 text-xs font-semibold uppercase tracking-wide text-gray-500">
-                        Teaware
-                      </p>
-                      {shopLinks[2].items.map((item) => (
-                        <Link
-                          key={item}
-                          href={`/shop?category=${toCategoryParam(item)}`}
-                          className="hover:text-gray-900"
-                          onClick={closeShopDropdown}
-                        >
-                          {item}
-                        </Link>
+                      )}
+                      {headerCategories.map((category) => (
+                        <div key={category.slug} className="space-y-2">
+                          <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+                            {category.name}
+                          </p>
+                          <Link
+                            href={`/shop?category=${category.slug}`}
+                            className="hover:text-gray-900"
+                            onClick={closeShopDropdown}
+                          >
+                            All {category.name}
+                          </Link>
+                          {category.subcategories.map((sub) => (
+                            <Link
+                              key={sub.slug}
+                              href={`/shop?category=${category.slug}&subcategory=${sub.slug}`}
+                              className="hover:text-gray-900"
+                              onClick={closeShopDropdown}
+                            >
+                              {sub.name}
+                            </Link>
+                          ))}
+                        </div>
                       ))}
                     </div>
                   </details>
@@ -466,20 +448,47 @@ export default function NewHeader() {
                 <div className=" flex flex-col gap-10 lg:flex-row">
                   <div className="flex-1 max-h-[360px] overflow-y-auto pr-4">
                     <div className="grid grid-cols-2 gap-8 text-sm">
-                      {shopLinks.map((group) => (
-                        <div key={group.label}>
+                      {headerCategories.length === 0 && (
+                        <div>
                           <p className="mb-4 text-base font-semibold text-gray-900">
-                            {group.label}
+                            Shop
                           </p>
                           <ul className="space-y-2 text-gray-700">
-                            {group.items.map((item) => (
-                              <li key={item}>
+                            <li>
+                              <Link
+                                href="/shop"
+                                className="hover:text-gray-900"
+                                onClick={closeShopDropdown}
+                              >
+                                Shop all
+                              </Link>
+                            </li>
+                          </ul>
+                        </div>
+                      )}
+                      {headerCategories.map((category) => (
+                        <div key={category.slug}>
+                          <p className="mb-4 text-base font-semibold text-gray-900">
+                            {category.name}
+                          </p>
+                          <ul className="space-y-2 text-gray-700">
+                            <li>
+                              <Link
+                                href={`/shop?category=${category.slug}`}
+                                className="hover:text-gray-900"
+                                onClick={closeShopDropdown}
+                              >
+                                All {category.name}
+                              </Link>
+                            </li>
+                            {category.subcategories.map((sub) => (
+                              <li key={sub.slug}>
                                 <Link
-                                  href={`/shop?category=${toCategoryParam(item)}`}
+                                  href={`/shop?category=${category.slug}&subcategory=${sub.slug}`}
                                   className="hover:text-gray-900"
                                   onClick={closeShopDropdown}
                                 >
-                                  {item}
+                                  {sub.name}
                                 </Link>
                               </li>
                             ))}

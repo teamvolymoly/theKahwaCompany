@@ -5,6 +5,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import AddBar from "@/components/AddBar";
 import NewHeader from "@/components/NewHeader";
+import ToastHost from "@/components/ToastHost";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -35,6 +36,7 @@ export default function RootLayout({ children }) {
           {/* <AddBar /> */}
           {/* <Header /> */}
           <NewHeader />
+          <ToastHost />
           {children}
           <Footer />
         </AuthProvider>
