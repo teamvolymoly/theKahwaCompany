@@ -29,45 +29,94 @@ export default function ProductDetail() {
 
   useEffect(() => {
     const load = async () => {
+      const safeSlug = Array.isArray(slug) ? slug[0] : slug;
       const fallback =
-        dummyProducts.find((p) => p.slug === slug || String(p.id) === slug) ||
-        dummyProducts[0];
+        dummyProducts.find(
+          (p) => p.slug === safeSlug || String(p.id) === String(safeSlug),
+        ) || dummyProducts[0];
       try {
-        const prod = await apiFetch(`/products/${slug}`);
+        const prod = await apiFetch(
+          `/products/${encodeURIComponent(safeSlug)}`,
+        );
+        if (!prod || !prod.id) {
+          throw new Error("Product not found.");
+        }
         const resolved = prod || fallback;
-        setProduct(resolved);
+        const normalized = {
+          ...fallback,
+          ...resolved,
+          tag_line_1:
+            resolved?.tag_line_1 ||
+            resolved?.tag_line ||
+            fallback.tag_line_1 ||
+            fallback.tag_line,
+          tag_line_2:
+            resolved?.tag_line_2 ||
+            resolved?.short_description ||
+            fallback.tag_line_2 ||
+            fallback.short_description,
+          images: Array.isArray(resolved?.images)
+            ? resolved.images
+            : fallback.images || [],
+          ingredients_list: Array.isArray(resolved?.ingredients_list)
+            ? resolved.ingredients_list
+            : fallback.ingredients_list || [],
+          variants: Array.isArray(resolved?.variants)
+            ? resolved.variants
+            : fallback.variants || [],
+          reviews: resolved?.reviews || fallback.reviews || {},
+          price: resolved?.price ?? fallback.price,
+          discount_price: resolved?.discount_price ?? fallback.discount_price,
+          compare_price: resolved?.compare_price ?? fallback.compare_price,
+          oldPrice:
+            resolved?.compare_price ??
+            resolved?.discount_price ??
+            fallback.oldPrice,
+        };
 
-        const imgs = await apiFetch(`/products/${resolved.id}/images`);
-        const imageList =
-          Array.isArray(imgs) && imgs.length ? imgs : resolved.images || [];
+        setProduct(normalized);
+
+        const imageList = normalized.images || [];
         setImages(imageList);
         setActiveImage(0);
 
-        const vars = await apiFetch(`/products/${resolved.id}/variants`);
-        const variantList =
-          Array.isArray(vars) && vars.length ? vars : resolved.variants || [];
+        const variantList = normalized.variants || [];
         setVariants(variantList);
-        setSelectedVariant(variantList[0] ?? null);
+        const defaultVariant =
+          variantList.find((v) => v.id === normalized.default_variant_id) ||
+          variantList.find((v) => v.is_default) ||
+          variantList[0] ||
+          null;
+        setSelectedVariant(defaultVariant);
 
-        const revs = await apiFetch(`/products/${resolved.id}/reviews`);
-        setReviews(Array.isArray(revs) && revs.length ? revs : dummyReviews);
+        const reviewItems = normalized.reviews?.items;
+        setReviews(Array.isArray(reviewItems) ? reviewItems : dummyReviews);
       } catch (err) {
-        setProduct(fallback);
-        setImages(fallback.images || []);
+        alert(err?.message || "Product not found.");
+        const normalizedFallback = {
+          ...fallback,
+          tag_line_1: fallback.tag_line_1 || fallback.tag_line,
+          tag_line_2: fallback.tag_line_2 || fallback.short_description,
+        };
+        setProduct(normalizedFallback);
+        setImages(normalizedFallback.images || []);
         setActiveImage(0);
-        setVariants(fallback.variants || []);
-        setSelectedVariant((fallback.variants || [])[0] ?? null);
+        setVariants(normalizedFallback.variants || []);
+        setSelectedVariant((normalizedFallback.variants || [])[0] ?? null);
         setReviews(dummyReviews);
       }
     };
     if (slug) load();
   }, [slug]);
 
+
+
   const avgRating = useMemo(() => {
+    if (product?.reviews?.average_rating) return product.reviews.average_rating;
     if (!reviews.length) return 0;
     const total = reviews.reduce((sum, r) => sum + (r.rating || 0), 0);
     return total / reviews.length;
-  }, [reviews]);
+  }, [product, reviews]);
 
   const fullStars = Math.max(0, Math.min(5, Math.round(avgRating)));
   const ratingStats = useMemo(() => {
@@ -76,10 +125,14 @@ export default function ProductDetail() {
       const score = Math.round(r.rating || 0);
       if (score >= 1 && score <= 5) counts[score - 1] += 1;
     });
-    const total = reviews.length || 1;
+    const totalReviews =
+      Number.isFinite(product?.reviews?.count) && product.reviews.count >= 0
+        ? product.reviews.count
+        : reviews.length;
+    const total = totalReviews || 1;
     const percents = counts.map((c) => Math.round((c / total) * 100));
-    return { counts, percents, totalReviews: reviews.length };
-  }, [reviews]);
+    return { counts, percents, totalReviews };
+  }, [product, reviews]);
 
   const reviewImageStrip = useMemo(() => {
     const images = [];
@@ -95,7 +148,9 @@ export default function ProductDetail() {
 
   const getWeightMeta = (variant) => {
     if (!variant) return null;
-    const gramsFromData = Number(variant.weight_g);
+    const gramsFromData =
+      Number(variant.weight_g) ||
+      (Number(variant.weight) ? Number(variant.weight) : null);
     if (Number.isFinite(gramsFromData) && gramsFromData > 0) {
       const label =
         gramsFromData >= 1000 && gramsFromData % 1000 === 0
@@ -252,6 +307,9 @@ export default function ProductDetail() {
       image: "/products/packets/18.png",
     },
   ];
+  const productBrewingRituals = selectedVariant?.brewing_rituals?.length
+    ? selectedVariant.brewing_rituals
+    : product?.brewing_rituals || [];
 
   const ingredientsBase = [
     {
@@ -285,10 +343,23 @@ export default function ProductDetail() {
         "/products/Ingredient/Spearmint_3cecd63e-bcdd-4904-a59e-bf260f503075.avif",
     },
   ];
-  const ingredients = Array.from({ length: 10 }).map((_, index) => {
+  const fallbackIngredients = Array.from({ length: 10 }).map((_, index) => {
     const item = ingredientsBase[index % ingredientsBase.length];
     return { ...item, id: `ing-${index}-${item.name}` };
   });
+  const ingredientsFromApi =
+    product?.ingredients_list?.length > 0
+      ? product.ingredients_list.map((item, index) => ({
+          id: `ing-${index}-${item.name || "ingredient"}`,
+          name: item.name || "Ingredient",
+          image: item.image_url || "",
+        }))
+      : [];
+  const ingredients =
+    ingredientsFromApi.length > 0 ? ingredientsFromApi : fallbackIngredients;
+  const useIngredientSwiper = ingredients.length > 1;
+
+  console.log("Resolved ingredients:", product);
 
   const discoverMore = dummyProducts
     .filter((p) => p.id !== product?.id)
@@ -505,7 +576,9 @@ export default function ProductDetail() {
 
             <div className="order-3">
               <div className="w-fit px-4 py-1 mt-4 text-sm bg-[#FFF1C3] text-yellow-600 uppercase tracking-[0.05em] rounded-sm">
-                {product.tag_line || "A delightful blend to brighten your day."}
+                {product.tag_line_1 ||
+                  product.tag_line ||
+                  "A delightful blend to brighten your day."}
               </div>
               <h1
                 className="text-4xl leading-tight lg:text-5xl uppercase tracking-[0.02em] mt-3 text-[#1c2230]"
@@ -514,7 +587,9 @@ export default function ProductDetail() {
                 {product.name}
               </h1>
               <p className="mt-3 text-sm text-black uppercase tracking-[0.05em] ">
-                {product.short_description}
+                {product.tag_line_2 ||
+                  product.short_description ||
+                  "Crafted for a refined, aromatic sip."}
               </p>
 
               <div className="mt-3 flex gap-3 border-b border-black/10 pb-8 text-black/60">
@@ -552,11 +627,22 @@ export default function ProductDetail() {
                   className="text-4xl font-semibold text-[#1c2230]"
                   // style={{ fontFamily: "var(--font-basker)" }}
                 >
-                  ₹ {selectedVariant?.price ?? "--"}
+                  ₹{" "}
+                  {selectedVariant?.formatted_price ??
+                    selectedVariant?.price ??
+                    product.price ??
+                    "--"}
                 </div>
-                {product.oldPrice && (
+                {(selectedVariant?.formatted_discount_price ??
+                  selectedVariant?.compare_price ??
+                  selectedVariant?.discount_price ??
+                  product.oldPrice) && (
                   <div className="text-lg text-[#1c2230]/40 line-through">
-                    ₹ {product.oldPrice}
+                    ₹{" "}
+                    {selectedVariant?.formatted_discount_price ??
+                      selectedVariant?.compare_price ??
+                      selectedVariant?.discount_price ??
+                      product.oldPrice}
                   </div>
                 )}
               </div>
@@ -809,6 +895,29 @@ export default function ProductDetail() {
               <h3 className="text-2xl lg:text-3xl font-semibold">
                 Brewing Rituals
               </h3>
+              {productBrewingRituals.length > 0 && (
+                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                  {productBrewingRituals.map((ritual, index) => (
+                    <div
+                      key={`${ritual.ritual || ritual.text}-${index}`}
+                      className="flex items-center gap-3 rounded-sm border border-black/10 bg-white p-4"
+                    >
+                      {ritual.image_url && (
+                        <span className="flex h-12 w-12 items-center justify-center rounded-full bg-white">
+                          <img
+                            src={ritual.image_url}
+                            alt={ritual.ritual || ritual.text || "Ritual"}
+                            className="h-8 w-8 object-contain"
+                          />
+                        </span>
+                      )}
+                      <p className="text-sm text-black">
+                        {ritual.ritual || ritual.text}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              )}
               <div className="grid gap-8 grid-cols-1 md:grid-cols-2">
                 <div className="w-full text-black">
                   <h4 className="text-lg font-semibold">Hot Brew</h4>
@@ -896,55 +1005,121 @@ export default function ProductDetail() {
                   onClick={() => ingredientsRef.current?.slidePrev()}
                   className="h-10 w-fit text-black/60 cursor-pointer"
                   aria-label="Scroll ingredients left"
+                  disabled={!useIngredientSwiper}
                 >
                   <ChevronLeftIcon />
                 </button>
-                <Swiper
-                  modules={[Navigation]}
-                  slidesPerView={1.2}
-                  spaceBetween={16}
-                  navigation={false}
-                  pagination={{ clickable: true }}
-                  scrollbar={{ draggable: true }}
-                  loop={true}
-                  onSwiper={(swiper) => {
-                    ingredientsRef.current = swiper;
-                  }}
-                  breakpoints={{
-                    480: { slidesPerView: 2.2, spaceBetween: 10 },
-                    768: { slidesPerView: 3.2, spaceBetween: 10 },
-                    1024: { slidesPerView: 4.2, spaceBetween: 10 },
-                    1280: { slidesPerView: 4.2, spaceBetween: 10 },
-                    1536: { slidesPerView: 5.2, spaceBetween: 10 },
-                  }}
-                  className="pb-6"
-                >
-                  {ingredients.map((item) => (
-                    <SwiperSlide key={item.id}>
-                      <div className="w-full mr-0">
-                        <div className="w-full aspect-square p-4">
-                          <img
-                            src={item.image}
-                            alt={item.name}
-                            className="h-full w-full object-contain rounded-sm"
-                          />
+                {useIngredientSwiper ? (
+                  <Swiper
+                    modules={[Navigation]}
+                    slidesPerView={1.2}
+                    spaceBetween={16}
+                    navigation={false}
+                    pagination={{ clickable: true }}
+                    scrollbar={{ draggable: true }}
+                    loop={ingredients.length > 4}
+                    onSwiper={(swiper) => {
+                      ingredientsRef.current = swiper;
+                    }}
+                    breakpoints={{
+                      480: { slidesPerView: 2.2, spaceBetween: 10 },
+                      768: { slidesPerView: 3.2, spaceBetween: 10 },
+                      1024: { slidesPerView: 4.2, spaceBetween: 10 },
+                      1280: { slidesPerView: 4.2, spaceBetween: 10 },
+                      1536: { slidesPerView: 5.2, spaceBetween: 10 },
+                    }}
+                    className="pb-6"
+                  >
+                    {ingredients.map((item) => (
+                      <SwiperSlide key={item.id}>
+                        <div className="w-full mr-0">
+                          <div className="w-full aspect-square p-4">
+                            {item.image ? (
+                              <img
+                                src={item.image}
+                                alt={item.name}
+                                className="h-full w-full object-contain rounded-sm"
+                              />
+                            ) : (
+                              <div className="flex h-full w-full items-center justify-center rounded-sm border border-black/10 bg-white text-xs text-black/40">
+                                No image
+                              </div>
+                            )}
+                          </div>
+                          <p className=" ms-4 text-sm uppercase tracking-[0.08em] text-black">
+                            {item.name}
+                          </p>
                         </div>
-                        <p className=" ms-4 text-sm uppercase tracking-[0.08em] text-black">
+                      </SwiperSlide>
+                    ))}
+                  </Swiper>
+                ) : (
+                  <div className="flex flex-1 flex-wrap gap-4 pb-6">
+                    {ingredients.map((item) => (
+                      <div key={item.id} className="w-[160px]">
+                        <div className="w-full aspect-square p-4">
+                          {item.image ? (
+                            <img
+                              src={item.image}
+                              alt={item.name}
+                              className="h-full w-full object-contain rounded-sm"
+                            />
+                          ) : (
+                            <div className="flex h-full w-full items-center justify-center rounded-sm border border-black/10 bg-white text-xs text-black/40">
+                              No image
+                            </div>
+                          )}
+                        </div>
+                        <p className="ms-4 text-sm uppercase tracking-[0.08em] text-black">
                           {item.name}
                         </p>
                       </div>
-                    </SwiperSlide>
-                  ))}
-                </Swiper>
+                    ))}
+                  </div>
+                )}
                 <button
                   type="button"
                   onClick={() => ingredientsRef.current?.slideNext()}
                   className="h-10 w-fit text-black/60 cursor-pointer"
                   aria-label="Scroll ingredients right"
+                  disabled={!useIngredientSwiper}
                 >
                   <ChevronRightIcon />
                 </button>
               </div>
+            </div>
+
+            <div className="mt-12 rounded-sm border border-black/10 bg-[#FBF9F2] p-6 lg:p-8">
+              <div className="flex flex-col gap-2">
+                <p className="text-xs uppercase tracking-[0.3em] text-black/50">
+                  Need Help?
+                </p>
+                <h3 className="text-2xl lg:text-3xl font-semibold">FAQs</h3>
+                <p className="text-sm text-black/60">
+                  Answers to the most common questions about this tea.
+                </p>
+              </div>
+              {product?.faqs?.length ? (
+                <div className="mt-6 divide-y divide-black/10 rounded-sm border border-black/10 bg-white">
+                  {product.faqs.map((faq, index) => (
+                    <details key={`faq-${index}`} className="group p-5">
+                      <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-sm font-semibold text-black">
+                        <span>{faq.question}</span>
+                        <span className="text-black/40 transition group-open:rotate-45">
+                          +
+                        </span>
+                      </summary>
+                      <p className="mt-3 text-sm text-black/70">
+                        {faq.answer}
+                      </p>
+                    </details>
+                  ))}
+                </div>
+              ) : (
+                <p className="mt-4 text-sm text-black/50">
+                  No FAQs available for this product yet.
+                </p>
+              )}
             </div>
 
             <div className="space-y-6 mt-10">
