@@ -1,0 +1,305 @@
+# API_Updates.txt
+# Keep simple: endpoint + purpose + payload/response
+
+1) Cart Delete (remove item)
+API: DELETE /api/cart/{item_id}
+Response:
+{
+  "status": true,
+  "message": "Item removed"
+}
+
+2) Address Label Field
+API: POST /api/addresses
+Payload:
+{
+  "label": "Home",
+}
+
+3) Header Advertisement
+API: GET /api/header/advertisement
+Response:
+{
+  "status": true,
+  "data": {
+    "image_url": "https://..."
+  }
+}
+
+4) Shop Advertisement
+API: GET /api/shop/advertisement
+Response:
+{
+  "status": true,
+  "data": {
+    "image_url": "https://..."
+  }
+}
+
+5) Navbar Search (autocomplete)
+API: GET /api/search?q=kahwa&limit=5
+Response:
+{
+  "status": true,
+  "data": [
+    {
+      "id": 1,
+      "name": "Kashmiri Kahwa",
+      "slug": "kashmiri-kahwa",
+      "image": "https://...",
+      "price": 499
+    }
+  ]
+}
+
+6) User Dashboard
+API: GET /api/user/dashboard
+Response:
+{
+  "status": true,
+  "message": "Dashboard data fetched successfully",
+  "data": {
+    "stats": {
+      "total_orders": 14,
+      "orders_in_transit": 2,
+      "delivered_orders": 11,
+      "amount_spent": 12840,
+      "currency": "INR"
+    },
+    "recent_orders": [
+      { "product_name": "kashmiri kahwa", "id": "TKC-1042", "date": "2026-03-12",
+       "status": "Delivered", "total": 1499 }
+    ],
+  }
+}
+
+7) User Orders (list + filters)
+API: GET /api/orders?status=Delivered&from=2026-03-01&to=2026-03-31&search=TKC&page=1&limit=10
+Response:
+{
+  "status": true,
+  "data": {
+    "items": [
+      { "id": "TKC-1042", "date": "2026-03-12", "status": "Delivered", "total": 1499, "product_name": "Kashmiri Kahwa" },
+      { "id": "TKC-1037", "date": "2026-02-28", "status": "In transit", "total": 899, "product_name": "Kahwa Sampler Set" },
+      { "id": "TKC-1029", "date": "2026-02-10", "status": "Delivered", "total": 2120, "product_name": "Saffron Kahwa" }
+    ],
+    "pagination": { "page": 1, "limit": 10, "total_items": 3, "total_pages": 1 }
+  }
+}
+
+8) Order Detail
+API: GET /api/orders/{id}
+Response:
+{
+  "status": true,
+  "data": {
+    "id": "TKC-1042",
+    "date": "2026-03-12",
+    "ordered_date": "2026-03-12",
+    "delivery_date": "2026-03-16",
+    "status": "Delivered",
+    "payment_method": "Online",
+    "payment_status": "Paid",
+    "tracking_id": "TRK-558921",
+    "subtotal": 1499,
+    "shipping": 0,
+    "total": 1499,
+    "items": [
+      { "product_name": "Kashmiri Kahwa", "variant_name": "30 cups", "quantity": 1, "price": 1499, "image": "https://..." },
+      { "product_name": "Kahwa Sampler Set", "variant_name": "Sampler Box", "quantity": 1, "price": 899, "image": "https://..." }
+    ],
+    "shipping_address": {
+      "label": "Home",
+      "address_line1": "House 18, Boulevard Road",
+      "address_line2": "Dal Lake",
+      "city": "Srinagar",
+      "state": "Kashmir",
+      "pincode": "190001",
+      "country": "India"
+    }
+  }
+}
+
+9) Checkout Summary (cart items + totals)
+API: GET /api/checkout/summary
+Response:
+{
+  "status": true,
+  "data": {
+    "items": [
+      { "id": 101, "name": "Kashmiri Kahwa", "variant": "30 Tea Bags", "qty": 1, "price": 499, "image": "https://..." }
+    ],
+    "subtotal": 499,
+    "shipping": 50,
+    "taxes": 0,
+    "total": 549
+  }
+}
+
+10) Checkout Payment (Step 1: Create Razorpay order)
+API: POST /api/razorpay/order
+Payload:
+{
+  "amount": 549,
+  "currency": "INR",
+  "address_id": 1,
+  "contact": "9009255085",
+  "name": "Admin",
+  "email": "admin@example.com"
+}
+Response:
+{
+  "status": true,
+  "data": { "id": "order_xyz", "amount": 549, "currency": "INR" }
+}
+
+11) Checkout Payment (Step 2: Verify Razorpay payment)
+API: POST /api/razorpay/verify
+Payload:
+{
+  "razorpay_order_id": "order_xyz",
+  "razorpay_payment_id": "pay_xyz",
+  "razorpay_signature": "signature"
+}
+Response:
+{
+  "status": true,
+  "message": "Payment verified"
+}
+
+12) Checkout Flow (Laravel guide - correct order)
+Routes (routes/api.php):
+1) GET  /checkout/summary  -> CheckoutController@summary
+2) POST /razorpay/order    -> PaymentController@createOrder
+3) POST /razorpay/verify   -> PaymentController@verify
+
+Controllers (Laravel - short):
+1) CheckoutController@summary
+   - read cart items (auth user)
+   - compute subtotal/shipping/taxes/total
+   - return { items, subtotal, shipping, taxes, total }
+
+2) PaymentController@createOrder
+   - validate address_id + amount
+   - create Razorpay order via SDK
+   - return { id, amount, currency }
+   - Payload from frontend:
+     { "amount": 549, "currency": "INR", "address_id": 1, "contact": "9009255085", "name": "Admin", "email": "admin@example.com" }
+
+3) PaymentController@verify
+   - verify signature
+   - mark payment success + create/confirm order in DB
+   - return { status: true, message: "Payment verified" }
+   - Payload from frontend:
+     { "razorpay_order_id": "order_xyz", "razorpay_payment_id": "pay_xyz", "razorpay_signature": "signature" }
+
+13) Payment Success Page
+API: GET /api/payment/success/{order_id}
+Response:
+{
+  "status": true,
+  "message": "Payment successful",
+  "data": {
+    "order_id": "TKC-1042",
+    "payment_id": "pay_xyz",
+    "status": "Paid",
+    "amount": 549,
+    "currency": "INR",
+    "paid_at": "2026-04-14T10:20:00Z",
+    "items": [
+      { "product_name": "Kashmiri Kahwa", "variant_name": "30 cups", "quantity": 1, "price": 499, "image": "https://..." }
+    ],
+    "shipping_address": {
+      "label": "Home",
+      "address_line1": "House 18, Boulevard Road",
+      "address_line2": "Dal Lake",
+      "city": "Srinagar",
+      "state": "Kashmir",
+      "pincode": "190001",
+      "country": "India"
+    }
+  }
+}
+
+14) Payment Failure (log + retry) + Laravel guide
+Flow:
+- Razorpay failure -> call /payment/failure
+- Show failure UI -> Retry Pay -> call /payment/retry -> open Razorpay
+
+API: POST /api/payment/failure
+Payload:
+{
+  "razorpay_order_id": "order_xyz",
+  "razorpay_payment_id": "pay_xyz",
+  "reason": "Payment cancelled by user",
+  "code": "PAYMENT_CANCELLED",
+  "order_id": "TKC-1042"
+}
+Response:
+{ "status": true, "message": "Failure logged" }
+
+API: POST /api/payment/retry
+Payload:
+{
+  "order_id": "TKC-1042",
+  "amount": 549,
+  "currency": "INR",
+  "address_id": 1,
+  "contact": "9009255085",
+  "name": "Admin",
+  "email": "admin@example.com"
+}
+Response:
+{
+  "status": true,
+  "data": { "id": "order_new_xyz", "amount": 549, "currency": "INR" }
+}
+
+Laravel guide (short):
+- POST /payment/failure -> PaymentController@logFailure
+- POST /payment/retry   -> PaymentController@retry
+
+15) Order Tracking (optional)
+API: GET /api/orders/{id}/tracking
+Response:
+{
+  "status": true,
+  "data": {
+    "order_id": "TKC-1042",
+    "events": [
+      { "status": "Packed", "date": "2026-03-13" },
+      { "status": "Shipped", "date": "2026-03-14" },
+      { "status": "Out for delivery", "date": "2026-03-16" }
+    ]
+  }
+}
+
+16) Order Cancel
+API: POST /api/orders/{id}/cancel
+Payload:
+{ "reason": "Ordered by mistake" }
+Response:
+{ "status": true, "message": "Order cancelled" }
+
+17) Order Return
+API: POST /api/orders/{id}/return
+Payload:
+{ "reason": "Damaged item", "items": [{ "product_id": 1, "quantity": 1 }] }
+Response:
+{ "status": true, "message": "Return requested" }
+
+18) Coupon Apply
+API: POST /api/coupons/apply
+Payload:
+{ "code": "KAHWA10" }
+Response:
+{ "status": true, "data": { "discount": 50, "new_total": 499 } }
+
+19) Update Delivery Phone (optional)
+API: PUT /api/auth/profile
+Payload:
+{ "phone": "9009255085", "delivery_phone": "9876543210" }
+Response:
+{ "status": true, "message": "Profile updated" }
+

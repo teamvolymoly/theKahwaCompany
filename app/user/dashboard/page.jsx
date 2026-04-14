@@ -86,9 +86,12 @@ export default function DashboardPage() {
                 Dashboard
               </h1>
             </div>
-            <button className="self-start rounded-sm border border-black/60 px-5 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-black hover:border-black cursor-pointer">
+            <Link
+              href="/user/orders"
+              className="self-start rounded-sm border border-black/60 px-5 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-black hover:border-black cursor-pointer"
+            >
               View orders
-            </button>
+            </Link>
           </div>
 
           <div className="mt-10 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -116,15 +119,19 @@ export default function DashboardPage() {
                     Latest activity
                   </h2>
                 </div>
-                <button className="rounded-sm border border-black/60 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-black hover:border-black cursor-pointer">
+                <Link
+                  href="/user/orders"
+                  className="rounded-sm border border-black/60 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-black hover:border-black cursor-pointer"
+                >
                   View all
-                </button>
+                </Link>
               </div>
               <div className="mt-6 grid gap-4">
                 {recentOrders.map((order) => (
-                  <div
+                  <Link
                     key={order.id}
-                    className="rounded-sm shadow-sm bg-gray-50 p-4 flex flex-col gap-2 md:flex-row md:items-center md:justify-between"
+                    href={`/user/orders/${order.id}`}
+                    className="rounded-sm shadow-sm bg-gray-50 p-4 flex flex-col gap-2 md:flex-row md:items-center md:justify-between hover:border-black/30 border border-transparent transition cursor-pointer"
                   >
                     <div>
                       <p className="text-sm font-semibold">{order.id}</p>
@@ -132,7 +139,7 @@ export default function DashboardPage() {
                     </div>
                     <div className="text-sm text-black/60">{order.status}</div>
                     <div className="text-sm font-semibold">{order.total}</div>
-                  </div>
+                  </Link>
                 ))}
               </div>
             </div>

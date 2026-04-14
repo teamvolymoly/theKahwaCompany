@@ -1,9 +1,11 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { apiFetch } from "@/utils/api";
 
 export default function ProductCard({ product }) {
+  const router = useRouter();
   const slugOrId = product.slug || product.id;
   const rating = Number.isFinite(product.rating) ? product.rating : 4;
   const fullStars = Math.max(0, Math.min(5, Math.round(rating)));
@@ -29,14 +31,7 @@ export default function ProductCard({ product }) {
       const variantId =
         product.variants?.[0]?.id || product.default_variant_id || null;
       if (!variantId) {
-        window.dispatchEvent(
-          new CustomEvent("toast", {
-            detail: {
-              message: "Select a size on the product page.",
-              type: "error",
-            },
-          }),
-        );
+        router.push(`/product/${slugOrId}`);
         return;
       }
       const cart = await apiFetch("/cart");
@@ -147,7 +142,7 @@ export default function ProductCard({ product }) {
 
       <button
         onClick={handleAddToCart}
-        className="w-full bg-gradient-to-r from-[#7a8177] to-[#6a716a] py-3 text-xs font-semibold uppercase tracking-[0.12em] text-white transition hover:from-[#5f665e] hover:to-[#525a53]"
+        className="w-full bg-gradient-to-r from-[#7a8177] to-[#6a716a] py-3 text-xs font-semibold uppercase tracking-[0.12em] text-white transition hover:from-[#5f665e] hover:to-[#525a53] cursor-pointer"
       >
         Add To Cart
       </button>

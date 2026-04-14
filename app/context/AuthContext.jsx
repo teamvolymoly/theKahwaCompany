@@ -45,8 +45,7 @@ export function AuthProvider({ children }) {
     }
 
     try {
-      const data =
-        (await apiFetch("/auth/profile")) ?? (await apiFetch("/users/me"));
+      const data = await apiFetch("/auth/profile");
       setUser(data || null);
       setLoading(false);
       return data;
