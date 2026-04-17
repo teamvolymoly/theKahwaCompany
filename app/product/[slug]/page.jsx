@@ -109,8 +109,6 @@ export default function ProductDetail() {
     if (slug) load();
   }, [slug]);
 
-
-
   const avgRating = useMemo(() => {
     if (product?.reviews?.average_rating) return product.reviews.average_rating;
     if (!reviews.length) return 0;
@@ -159,7 +157,23 @@ export default function ProductDetail() {
       const cups = Math.round(gramsFromData * 0.5);
       return { label, cups };
     }
-    const name = variant.variant_name || "";
+    const weightText = String(variant.weight || "");
+    const weightMatch = weightText.match(/(\d+(?:\.\d+)?)\s*(kg|g)\b/i);
+    if (weightMatch) {
+      const value = parseFloat(weightMatch[1]);
+      const unit = weightMatch[2].toLowerCase();
+      const grams =
+        unit === "kg" ? Math.round(value * 1000) : Math.round(value);
+      if (grams > 0) {
+        const label =
+          grams >= 1000 && grams % 1000 === 0
+            ? `${grams / 1000}kg`
+            : `${grams}g`;
+        const cups = Math.round(grams * 0.5);
+        return { label, cups };
+      }
+    }
+    const name = String(variant.variant_name || variant.name || "");
     const match = name.match(/(\d+(?:\.\d+)?)\s*(kg|g)\b/i);
     if (!match) return null;
     const value = parseFloat(match[1]);
@@ -365,8 +379,6 @@ export default function ProductDetail() {
     ingredientsFromApi.length > 0 ? ingredientsFromApi : fallbackIngredients;
   const useIngredientSwiper = ingredients.length > 1;
 
-  console.log("Resolved ingredients:", product);
-
   const discoverMore = dummyProducts
     .filter((p) => p.id !== product?.id)
     .slice(0, 4);
@@ -401,7 +413,7 @@ export default function ProductDetail() {
             <button
               type="button"
               onClick={() => setPreviewIndex(null)}
-              className="absolute right-6 top-6 flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-white/10 text-lg text-white"
+              className="absolute right-6 top-6 flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-white/10 text-lg text-white cursor-pointer"
               aria-label="Close preview"
             >
               ×
@@ -410,7 +422,7 @@ export default function ProductDetail() {
               <button
                 type="button"
                 onClick={handlePrevPreview}
-                className="absolute left-4 top-1/2 -translate-y-1/2 rounded-full border border-black/10 bg-white/90 px-4 py-3 text-2xl text-black/70 hover:text-black"
+                className="absolute left-4 top-1/2 -translate-y-1/2 px-4 py-3 text-2xl text-black/70 hover:text-black cursor-pointer"
                 aria-label="Previous image"
               >
                 ‹
@@ -418,7 +430,7 @@ export default function ProductDetail() {
               <button
                 type="button"
                 onClick={handleNextPreview}
-                className="absolute right-4 top-1/2 -translate-y-1/2 rounded-full border border-black/10 bg-white/90 px-4 py-3 text-2xl text-black/70 hover:text-black"
+                className="absolute right-4 top-1/2 -translate-y-1/2 px-4 py-3 text-2xl text-black/70 hover:text-black cursor-pointer"
                 aria-label="Next image"
               >
                 ›
@@ -429,18 +441,18 @@ export default function ProductDetail() {
                 className="h-[70vh] w-full object-contain"
               />
               <div className="mt-4 flex flex-col items-center gap-3">
-                <div className="text-xs uppercase tracking-[0.3em] text-black/40">
+                {/* <div className="text-xs uppercase tracking-[0.3em] text-black/40">
                   {previewIndex !== null
                     ? `Image ${previewIndex + 1} of ${galleryImages.length}`
                     : ""}
-                </div>
+                </div> */}
                 <div className="flex flex-wrap items-center justify-center gap-2">
                   {galleryImages.map((_, index) => (
                     <button
                       key={`dot-${index}`}
                       type="button"
                       onClick={() => setPreviewIndex(index)}
-                      className={`h-2.5 w-2.5 rounded-full border transition ${
+                      className={`h-2.5 w-2.5 rounded-full border transition cursor-pointer ${
                         index === previewIndex
                           ? "border-black bg-black"
                           : "border-black/30 bg-transparent"
@@ -633,22 +645,20 @@ export default function ProductDetail() {
                   className="text-4xl font-semibold text-[#1c2230]"
                   // style={{ fontFamily: "var(--font-basker)" }}
                 >
-                  ₹{" "}
-                  {selectedVariant?.formatted_price ??
-                    selectedVariant?.price ??
-                    product.price ??
-                    "--"}
+                  {selectedVariant?.formatted_price || selectedVariant?.price ? (
+                    <>
+                      ₹ {selectedVariant?.formatted_price ?? selectedVariant?.price}
+                    </>
+                  ) : (
+                    ""
+                  )}
                 </div>
                 {(selectedVariant?.formatted_discount_price ??
-                  selectedVariant?.compare_price ??
-                  selectedVariant?.discount_price ??
-                  product.oldPrice) && (
+                  selectedVariant?.discount_price) && (
                   <div className="text-lg text-[#1c2230]/40 line-through">
                     ₹{" "}
                     {selectedVariant?.formatted_discount_price ??
-                      selectedVariant?.compare_price ??
-                      selectedVariant?.discount_price ??
-                      product.oldPrice}
+                      selectedVariant?.discount_price}
                   </div>
                 )}
               </div>
@@ -662,6 +672,7 @@ export default function ProductDetail() {
                     {selectedVariant.variant_name}
                   </p>
                 )} */}
+
                 <div className="flex flex-wrap gap-3 mt-3">
                   {variants.map((v) =>
                     (() => {
@@ -944,9 +955,7 @@ export default function ProductDetail() {
                               <img
                                 src={item.image_url || item.image}
                                 alt={
-                                  item.text ||
-                                  item.description ||
-                                  "Iced ritual"
+                                  item.text || item.description || "Iced ritual"
                                 }
                                 className="h-10 w-10 object-contain"
                               />
@@ -1078,9 +1087,7 @@ export default function ProductDetail() {
                           +
                         </span>
                       </summary>
-                      <p className="mt-3 text-sm text-black/70">
-                        {faq.answer}
-                      </p>
+                      <p className="mt-3 text-sm text-black/70">{faq.answer}</p>
                     </details>
                   ))}
                 </div>
