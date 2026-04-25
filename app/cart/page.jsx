@@ -17,16 +17,47 @@ export default function CartPage() {
   const [actionLoading, setActionLoading] = useState(false);
   const [error, setError] = useState("");
 
+  const normalizeCartItem = (item) => {
+    const variant = item?.variant || {};
+    const product = variant?.product || {};
+    const primaryImage =
+      variant?.primaryImage ||
+      product?.primaryImage ||
+      product?.image ||
+      {};
+
+    const cartItemId = item?.id || item?.cart_item_id || item?.cart_id || null;
+    const variantId = item?.variant_id || variant?.id || null;
+    const quantity = Number(item?.quantity ?? 0) || 0;
+    const unitPrice =
+      Number(item?.price ?? item?.unit_price ?? variant?.price ?? 0) || 0;
+    const subtotal = Number(item?.subtotal ?? unitPrice * quantity) || 0;
+
+    return {
+      ...item,
+      cart_item_id: cartItemId,
+      variant_id: variantId,
+      quantity,
+      price: unitPrice,
+      subtotal,
+      product_name: item?.product_name || product?.name || "",
+      variant_name: item?.variant_name || variant?.variant_name || variant?.name || "",
+      product_image:
+        item?.product_image ||
+        primaryImage?.image_url ||
+        primaryImage?.url ||
+        product?.image_url ||
+        "",
+    };
+  };
+
   const loadCart = useCallback(async () => {
     setLoading(true);
     setError("");
     try {
       const data = await apiFetch("/cart");
       const nextItems = Array.isArray(data?.items) ? data.items : [];
-      const normalized = nextItems.map((item) => ({
-        ...item,
-        variant_id: item.variant_id || item.id,
-      }));
+      const normalized = nextItems.map(normalizeCartItem);
       setItems(normalized);
       setSummary(
         data?.summary || {
@@ -69,13 +100,17 @@ export default function CartPage() {
   const updateQty = async (item, delta) => {
     if (actionLoading) return;
     const nextQty = Math.max(1, (item.quantity || 1) + delta);
+    const itemId = item.cart_item_id || item.id;
+    if (!itemId) {
+      setError("Unable to update quantity.");
+      return;
+    }
     setActionLoading(true);
     setError("");
     try {
-      await apiFetch("/cart", {
-        method: "POST",
+      await apiFetch(`/cart/${itemId}`, {
+        method: "PUT",
         body: JSON.stringify({
-          variant_id: item.variant_id || item.id,
           quantity: nextQty,
         }),
       });
@@ -89,16 +124,15 @@ export default function CartPage() {
 
   const removeItem = async (item) => {
     if (actionLoading) return;
+    const itemId = item.cart_item_id || item.id;
+    if (!itemId) {
+      setError("Unable to remove item.");
+      return;
+    }
     setActionLoading(true);
     setError("");
     try {
-      await apiFetch("/cart", {
-        method: "POST",
-        body: JSON.stringify({
-          variant_id: item.variant_id || item.id,
-          quantity: 0,
-        }),
-      });
+      await apiFetch(`/cart/${itemId}`, { method: "DELETE" });
       await loadCart();
     } catch (err) {
       setError(err?.message || "Unable to remove item.");

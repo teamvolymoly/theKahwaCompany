@@ -192,11 +192,19 @@ export default function ProductDetail() {
     try {
       const cart = await apiFetch("/cart");
       const cartItems = Array.isArray(cart?.items) ? cart.items : [];
+      const targetVariantId = Number(selectedVariant?.id);
       const alreadyInCart = cartItems.some(
-        (item) =>
-          item.product_name === product?.name &&
-          (item.variant_name || "") ===
-            (selectedVariant?.variant_name || selectedVariant?.name || ""),
+        (item) => {
+          const itemVariantId = Number(item?.variant_id || item?.variant?.id);
+          if (Number.isFinite(itemVariantId) && Number.isFinite(targetVariantId)) {
+            return itemVariantId === targetVariantId;
+          }
+          return (
+            item.product_name === product?.name &&
+            (item.variant_name || item?.variant?.variant_name || "") ===
+              (selectedVariant?.variant_name || selectedVariant?.name || "")
+          );
+        },
       );
       if (alreadyInCart) {
         window.dispatchEvent(

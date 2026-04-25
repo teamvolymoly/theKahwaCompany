@@ -21,6 +21,7 @@ const toSlug = (value) =>
 export default function Home() {
   const [categories, setCategories] = useState([]);
   const [products, setProducts] = useState([]);
+  const [blogPosts, setBlogPosts] = useState([]);
   const [loadingProducts, setLoadingProducts] = useState(false);
   const [loadingCategories, setLoadingCategories] = useState(false);
   const slides = [
@@ -102,6 +103,51 @@ export default function Home() {
       }
     };
     loadData();
+  }, []);
+
+  useEffect(() => {
+    const loadBlogs = async () => {
+      try {
+        const data = await apiFetch("/home/blogs");
+        const list = Array.isArray(data)
+          ? data
+          : Array.isArray(data?.items)
+            ? data.items
+            : Array.isArray(data?.data)
+              ? data.data
+              : [];
+
+        const normalized = list.slice(0, 3).map((item, index) => {
+          const isoDate = item?.published_at || item?.created_at;
+          const parsedDate = isoDate ? new Date(isoDate) : null;
+          const formattedDate =
+            parsedDate && !Number.isNaN(parsedDate.getTime())
+              ? parsedDate.toLocaleDateString("en-US", {
+                  month: "long",
+                  day: "numeric",
+                  year: "numeric",
+                })
+              : "";
+
+          return {
+            id: item?.id || `fallback-blog-${index}`,
+            title: item?.title || "",
+            excerpt: item?.excerpt || "",
+            image: item?.featured_image_url || "",
+            date: formattedDate,
+            tag: "",
+            author: "",
+            read: "",
+          };
+        });
+
+        setBlogPosts(normalized);
+      } catch {
+        setBlogPosts([]);
+      }
+    };
+
+    loadBlogs();
   }, []);
 
   return (
@@ -593,40 +639,9 @@ export default function Home() {
             </div>
 
             <div className="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {[
-                {
-                  title: "The Ritual of Kahwa: A Kashmiri Tradition",
-                  date: "March 12, 2026",
-                  image: "/products/11.png",
-                  excerpt:
-                    "A warm introduction to the spices, stories, and hospitality that make kahwa a timeless ritual.",
-                  tag: "Culture",
-                  author: "Editorial Team",
-                  read: "6 min read",
-                },
-                {
-                  title: "How to Brew the Perfect Cup at Home",
-                  date: "February 28, 2026",
-                  image: "/products/9.png",
-                  excerpt:
-                    "A simple, step-by-step guide to bring cafe-quality kahwa to your kitchen.",
-                  tag: "Brewing",
-                  author: "Kahwa Lab",
-                  read: "4 min read",
-                },
-                {
-                  title: "Flavour Pairings: Mint, Saffron & Beyond",
-                  date: "February 10, 2026",
-                  image: "/products/12.png",
-                  excerpt:
-                    "Explore pairings that elevate the aroma and taste of your favorite blends.",
-                  tag: "Pairings",
-                  author: "Tea Master",
-                  read: "5 min read",
-                },
-              ].map((post, index) => (
+              {blogPosts.map((post, index) => (
                 <Link
-                  key={post.title}
+                  key={post.id || `${post.title}-${index}`}
                   href="/#blog"
                   className="group overflow-hidden rounded-3xl border border-black/10 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-2xl"
                 >

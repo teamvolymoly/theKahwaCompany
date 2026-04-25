@@ -1,0 +1,141 @@
+USED API URLs (Frontend)
+Project: tkc
+Generated from code scan of app/, components/, utils/
+
+Base behavior:
+- apiFetch() prefixes /api for paths that do not already start with /api.
+- Effective base URL from env: NEXT_PUBLIC_API_BASE_URL
+
+1) GET /products/filters
+   Used in:
+   - app/page.js
+   - app/shop/ShopClient.jsx
+
+2) GET /products?limit=8
+   Used in:
+   - app/page.js
+
+3) GET /products?{query_params}
+   Used in:
+   - app/shop/ShopClient.jsx
+
+4) GET /products
+   Used in:
+   - app/category/[slug]/page.jsx
+
+5) GET /products/{slug_or_id}
+   Used in:
+   - app/product/[slug]/page.jsx
+
+6) GET /categories/{slug}
+   Used in:
+   - app/category/[slug]/page.jsx
+
+7) GET /categories/{slug}/subcategories
+   Used in:
+   - app/category/[slug]/page.jsx
+
+8) GET /home/hero-sections
+   Used in:
+   - components/HeroSection.jsx
+
+9) GET /home/blogs
+   Used in:
+   - app/page.js
+
+10) GET /header
+    Used in:
+    - components/NewHeader.jsx
+
+11) GET /cart
+    Used in:
+    - app/cart/page.jsx
+    - components/ProductCard.jsx
+    - app/product/[slug]/page.jsx
+
+12) POST /cart
+    Payload: { variant_id, quantity }
+    Used in:
+    - components/ProductCard.jsx
+    - app/product/[slug]/page.jsx
+
+13) PUT /cart/{id}
+    Payload: { quantity }
+    Used in:
+    - app/cart/page.jsx
+
+14) DELETE /cart/{id}
+    Used in:
+    - app/cart/page.jsx
+
+15) GET /auth/profile
+    Used in:
+    - app/context/AuthContext.jsx
+    - app/checkout/page.jsx
+    - app/user/profile/page.jsx
+
+16) PUT /auth/profile
+    Used in:
+    - app/user/profile/page.jsx
+
+17) POST /auth/login
+    Used in:
+    - app/context/AuthContext.jsx
+
+18) POST /auth/logout
+    Used in:
+    - app/context/AuthContext.jsx
+
+19) POST /auth/refresh
+    Used in:
+    - app/context/AuthContext.jsx
+
+20) POST /auth/change-password
+    Payload: { current_password, password, password_confirmation }
+    Used in:
+    - app/user/password/page.jsx
+
+21) POST /api/auth/register
+    Used in:
+    - app/auth/AccountClient.jsx
+
+22) GET /addresses
+    Used in:
+    - app/checkout/page.jsx
+    - app/user/profile/page.jsx
+
+23) POST /addresses
+    Used in:
+    - app/checkout/page.jsx
+    - app/user/profile/page.jsx
+
+24) PUT /addresses/{id}
+    Used in:
+    - app/checkout/page.jsx
+    - app/user/profile/page.jsx
+
+25) DELETE /addresses/{id}
+    Used in:
+    - app/checkout/page.jsx
+    - app/user/profile/page.jsx
+
+26) POST /addresses/{id}/set-default
+    Used in:
+    - app/checkout/page.jsx
+    - app/user/profile/page.jsx
+
+27) POST /razorpay/order
+    Used in:
+    - app/checkout/page.jsx
+
+28) POST /razorpay/verify
+    Used in:
+    - app/checkout/page.jsx
+
+29) POST /api/auth/refresh (internal retry on 401 inside apiFetch)
+    Used in:
+    - utils/api.js
+
+Notes:
+- app/payment-success/page.jsx has fetch(url) for local image-to-PDF conversion; it is not a backend API endpoint.
+- Clear cart endpoint DELETE /cart is not currently used in UI.

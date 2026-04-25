@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/app/context/AuthContext";
 import { Pencil, Trash2 } from "lucide-react";
 import { apiFetch } from "@/utils/api";
+import Link from "next/link";
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -298,15 +299,19 @@ export default function ProfilePage() {
                 Account quick links
               </p>
               <div className="mt-4 grid gap-3 text-sm text-black/70">
-                <button className="rounded-sm border border-black/10 bg-gray-50 px-4 py-3 text-left hover:border-black/30 cursor-pointer">
+                <Link
+                  href="/user/orders"
+                  className="rounded-sm border border-black/10 bg-gray-50 px-4 py-3 text-left hover:border-black/30 cursor-pointer"
+                >
                   Order history
-                </button>
-                {/* <button className="rounded-sm border border-black/10 bg-gray-50 px-4 py-3 text-left hover:border-black/30">
-                  Payment methods
-                </button> */}
-                <button className="rounded-sm border border-black/10 bg-gray-50 px-4 py-3 text-left hover:border-black/30 cursor-pointer">
+                </Link>
+
+                <Link
+                  href="/user/password"
+                  className="rounded-sm border border-black/10 bg-gray-50 px-4 py-3 text-left hover:border-black/30 cursor-pointer"
+                >
                   Change password
-                </button>
+                </Link>
               </div>
             </div>
           </div>
