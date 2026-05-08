@@ -140,6 +140,10 @@ export default function CheckoutPage() {
       document.body.appendChild(script);
     });
 
+  const redirectPaymentFailed = () => {
+    window.location.href = "/payment-failed";
+  };
+
   const handlePayNow = async () => {
     setPaymentError("");
     if (!selectedAddressId) {
@@ -148,6 +152,10 @@ export default function CheckoutPage() {
     }
     if (!orderItems.length || total <= 0) {
       setPaymentError("Your cart is empty.");
+      return;
+    }
+    if (!process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID) {
+      setPaymentError("Razorpay key is missing.");
       return;
     }
     setProcessingPayment(true);
@@ -159,8 +167,6 @@ export default function CheckoutPage() {
     }
     try {
       const orderPayload = {
-        amount: total,
-        currency: totals.currency || "INR",
         address_id: selectedAddressId,
         contact: deliveryPhone || profile.phone,
         name: profile.name,
@@ -170,14 +176,17 @@ export default function CheckoutPage() {
         method: "POST",
         body: JSON.stringify(orderPayload),
       });
+      if (!order?.razorpay_order_id) {
+        throw new Error("Razorpay order id is missing.");
+      }
 
       const options = {
-        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+        key: order?.key || process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
         amount: order?.amount,
         currency: order?.currency || "INR",
         name: "The Kahwa Company",
         description: "Order payment",
-        order_id: order?.id || order?.order_id,
+        order_id: order?.razorpay_order_id,
         prefill: {
           name: profile.name,
           email: profile.email,
@@ -185,6 +194,7 @@ export default function CheckoutPage() {
         },
         notes: {
           address_id: String(selectedAddressId),
+          order_id: order?.order_id || "",
         },
         handler: async (response) => {
           try {
@@ -199,6 +209,7 @@ export default function CheckoutPage() {
             window.location.href = "/payment-success";
           } catch (err) {
             setPaymentError(err?.message || "Payment verification failed.");
+            redirectPaymentFailed();
           }
         },
         modal: {
@@ -217,6 +228,7 @@ export default function CheckoutPage() {
           resp?.error?.description || "Payment failed. Please try again.",
         );
         setProcessingPayment(false);
+        redirectPaymentFailed();
       });
       razorpay.open();
     } catch (err) {
