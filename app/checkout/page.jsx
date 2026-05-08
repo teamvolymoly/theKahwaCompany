@@ -5,9 +5,40 @@ import Link from "next/link";
 import { apiFetch } from "@/utils/api";
 import { Pencil, Trash2, MapPin, User, Trash } from "lucide-react";
 
+const EMPTY_TOTALS = {
+  subtotal: 0,
+  shipping: 0,
+  tax: 0,
+  discount_amount: 0,
+  total: 0,
+  final_total: 0,
+  currency: "INR",
+  free_shipping_threshold: 0,
+};
+
+const normalizeCheckoutItem = (item) => {
+  const quantity = Number(item?.quantity ?? item?.qty ?? 0) || 0;
+  const price = Number(item?.price ?? 0) || 0;
+
+  return {
+    id: item?.id,
+    variant_id: item?.variant_id,
+    name: item?.product_name || item?.name || "",
+    variant: item?.variant_name || item?.variant || "",
+    qty: quantity,
+    price,
+    line_total: Number(item?.line_total ?? price * quantity) || 0,
+    image: item?.image || "",
+  };
+};
+
 export default function CheckoutPage() {
   const [processingPayment, setProcessingPayment] = useState(false);
   const [paymentError, setPaymentError] = useState("");
+  const [checkoutItems, setCheckoutItems] = useState([]);
+  const [totals, setTotals] = useState(EMPTY_TOTALS);
+  const [checkoutLoading, setCheckoutLoading] = useState(true);
+  const [checkoutError, setCheckoutError] = useState("");
   const [profile, setProfile] = useState({
     name: "",
     email: "",
@@ -33,41 +64,26 @@ export default function CheckoutPage() {
     country: "India",
     is_default: false,
   });
-  const orderItems = [
-    {
-      id: 101,
-      name: "Kashmiri Kahwa",
-      variant: "30 Tea Bags",
-      qty: 1,
-      price: 499,
-      image: "/products/tin/BLTIN1.png",
-    },
-    {
-      id: 104,
-      name: "Kahwa Sampler Set",
-      variant: "Sampler Box",
-      qty: 1,
-      price: 799,
-      image: "/products/tin/KLTIN1.png",
-    },
-  ];
-  const subtotal = orderItems.reduce(
-    (sum, item) => sum + item.price * item.qty,
-    0,
-  );
-  const shippingFee = subtotal > 500 ? 0 : 120;
-  const taxes = 0;
-  const total = subtotal + shippingFee + taxes;
+  const orderItems = checkoutItems;
+  const subtotal = totals.subtotal ?? 0;
+  const shippingFee = totals.shipping ?? 0;
+  const taxes = totals.tax ?? 0;
+  const discount = totals.discount_amount ?? 0;
+  const total =
+    totals.final_total ?? totals.total ?? subtotal + shippingFee + taxes - discount;
 
   useEffect(() => {
     let active = true;
     const load = async () => {
       setLoadingAddresses(true);
+      setCheckoutLoading(true);
       setAddressError("");
+      setCheckoutError("");
       try {
-        const [profileRes, addressRes] = await Promise.all([
+        const [profileRes, addressRes, checkoutRes] = await Promise.all([
           apiFetch("/auth/profile"),
           apiFetch("/addresses"),
+          apiFetch("/checkout"),
         ]);
         if (!active) return;
         setProfile({
@@ -86,11 +102,25 @@ export default function CheckoutPage() {
         const defaultAddress = list.find((item) => item.is_default) || list[0];
         setSelectedAddressId(defaultAddress?.id ?? null);
         if (!list.length) setAddressFormOpen(true);
+        const checkout = checkoutRes?.products ? checkoutRes : checkoutRes?.data || {};
+        setCheckoutItems(
+          Array.isArray(checkout?.products)
+            ? checkout.products.map(normalizeCheckoutItem)
+            : [],
+        );
+        setTotals({
+          ...EMPTY_TOTALS,
+          ...(checkout?.totals || {}),
+        });
       } catch (err) {
         if (!active) return;
-        setAddressError(err?.message || "Failed to load addresses.");
+        setAddressError(err?.message || "Failed to load checkout details.");
+        setCheckoutError(err?.message || "Failed to load checkout details.");
       } finally {
-        if (active) setLoadingAddresses(false);
+        if (active) {
+          setLoadingAddresses(false);
+          setCheckoutLoading(false);
+        }
       }
     };
     load();
@@ -116,6 +146,10 @@ export default function CheckoutPage() {
       setPaymentError("Please select a delivery address.");
       return;
     }
+    if (!orderItems.length || total <= 0) {
+      setPaymentError("Your cart is empty.");
+      return;
+    }
     setProcessingPayment(true);
     const ready = await loadRazorpay();
     if (!ready) {
@@ -124,10 +158,9 @@ export default function CheckoutPage() {
       return;
     }
     try {
-      // TODO: replace amount with live cart total from backend
       const orderPayload = {
-        amount: 1499,
-        currency: "INR",
+        amount: total,
+        currency: totals.currency || "INR",
         address_id: selectedAddressId,
         contact: deliveryPhone || profile.phone,
         name: profile.name,
@@ -148,7 +181,7 @@ export default function CheckoutPage() {
         prefill: {
           name: profile.name,
           email: profile.email,
-          contact: profile.phone,
+          contact: deliveryPhone || profile.phone,
         },
         notes: {
           address_id: String(selectedAddressId),
@@ -707,31 +740,40 @@ export default function CheckoutPage() {
               Order summary
             </p>
             <div className="mt-5 space-y-4">
-              {orderItems.map((item) => (
-                <div
-                  key={item.id}
-                  className="flex items-center gap-4 border-b border-black/10 pb-4"
-                >
-                  <div className="h-14 w-14 overflow-hidden rounded-sm bg-white p-2">
-                    <img
-                      src={item.image}
-                      alt={item.name}
-                      className="h-full w-full object-contain"
-                    />
-                  </div>
-                  <div className="flex-1">
+              {checkoutLoading ? (
+                <p className="text-sm text-black/60">Loading order...</p>
+              ) : orderItems.length ? (
+                orderItems.map((item) => (
+                  <div
+                    key={`${item.id}-${item.variant_id}`}
+                    className="flex items-center gap-4 border-b border-black/10 pb-4"
+                  >
+                    <div className="h-14 w-14 overflow-hidden rounded-sm bg-white p-2">
+                      <img
+                        src={item.image}
+                        alt={item.name}
+                        className="h-full w-full object-contain"
+                      />
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-sm font-semibold text-black">
+                        {item.name}
+                      </p>
+                      <p className="text-xs text-black/60">{item.variant}</p>
+                      <p className="text-xs text-black/60">Qty: {item.qty}</p>
+                    </div>
                     <p className="text-sm font-semibold text-black">
-                      {item.name}
+                      ₹ {item.line_total}
                     </p>
-                    <p className="text-xs text-black/60">{item.variant}</p>
-                    <p className="text-xs text-black/60">Qty: {item.qty}</p>
                   </div>
-                  <p className="text-sm font-semibold text-black">
-                    ₹ {item.price * item.qty}
-                  </p>
-                </div>
-              ))}
+                ))
+              ) : (
+                <p className="text-sm text-black/60">Your cart is empty.</p>
+              )}
             </div>
+            {checkoutError && (
+              <p className="mt-4 text-xs text-red-600">{checkoutError}</p>
+            )}
             {selectedAddressId && (
               <div className="mt-5 rounded-sm border border-black/10 bg-white p-4">
                 <p className="text-xs uppercase tracking-[0.2em] text-black/50">
@@ -771,6 +813,12 @@ export default function CheckoutPage() {
                 <span>Taxes</span>
                 <span>{taxes === 0 ? "₹ 0" : `₹ ${taxes}`}</span>
               </div>
+              {discount > 0 && (
+                <div className="flex items-center justify-between">
+                  <span>Discount</span>
+                  <span>{`- ₹ ${discount}`}</span>
+                </div>
+              )}
               <div className="flex items-center justify-between border-t border-black/10 pt-3 text-black font-semibold">
                 <span>Total</span>
                 <span>₹ {total}</span>
@@ -786,7 +834,9 @@ export default function CheckoutPage() {
             <button
               type="button"
               onClick={handlePayNow}
-              disabled={processingPayment}
+              disabled={
+                processingPayment || checkoutLoading || !orderItems.length
+              }
               className="mt-6 inline-flex w-full items-center justify-center rounded-full bg-black px-6 py-3 text-xs uppercase tracking-[0.01em] text-white hover:bg-black/90 transition disabled:opacity-60 cursor-pointer"
             >
               {processingPayment ? "Processing..." : "Pay now"}

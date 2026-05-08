@@ -68,71 +68,85 @@ Base behavior:
     Used in:
     - app/cart/page.jsx
 
-15) GET /auth/profile
+15) POST /api/coupons/apply
+    Payload: { code }
+    Used in:
+    - app/cart/page.jsx
+
+16) POST /api/coupons/remove
+    Payload: {}
+    Used in:
+    - app/cart/page.jsx
+
+17) GET /checkout
+    Used in:
+    - app/checkout/page.jsx
+
+18) GET /auth/profile
     Used in:
     - app/context/AuthContext.jsx
     - app/checkout/page.jsx
     - app/user/profile/page.jsx
 
-16) PUT /auth/profile
+19) PUT /auth/profile
     Used in:
     - app/user/profile/page.jsx
 
-17) POST /auth/login
+20) POST /auth/login
     Used in:
     - app/context/AuthContext.jsx
 
-18) POST /auth/logout
+21) POST /auth/logout
     Used in:
     - app/context/AuthContext.jsx
 
-19) POST /auth/refresh
+22) POST /auth/refresh
     Used in:
     - app/context/AuthContext.jsx
 
-20) POST /auth/change-password
+23) POST /auth/change-password
     Payload: { current_password, password, password_confirmation }
     Used in:
     - app/user/password/page.jsx
 
-21) POST /api/auth/register
+24) POST /api/auth/register
     Used in:
     - app/auth/AccountClient.jsx
 
-22) GET /addresses
+25) GET /addresses
     Used in:
     - app/checkout/page.jsx
     - app/user/profile/page.jsx
 
-23) POST /addresses
+26) POST /addresses
     Used in:
     - app/checkout/page.jsx
     - app/user/profile/page.jsx
 
-24) PUT /addresses/{id}
+27) PUT /addresses/{id}
     Used in:
     - app/checkout/page.jsx
     - app/user/profile/page.jsx
 
-25) DELETE /addresses/{id}
+28) DELETE /addresses/{id}
     Used in:
     - app/checkout/page.jsx
     - app/user/profile/page.jsx
 
-26) POST /addresses/{id}/set-default
+29) POST /addresses/{id}/set-default
     Used in:
     - app/checkout/page.jsx
     - app/user/profile/page.jsx
 
-27) POST /razorpay/order
+30) POST /razorpay/order
     Used in:
     - app/checkout/page.jsx
 
-28) POST /razorpay/verify
+31) POST /razorpay/verify
     Used in:
     - app/checkout/page.jsx
 
-29) POST /api/auth/refresh (internal retry on 401 inside apiFetch)
+32) POST /api/auth/refresh (internal retry on 401 inside apiFetch)
     Used in:
     - utils/api.js
 

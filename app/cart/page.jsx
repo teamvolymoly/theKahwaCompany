@@ -5,16 +5,26 @@ import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { apiFetch } from "@/utils/api";
 
+const EMPTY_SUMMARY = {
+  subtotal: 0,
+  shipping: 0,
+  tax: 0,
+  discount_amount: 0,
+  total: 0,
+  final_total: 0,
+  currency: "INR",
+  free_shipping_threshold: 0,
+};
+
 export default function CartPage() {
   const [items, setItems] = useState([]);
-  const [summary, setSummary] = useState({
-    subtotal: 0,
-    shipping: 0,
-    total: 0,
-    free_shipping_threshold: 0,
-  });
+  const [summary, setSummary] = useState(EMPTY_SUMMARY);
+  const [coupon, setCoupon] = useState(null);
+  const [couponCode, setCouponCode] = useState("");
+  const [couponMessage, setCouponMessage] = useState("");
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
+  const [couponLoading, setCouponLoading] = useState(false);
   const [error, setError] = useState("");
 
   const normalizeCartItem = (item) => {
@@ -28,10 +38,11 @@ export default function CartPage() {
 
     const cartItemId = item?.id || item?.cart_item_id || item?.cart_id || null;
     const variantId = item?.variant_id || variant?.id || null;
-    const quantity = Number(item?.quantity ?? 0) || 0;
+    const quantity = Number(item?.quantity ?? item?.qty ?? 0) || 0;
     const unitPrice =
       Number(item?.price ?? item?.unit_price ?? variant?.price ?? 0) || 0;
-    const subtotal = Number(item?.subtotal ?? unitPrice * quantity) || 0;
+    const subtotal =
+      Number(item?.line_total ?? item?.subtotal ?? unitPrice * quantity) || 0;
 
     return {
       ...item,
@@ -40,10 +51,16 @@ export default function CartPage() {
       quantity,
       price: unitPrice,
       subtotal,
-      product_name: item?.product_name || product?.name || "",
-      variant_name: item?.variant_name || variant?.variant_name || variant?.name || "",
+      product_name: item?.product_name || item?.name || product?.name || "",
+      variant_name:
+        item?.variant_name ||
+        item?.variant ||
+        variant?.variant_name ||
+        variant?.name ||
+        "",
       product_image:
         item?.product_image ||
+        item?.image ||
         primaryImage?.image_url ||
         primaryImage?.url ||
         product?.image_url ||
@@ -51,35 +68,36 @@ export default function CartPage() {
     };
   };
 
+  const hydrateCart = useCallback((payload) => {
+    const cart = payload?.items ? payload : payload?.data || {};
+    const nextItems = Array.isArray(cart?.items) ? cart.items : [];
+    const normalized = nextItems.map(normalizeCartItem);
+
+    setItems(normalized);
+    setSummary({
+      ...EMPTY_SUMMARY,
+      ...(cart?.summary || {}),
+    });
+    setCoupon(cart?.coupon || null);
+    setCouponCode(cart?.coupon?.code || "");
+  }, []);
+
   const loadCart = useCallback(async () => {
     setLoading(true);
     setError("");
     try {
       const data = await apiFetch("/cart");
-      const nextItems = Array.isArray(data?.items) ? data.items : [];
-      const normalized = nextItems.map(normalizeCartItem);
-      setItems(normalized);
-      setSummary(
-        data?.summary || {
-          subtotal: 0,
-          shipping: 0,
-          total: 0,
-          free_shipping_threshold: 0,
-        },
-      );
+      hydrateCart(data);
     } catch (err) {
       setError(err?.message || "Failed to load cart.");
       setItems([]);
-      setSummary({
-        subtotal: 0,
-        shipping: 0,
-        total: 0,
-        free_shipping_threshold: 0,
-      });
+      setSummary(EMPTY_SUMMARY);
+      setCoupon(null);
+      setCouponCode("");
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [hydrateCart]);
 
   useEffect(() => {
     loadCart();
@@ -91,7 +109,12 @@ export default function CartPage() {
   );
   const freeShippingThreshold = summary.free_shipping_threshold ?? 0;
   const shipping = summary.shipping ?? 0;
-  const total = summary.total ?? subtotal + shipping;
+  const discount = summary.discount_amount ?? 0;
+  const finalTotal = summary.final_total ?? 0;
+  const total =
+    discount > 0 || finalTotal > 0 || subtotal === 0
+      ? finalTotal
+      : summary.total ?? subtotal + shipping;
   const amountForFreeShipping =
     freeShippingThreshold > 0 && subtotal < freeShippingThreshold
       ? Math.max(0, freeShippingThreshold + 1 - subtotal)
@@ -138,6 +161,56 @@ export default function CartPage() {
       setError(err?.message || "Unable to remove item.");
     } finally {
       setActionLoading(false);
+    }
+  };
+
+  const applyCoupon = async (event) => {
+    event.preventDefault();
+    if (couponLoading) return;
+
+    const code = couponCode.trim();
+    if (!code) {
+      setError("Please enter a coupon code.");
+      setCouponMessage("");
+      return;
+    }
+
+    setCouponLoading(true);
+    setError("");
+    setCouponMessage("");
+    try {
+      await apiFetch("/api/coupons/apply", {
+        method: "POST",
+        body: JSON.stringify({ code }),
+      });
+      await loadCart();
+      setCouponMessage("Coupon applied.");
+    } catch (err) {
+      setError(err?.message || "Unable to apply coupon.");
+    } finally {
+      setCouponLoading(false);
+    }
+  };
+
+  const removeCoupon = async () => {
+    if (couponLoading) return;
+
+    setCouponLoading(true);
+    setError("");
+    setCouponMessage("");
+    try {
+      await apiFetch("/api/coupons/remove", {
+        method: "POST",
+        body: JSON.stringify({}),
+      });
+      await loadCart();
+      setCoupon(null);
+      setCouponCode("");
+      setCouponMessage("Coupon removed.");
+    } catch (err) {
+      setError(err?.message || "Unable to remove coupon.");
+    } finally {
+      setCouponLoading(false);
     }
   };
 
@@ -261,13 +334,19 @@ export default function CartPage() {
                 <span>Shipping</span>
                 <span>{shipping === 0 ? "Free" : `₹ ${shipping}`}</span>
               </div>
+              {discount > 0 && (
+                <div className="flex items-center justify-between">
+                  <span>Discount</span>
+                  <span>{`- \u20b9 ${discount}`}</span>
+                </div>
+              )}
               <div className="flex items-center justify-between border-t border-black/10 pt-3 text-black font-semibold">
                 <span>Total</span>
                 <span>₹ {total}</span>
               </div>
             </div>
 
-            <div className="mt-6">
+            <form className="mt-6" onSubmit={applyCoupon}>
               <label className="text-xs uppercase tracking-[0.08em] text-black/50">
                 Coupon code
               </label>
@@ -275,13 +354,32 @@ export default function CartPage() {
                 <input
                   type="text"
                   placeholder="KAHWA10"
+                  value={couponCode}
+                  onChange={(event) => setCouponCode(event.target.value)}
+                  disabled={couponLoading || Boolean(coupon)}
                   className="flex-1 rounded-sm border  border-black/20 px-4 py-2 text-sm outline-none focus:border-black"
                 />
-                <button className="rounded-sm border border-black/20 px-4 py-2 text-sm font-semibold uppercase tracking-[0.1em] text-black cursor-pointer hover:bg-black hover:text-white transition">
-                  Apply
+                <button
+                  type={coupon ? "button" : "submit"}
+                  onClick={coupon ? removeCoupon : undefined}
+                  disabled={couponLoading}
+                  className="rounded-sm border border-black/20 px-4 py-2 text-sm font-semibold uppercase tracking-[0.1em] text-black cursor-pointer hover:bg-black hover:text-white transition disabled:opacity-60"
+                >
+                  {coupon
+                    ? couponLoading
+                      ? "Removing"
+                      : "Remove"
+                    : couponLoading
+                      ? "Applying"
+                      : "Apply"}
                 </button>
               </div>
-            </div>
+              {couponMessage && (
+                <p className="mt-3 text-xs uppercase tracking-[0.08em] text-black/50">
+                  {couponMessage}
+                </p>
+              )}
+            </form>
             <Link href="/checkout">
               <button className="mt-8 w-full rounded-full bg-black px-4 py-3 text-xs font-semibold uppercase tracking-[0.08em] text-white cursor-pointer hover:bg-black/90 transition">
                 Proceed to checkout
