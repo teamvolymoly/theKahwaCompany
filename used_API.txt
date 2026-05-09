@@ -35,129 +35,147 @@ Base behavior:
    Used in:
    - app/category/[slug]/page.jsx
 
-8) GET /home/hero-sections
+8) GET /products/{slug_or_id}/reviews?page=1&limit=10
+   Used in:
+   - app/product/[slug]/page.jsx
+
+9) GET /home/hero-sections
    Used in:
    - components/HeroSection.jsx
 
-9) GET /home/blogs
+10) GET /home/blogs
    Used in:
    - app/page.js
 
-10) GET /header
+11) GET /header
     Used in:
     - components/NewHeader.jsx
 
-11) GET /cart
+12) GET /cart
     Used in:
     - app/cart/page.jsx
     - components/ProductCard.jsx
     - app/product/[slug]/page.jsx
 
-12) POST /cart
+13) POST /cart
     Payload: { variant_id, quantity }
     Used in:
     - components/ProductCard.jsx
     - app/product/[slug]/page.jsx
 
-13) PUT /cart/{id}
+14) PUT /cart/{id}
     Payload: { quantity }
     Used in:
     - app/cart/page.jsx
 
-14) DELETE /cart/{id}
+15) DELETE /cart/{id}
     Used in:
     - app/cart/page.jsx
 
-15) POST /api/coupons/apply
+16) POST /api/coupons/apply
     Payload: { code }
     Used in:
     - app/cart/page.jsx
 
-16) POST /api/coupons/remove
+17) POST /api/coupons/remove
     Payload: {}
     Used in:
     - app/cart/page.jsx
 
-17) GET /checkout
+18) GET /checkout
     Used in:
     - app/checkout/page.jsx
 
-18) GET /auth/profile
+19) GET /auth/profile
     Used in:
     - app/context/AuthContext.jsx
     - app/checkout/page.jsx
     - app/user/profile/page.jsx
 
-19) PUT /auth/profile
+20) PUT /auth/profile
     Used in:
     - app/user/profile/page.jsx
 
-20) POST /auth/login
+21) POST /auth/login
     Used in:
     - app/context/AuthContext.jsx
 
-21) POST /auth/logout
+22) POST /auth/logout
     Used in:
     - app/context/AuthContext.jsx
 
-22) POST /auth/refresh
+23) POST /auth/refresh
     Used in:
     - app/context/AuthContext.jsx
 
-23) POST /auth/change-password
+24) POST /auth/change-password
     Payload: { current_password, password, password_confirmation }
     Used in:
     - app/user/password/page.jsx
 
-24) POST /api/auth/register
+25) POST /api/auth/register
     Used in:
     - app/auth/AccountClient.jsx
 
-25) GET /addresses
+26) GET /addresses
     Used in:
     - app/checkout/page.jsx
     - app/user/profile/page.jsx
 
-26) POST /addresses
+27) POST /addresses
     Used in:
     - app/checkout/page.jsx
     - app/user/profile/page.jsx
 
-27) PUT /addresses/{id}
+28) PUT /addresses/{id}
     Used in:
     - app/checkout/page.jsx
     - app/user/profile/page.jsx
 
-28) DELETE /addresses/{id}
+29) DELETE /addresses/{id}
     Used in:
     - app/checkout/page.jsx
     - app/user/profile/page.jsx
 
-29) POST /addresses/{id}/set-default
+30) POST /addresses/{id}/set-default
     Used in:
     - app/checkout/page.jsx
     - app/user/profile/page.jsx
 
-30) POST /razorpay/order
+31) POST /razorpay/order
     Payload: { address_id, name, email, contact }
     Response uses: { key, razorpay_order_id, order_id, amount, currency }
     Used in:
     - app/checkout/page.jsx
 
-31) POST /razorpay/verify
+32) POST /razorpay/verify
     Payload: { razorpay_order_id, razorpay_payment_id, razorpay_signature }
     Used in:
     - app/checkout/page.jsx
 
-32) GET /payments/success/{order_id}
+33) GET /payments/success/{order_id}
     Used in:
     - app/checkout/page.jsx
+    - app/payment-success/page.jsx
 
-33) GET /payments/failed/{order_id}
+34) GET /payments/failed/{order_id}
     Used in:
     - app/checkout/page.jsx
+    - app/payment-failed/page.jsx
 
-34) POST /api/auth/refresh (internal retry on 401 inside apiFetch)
+35) GET /orders?page={page}&limit={limit}&status={status}
+    Used in:
+    - app/user/orders/page.jsx
+
+36) GET /orders/{order_id}
+    Used in:
+    - app/user/orders/[id]/page.jsx
+
+37) GET /user/dashboard
+    Used in:
+    - app/user/dashboard/page.jsx
+
+38) POST /api/auth/refresh (internal retry on 401 inside apiFetch)
     Used in:
     - utils/api.js
 

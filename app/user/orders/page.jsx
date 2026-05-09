@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/app/context/AuthContext";
+import { apiFetch } from "@/utils/api";
 const STATUS_OPTIONS = [
   "All",
   "Pending",
@@ -12,6 +13,22 @@ const STATUS_OPTIONS = [
   "Delivered",
   "Cancelled",
 ];
+
+const formatMoney = (value, currency = "INR") =>
+  `${currency === "INR" ? "₹" : currency} ${Number(value ?? 0) || 0}`;
+
+const normalizeOrder = (order) => ({
+  id: order.id || order.order_id,
+  date: order.placed_on || order.date || order.created_at || "",
+  status: order.status || "Processing",
+  total: order.total ?? order.amount ?? 0,
+  currency: order.currency || "INR",
+  product_name:
+    order.product_name ||
+    (order.items_count
+      ? `${order.items_count} item${order.items_count > 1 ? "s" : ""}`
+      : ""),
+});
 
 export default function OrdersPage() {
   const router = useRouter();
@@ -30,30 +47,6 @@ export default function OrdersPage() {
   });
   const [loadingOrders, setLoadingOrders] = useState(false);
   const [error, setError] = useState("");
-  const fallbackOrders = [
-    {
-      id: "TKC-1042",
-      date: "2026-03-12",
-      status: "Delivered",
-      total: 1499,
-      product_name: "Kashmiri Kahwa",
-    },
-    {
-      id: "TKC-1037",
-      date: "2026-02-28",
-      status: "In transit",
-      total: 899,
-      product_name: "Kahwa Sampler Set",
-    },
-    {
-      id: "TKC-1029",
-      date: "2026-02-10",
-      status: "Delivered",
-      total: 2120,
-      product_name: "Saffron Kahwa",
-    },
-  ];
-
   useEffect(() => {
     if (!loading && !isAuthenticated) {
       router.push("/auth/login?next=/user/orders");
@@ -61,13 +54,58 @@ export default function OrdersPage() {
   }, [loading, isAuthenticated, router]);
 
   useEffect(() => {
-    setOrders(fallbackOrders);
-    setPagination({
-      page: 1,
-      total_pages: 1,
-      total_items: fallbackOrders.length,
-    });
-  }, []);
+    if (loading || !isAuthenticated) return;
+    let active = true;
+
+    const loadOrders = async () => {
+      setLoadingOrders(true);
+      setError("");
+      try {
+        const params = new URLSearchParams({
+          page: String(page),
+          limit: "10",
+        });
+        if (status !== "All") params.set("status", status.toLowerCase());
+        const data = await apiFetch(`/orders?${params.toString()}`);
+        if (!active) return;
+        const items = Array.isArray(data?.items) ? data.items : [];
+        setOrders(items.map(normalizeOrder));
+        setPagination(
+          data?.pagination || {
+            page,
+            total_pages: 1,
+            total_items: items.length,
+          },
+        );
+      } catch (err) {
+        if (active) {
+          setError(err?.message || "Failed to load orders.");
+          setOrders([]);
+          setPagination({ page: 1, total_pages: 1, total_items: 0 });
+        }
+      } finally {
+        if (active) setLoadingOrders(false);
+      }
+    };
+
+    loadOrders();
+    return () => {
+      active = false;
+    };
+  }, [loading, isAuthenticated, page, status]);
+
+  const visibleOrders = useMemo(
+    () =>
+      orders.filter((order) => {
+        const matchesSearch =
+          !search ||
+          String(order.id).toLowerCase().includes(search.toLowerCase());
+        const matchesFrom = !dateFrom || String(order.date) >= dateFrom;
+        const matchesTo = !dateTo || String(order.date) <= dateTo;
+        return matchesSearch && matchesFrom && matchesTo;
+      }),
+    [orders, search, dateFrom, dateTo],
+  );
 
   const resetFilters = () => {
     setStatus("All");
@@ -194,13 +232,13 @@ export default function OrdersPage() {
 
           {loadingOrders ? (
             <p className="mt-6 text-sm text-black/60">Loading orders...</p>
-          ) : orders.length === 0 ? (
+          ) : visibleOrders.length === 0 ? (
             <p className="mt-6 text-sm text-black/60">
               No orders found for these filters.
             </p>
           ) : (
             <div className="mt-6 grid gap-4">
-              {orders.map((order) => (
+              {visibleOrders.map((order) => (
                 <Link
                   key={order.id}
                   href={`/user/orders/${order.id || order.order_id}`}
@@ -223,7 +261,7 @@ export default function OrdersPage() {
                     {order.status || "Processing"}
                   </div>
                   <div className="text-sm font-semibold">
-                    ₹ {order.total || order.amount || 0}
+                    {formatMoney(order.total || order.amount, order.currency)}
                   </div>
                 </Link>
               ))}

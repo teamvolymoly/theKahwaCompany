@@ -11,6 +11,17 @@ import "swiper/css";
 import "swiper/css/navigation";
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 
+const normalizeReview = (review) => ({
+  id: review.id,
+  name: review.name || review.customer_name || "Customer",
+  rating: Number(review.rating ?? 0) || 0,
+  review: review.review || review.comment || "",
+  date: review.date || review.created_at || "",
+  title: review.title || "",
+  location: review.location || "",
+  images: Array.isArray(review.images) ? review.images : [],
+});
+
 export default function ProductDetail() {
   const { slug } = useParams();
   const [product, setProduct] = useState(null);
@@ -35,9 +46,12 @@ export default function ProductDetail() {
           (p) => p.slug === safeSlug || String(p.id) === String(safeSlug),
         ) || dummyProducts[0];
       try {
-        const prod = await apiFetch(
-          `/products/${encodeURIComponent(safeSlug)}`,
-        );
+        const [prod, reviewRes] = await Promise.all([
+          apiFetch(`/products/${encodeURIComponent(safeSlug)}`),
+          apiFetch(
+            `/products/${encodeURIComponent(safeSlug)}/reviews?page=1&limit=10`,
+          ).catch(() => null),
+        ]);
         if (!prod || !prod.id) {
           throw new Error("Product not found.");
         }
@@ -74,8 +88,6 @@ export default function ProductDetail() {
             fallback.oldPrice,
         };
 
-        setProduct(normalized);
-
         const imageList = normalized.images || [];
         setImages(imageList);
         setActiveImage(0);
@@ -89,8 +101,28 @@ export default function ProductDetail() {
           null;
         setSelectedVariant(defaultVariant);
 
-        const reviewItems = normalized.reviews?.items;
-        setReviews(Array.isArray(reviewItems) ? reviewItems : dummyReviews);
+        const reviewItems = Array.isArray(reviewRes?.items)
+          ? reviewRes.items
+          : normalized.reviews?.items;
+        const reviewSummary = reviewRes?.summary || normalized.reviews || {};
+        setProduct({
+          ...normalized,
+          reviews: {
+            ...reviewSummary,
+            average_rating:
+              reviewSummary.average_rating ?? reviewSummary.rating ?? 0,
+            count:
+              reviewSummary.total_reviews ??
+              reviewSummary.count ??
+              reviewItems?.length ??
+              0,
+          },
+        });
+        setReviews(
+          Array.isArray(reviewItems)
+            ? reviewItems.map(normalizeReview)
+            : dummyReviews,
+        );
       } catch (err) {
         alert(err?.message || "Product not found.");
         const normalizedFallback = {

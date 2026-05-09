@@ -4,6 +4,34 @@ import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/app/context/AuthContext";
+import { apiFetch } from "@/utils/api";
+
+const normalizeOrderDetail = (payload, orderId) => {
+  const data = payload?.data || payload || {};
+  const order = data.order || data;
+  const address = data.shipping_address || order.shipping_address || {};
+  const items = data.items || order.items || [];
+
+  return {
+    id: order.id || order.order_id || orderId,
+    date: order.placed_on || order.date || order.created_at || "",
+    ordered_date: order.placed_on || order.ordered_date || order.created_at || "",
+    delivery_date:
+      order.delivery_date || order.expected_delivery?.date || data.delivery_date || "",
+    status: order.status || "Processing",
+    payment_method: order.payment_method || "Online",
+    payment_status: order.payment_status || "Paid",
+    tracking_id: order.tracking_id || "",
+    subtotal: order.subtotal ?? data.summary?.subtotal ?? 0,
+    shipping: order.shipping ?? data.summary?.shipping ?? 0,
+    tax: order.tax ?? data.summary?.tax ?? 0,
+    discount: order.discount ?? data.summary?.discount ?? 0,
+    total: order.total ?? data.summary?.total ?? 0,
+    items,
+    shipping_address: address,
+  };
+};
+
 export default function OrderDetailPage() {
   const router = useRouter();
   const { id } = useParams();
@@ -12,46 +40,6 @@ export default function OrderDetailPage() {
   const [order, setOrder] = useState(null);
   const [loadingOrder, setLoadingOrder] = useState(false);
   const [error, setError] = useState("");
-  const fallbackOrder = {
-    id: "TKC-1042",
-    date: "2026-03-12",
-    ordered_date: "2026-03-12",
-    delivery_date: "2026-03-16",
-    status: "Delivered",
-    payment_method: "Online",
-    payment_status: "Paid",
-    tracking_id: "TRK-558921",
-    subtotal: 1499,
-    shipping: 0,
-    total: 1499,
-    items: [
-      {
-        product_name: "Kashmiri Kahwa",
-        variant_name: "30 cups",
-        quantity: 1,
-        price: 1499,
-        image:
-          "https://tkc.volymoly.com/media/public/products/gallery/ZKtu1zsNSsBUIf2bkrvRVno4KkCCSqjEh47pD1kC.png",
-      },
-      {
-        product_name: "Kahwa Sampler Set",
-        variant_name: "Sampler Box",
-        quantity: 1,
-        price: 899,
-        image:
-          "https://tkc.volymoly.com/media/public/products/gallery/WXkuMe0DlQQVf2EckG0pdoiBxAYyfp7BuuUuW3OH.png",
-      },
-    ],
-    shipping_address: {
-      label: "Home",
-      address_line1: "House 18, Boulevard Road",
-      address_line2: "Dal Lake",
-      city: "Srinagar",
-      state: "Kashmir",
-      pincode: "190001",
-      country: "India",
-    },
-  };
 
   useEffect(() => {
     if (!loading && !isAuthenticated) {
@@ -60,9 +48,30 @@ export default function OrderDetailPage() {
   }, [loading, isAuthenticated, router, id]);
 
   useEffect(() => {
-    if (!id) return;
-    setOrder({ ...fallbackOrder, id });
-  }, [id]);
+    if (!id || loading || !isAuthenticated) return;
+    let active = true;
+
+    const loadOrder = async () => {
+      setLoadingOrder(true);
+      setError("");
+      try {
+        const data = await apiFetch(`/orders/${encodeURIComponent(id)}`);
+        if (active) setOrder(normalizeOrderDetail(data, id));
+      } catch (err) {
+        if (active) {
+          setError(err?.message || "Failed to load order.");
+          setOrder(null);
+        }
+      } finally {
+        if (active) setLoadingOrder(false);
+      }
+    };
+
+    loadOrder();
+    return () => {
+      active = false;
+    };
+  }, [id, loading, isAuthenticated]);
 
   if (loadingOrder) {
     return (
@@ -169,7 +178,9 @@ export default function OrderDetailPage() {
                       Qty: {item.quantity}
                     </p>
                   </div>
-                  <div className="text-sm font-semibold">₹ {item.price}</div>
+                  <div className="text-sm font-semibold">
+                    ₹ {item.line_total ?? item.price}
+                  </div>
                 </div>
               ))}
             </div>
@@ -207,6 +218,16 @@ export default function OrderDetailPage() {
                 <span>Shipping</span>
                 <span>{order.shipping ? `₹ ${order.shipping}` : "Free"}</span>
               </div>
+              <div className="flex items-center justify-between">
+                <span>Tax</span>
+                <span>₹ {order.tax}</span>
+              </div>
+              {order.discount > 0 && (
+                <div className="flex items-center justify-between">
+                  <span>Discount</span>
+                  <span>- ₹ {order.discount}</span>
+                </div>
+              )}
               <div className="flex items-center justify-between border-t border-black/10 pt-3 text-black font-semibold">
                 <span>Total</span>
                 <span>₹ {order.total}</span>
