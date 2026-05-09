@@ -27,6 +27,7 @@ export async function apiFetch(path, options = {}, { retry = true } = {}) {
     typeof window !== "undefined" ? localStorage.getItem("auth_token") : null;
 
   const headers = {
+    Accept: "application/json",
     ...(isFormData
       ? {}
       : options.body

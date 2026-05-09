@@ -1,20 +1,135 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { jsPDF } from "jspdf";
+import { apiFetch } from "@/utils/api";
+
+const formatMoney = (value) => {
+  if (typeof value === "string") return value;
+  return `₹ ${Number(value ?? 0) || 0}`;
+};
+
+const DEFAULT_ORDER = {
+  id: "Order",
+  placedOn: "",
+  paymentMethod: "Razorpay",
+  total: "₹ 0",
+  email: "",
+  phone: "",
+};
+
+const DEFAULT_DELIVERY = {
+  estimate: "",
+  window: "",
+  address: {
+    label: "Delivery address",
+    line1: "",
+    line2: "",
+    city: "",
+    state: "",
+    pincode: "",
+    country: "India",
+  },
+};
+
+const DEFAULT_BILL = {
+  invoiceId: "Invoice",
+  issuedOn: "",
+  seller: "The Kahwa Company",
+  gst: "",
+  subtotal: "₹ 0",
+  shipping: "₹ 0",
+  taxes: "₹ 0",
+  discount: "₹ 0",
+  couponCode: "",
+  total: "₹ 0",
+};
+
+const normalizePaymentDetails = (payload, orderId) => {
+  const data = payload?.data || payload || {};
+  const order = data.order || data.payment || data;
+  const payment = data.payment || {};
+  const customer = data.customer || {};
+  const totals = data.totals || data.summary || data.bill || order;
+  const address = data.address || data.delivery_address || data.shipping_address || {};
+  const products = data.items || data.products || data.order_items || [];
+  const invoice = data.invoice || {};
+  const expectedDelivery = order.expected_delivery || {};
+  const total =
+    payment.amount_paid ??
+    totals.final_total ??
+    totals.total ??
+    order.total ??
+    order.amount;
+
+  return {
+    order: {
+      id: order.order_id || order.id || orderId || DEFAULT_ORDER.id,
+      placedOn:
+        order.placed_on || order.placed_at || order.created_at || order.date || "",
+      paymentMethod: payment.method || order.payment_method || "Razorpay",
+      total: formatMoney(total),
+      email: customer.email || order.email || data.email || "",
+      phone:
+        customer.phone ||
+        order.contact ||
+        order.phone ||
+        data.contact ||
+        data.phone ||
+        "",
+    },
+    delivery: {
+      estimate: expectedDelivery.date || data.delivery_estimate || "",
+      window: expectedDelivery.time_window || data.delivery_window || "",
+      address: {
+        label: address.label || "Delivery address",
+        line1: address.address_line1 || address.line1 || "",
+        line2: address.address_line2 || address.line2 || "",
+        city: address.city || "",
+        state: address.state || "",
+        pincode: address.pincode || address.postal_code || "",
+        country: address.country || "India",
+      },
+    },
+    items: products.map((item) => ({
+      id: item.id || item.variant_id,
+      name: item.product_name || item.name || "",
+      variant: item.variant_name || item.variant || "",
+      qty: item.quantity || item.qty || 0,
+      price: formatMoney(item.line_total ?? item.price * (item.quantity || item.qty || 1)),
+      image: item.image || item.product_image || "",
+    })),
+    bill: {
+      invoiceId:
+        invoice.number ||
+        data.invoice_id ||
+        order.invoice_id ||
+        `INV-${orderId || ""}`,
+      issuedOn: invoice.issued_on || order.placed_on || order.created_at || "",
+      seller: "The Kahwa Company",
+      gst: data.gst || "",
+      subtotal: formatMoney(totals.subtotal),
+      shipping: formatMoney(totals.shipping),
+      taxes: formatMoney(totals.tax ?? totals.taxes),
+      discount: formatMoney(totals.discount ?? totals.discount_amount),
+      couponCode: totals.coupon_code || "",
+      total: formatMoney(total),
+    },
+  };
+};
 
 export default function PaymentSuccessPage() {
   const [invoiceOpen, setInvoiceOpen] = useState(false);
-  const order = {
+  const [order, setOrder] = useState({
     id: "TKC-2049",
     placedOn: "April 11, 2026",
     paymentMethod: "Razorpay • UPI",
     total: "₹ 1,298",
     email: "customer@example.com",
     phone: "+91 98765 43210",
-  };
-  const delivery = {
+  });
+  const [delivery, setDelivery] = useState({
     estimate: "April 15, 2026",
     window: "10 AM - 7 PM",
     address: {
@@ -26,8 +141,8 @@ export default function PaymentSuccessPage() {
       pincode: "190001",
       country: "India",
     },
-  };
-  const items = [
+  });
+  const [items, setItems] = useState([
     {
       id: 101,
       name: "Kashmiri Kahwa",
@@ -44,8 +159,8 @@ export default function PaymentSuccessPage() {
       price: "₹ 799",
       image: "/products/tin/KLTIN1.png",
     },
-  ];
-  const bill = {
+  ]);
+  const [bill, setBill] = useState({
     invoiceId: "INV-2049",
     issuedOn: "April 11, 2026",
     seller: "The Kahwa Company",
@@ -54,7 +169,38 @@ export default function PaymentSuccessPage() {
     shipping: "₹ 0",
     taxes: "₹ 0",
     total: "₹ 1,298",
-  };
+  });
+
+  const [loadingDetails, setLoadingDetails] = useState(true);
+  const [detailsError, setDetailsError] = useState("");
+
+  useEffect(() => {
+    const orderId = new URLSearchParams(window.location.search).get("order_id");
+    if (!orderId) {
+      setLoadingDetails(false);
+      setDetailsError("Order id is missing.");
+      return;
+    }
+
+    const loadPaymentDetails = async () => {
+      setLoadingDetails(true);
+      setDetailsError("");
+      try {
+        const payload = await apiFetch(`/payments/success/${orderId}`);
+        const details = normalizePaymentDetails(payload, orderId);
+        setOrder(details.order);
+        setDelivery(details.delivery);
+        setItems(details.items);
+        setBill(details.bill);
+      } catch (err) {
+        setDetailsError(err?.message || "Unable to load payment details.");
+      } finally {
+        setLoadingDetails(false);
+      }
+    };
+
+    loadPaymentDetails();
+  }, []);
 
   const fetchImageAsDataURL = async (url) => {
     const res = await fetch(url);
@@ -127,6 +273,10 @@ export default function PaymentSuccessPage() {
     doc.text(`Taxes: ${bill.taxes}`, pageWidth - 40, y, {
       align: "right",
     });
+    y += 14;
+    doc.text(`Discount: ${bill.discount}`, pageWidth - 40, y, {
+      align: "right",
+    });
     y += 18;
     doc.setFontSize(12);
     doc.text(`Total: ${bill.total}`, pageWidth - 40, y, {
@@ -165,6 +315,12 @@ export default function PaymentSuccessPage() {
         <p className="mt-4 text-sm text-black/60">
           Your payment was successful. A confirmation email has been sent.
         </p>
+        {loadingDetails && (
+          <p className="mt-4 text-sm text-black/60">Loading order details...</p>
+        )}
+        {detailsError && (
+          <p className="mt-4 text-sm text-red-600">{detailsError}</p>
+        )}
         <div className="mt-10 grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
           <div className="rounded-sm border border-black/10 bg-white p-6 shadow-sm">
             <p className="text-xs uppercase tracking-[0.08em] text-black/50">
@@ -277,6 +433,10 @@ export default function PaymentSuccessPage() {
                 <div className="flex items-center justify-between">
                   <span>Taxes</span>
                   <span>{bill.taxes}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span>Discount{bill.couponCode ? ` (${bill.couponCode})` : ""}</span>
+                  <span>{bill.discount}</span>
                 </div>
                 <div className="flex items-center justify-between border-t border-black/10 pt-3 font-semibold text-black">
                   <span>Total</span>
@@ -402,6 +562,10 @@ export default function PaymentSuccessPage() {
               <div className="flex items-center justify-between">
                 <span>Taxes</span>
                 <span>{bill.taxes}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span>Discount{bill.couponCode ? ` (${bill.couponCode})` : ""}</span>
+                <span>{bill.discount}</span>
               </div>
               <div className="flex items-center justify-between border-t border-black/10 pt-2 font-semibold text-black">
                 <span>Total</span>

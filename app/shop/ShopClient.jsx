@@ -12,6 +12,16 @@ const toCategoryParam = (value) =>
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/(^-|-$)/g, "");
 
+const DEFAULT_PRICE_RANGE = { min: 0, max: 2000 };
+
+const normalizePriceRange = (range) => {
+  const max = Number(range?.max ?? DEFAULT_PRICE_RANGE.max);
+  return {
+    min: 0,
+    max: Number.isFinite(max) && max > 0 ? max : DEFAULT_PRICE_RANGE.max,
+  };
+};
+
 export default function ShopClient() {
   const searchParams = useSearchParams();
   const [products, setProducts] = useState([]);
@@ -19,7 +29,7 @@ export default function ShopClient() {
   const [filters, setFilters] = useState({
     categories: [],
     subcategories: [],
-    price_range: { min: 0, max: 2000 },
+    price_range: DEFAULT_PRICE_RANGE,
     rating_options: [],
     tags: [],
     caffeine: [],
@@ -32,7 +42,10 @@ export default function ShopClient() {
   const [selectedCollection, setSelectedCollection] = useState("");
   const [ratingMin, setRatingMin] = useState("");
   const [inStockOnly, setInStockOnly] = useState(false);
-  const [priceRange, setPriceRange] = useState([0, 2000]);
+  const [priceRange, setPriceRange] = useState([
+    DEFAULT_PRICE_RANGE.min,
+    DEFAULT_PRICE_RANGE.max,
+  ]);
   const [searchTerm, setSearchTerm] = useState("");
   const [sort, setSort] = useState("default");
   const [page, setPage] = useState(1);
@@ -60,25 +73,28 @@ export default function ShopClient() {
         const nextFilters = {
           categories: data?.categories || [],
           subcategories: data?.subcategories || [],
-          price_range: data?.price_range || { min: 0, max: 2000 },
+          price_range: normalizePriceRange(data?.price_range),
           rating_options: data?.rating_options || [],
           tags: data?.tags || [],
           caffeine: data?.caffeine || [],
           collections: data?.collections || [],
         };
         setFilters(nextFilters);
-        setPriceRange([nextFilters.price_range.min, nextFilters.price_range.max]);
+        setPriceRange([
+          nextFilters.price_range.min,
+          nextFilters.price_range.max,
+        ]);
       } catch (err) {
         setFilters({
           categories: [],
           subcategories: [],
-          price_range: { min: 0, max: 2000 },
+          price_range: DEFAULT_PRICE_RANGE,
           rating_options: [],
           tags: [],
           caffeine: [],
           collections: [],
         });
-        setPriceRange([0, 2000]);
+        setPriceRange([DEFAULT_PRICE_RANGE.min, DEFAULT_PRICE_RANGE.max]);
       }
     };
     loadFilters();
@@ -115,8 +131,12 @@ export default function ShopClient() {
         if (searchTerm) params.set("search", searchTerm);
         if (selectedCategory) params.set("category", selectedCategory);
         if (selectedSubcategory) params.set("subcategory", selectedSubcategory);
-        if (priceRange[0] > 0) params.set("price_min", String(priceRange[0]));
-        if (priceRange[1] > 0) params.set("price_max", String(priceRange[1]));
+        if (priceRange[0] > filters.price_range.min) {
+          params.set("price_min", String(priceRange[0]));
+        }
+        if (priceRange[1] < filters.price_range.max) {
+          params.set("price_max", String(priceRange[1]));
+        }
         if (ratingMin) params.set("rating_min", String(ratingMin));
         if (inStockOnly) params.set("in_stock", "true");
         if (selectedTag) params.set("tag", selectedTag);
@@ -179,6 +199,8 @@ export default function ShopClient() {
     selectedCaffeine,
     selectedCollection,
     sort,
+    filters.price_range.min,
+    filters.price_range.max,
   ]);
 
   const handleClearFilters = () => {

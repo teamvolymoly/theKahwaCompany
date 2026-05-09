@@ -1,9 +1,48 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
+import { apiFetch } from "@/utils/api";
+
+const formatMoney = (value) => {
+  if (typeof value === "string") return value;
+  return `₹ ${Number(value ?? 0) || 0}`;
+};
+
+const normalizeFailedPaymentDetails = (payload, orderId) => {
+  const data = payload?.data || payload || {};
+  const order = data.order || data.payment || data;
+  const totals = data.totals || data.summary || data.bill || order;
+  const products = data.items || data.products || data.order_items || [];
+  const total = totals.final_total ?? totals.total ?? order.total ?? order.amount;
+
+  return {
+    order: {
+      id: order.order_id || order.id || orderId || "Order",
+      attemptedOn: order.attempted_at || order.created_at || order.date || "",
+      paymentMethod: order.payment_method || "Razorpay",
+      total: formatMoney(total),
+      email: order.email || data.email || "",
+      phone: order.contact || order.phone || data.contact || data.phone || "",
+      failureReason:
+        data.failure_reason ||
+        order.failure_reason ||
+        data.message ||
+        "Payment authorization failed. Please try again.",
+    },
+    items: products.map((item) => ({
+      id: item.id || item.variant_id,
+      name: item.product_name || item.name || "",
+      variant: item.variant_name || item.variant || "",
+      qty: item.quantity || item.qty || 0,
+      price: formatMoney(item.line_total ?? item.price),
+      image: item.image || item.product_image || "",
+    })),
+  };
+};
 
 export default function PaymentFailedPage() {
-  const order = {
+  const [order, setOrder] = useState({
     id: "TKC-2049",
     attemptedOn: "April 11, 2026",
     paymentMethod: "Razorpay • UPI",
@@ -11,8 +50,8 @@ export default function PaymentFailedPage() {
     email: "customer@example.com",
     phone: "+91 98765 43210",
     failureReason: "Payment authorization failed. Please try again.",
-  };
-  const items = [
+  });
+  const [items, setItems] = useState([
     {
       id: 101,
       name: "Kashmiri Kahwa",
@@ -29,7 +68,36 @@ export default function PaymentFailedPage() {
       price: "₹ 799",
       image: "/products/tin/KLTIN1.png",
     },
-  ];
+  ]);
+
+  const [loadingDetails, setLoadingDetails] = useState(true);
+  const [detailsError, setDetailsError] = useState("");
+
+  useEffect(() => {
+    const orderId = new URLSearchParams(window.location.search).get("order_id");
+    if (!orderId) {
+      setLoadingDetails(false);
+      setDetailsError("Order id is missing.");
+      return;
+    }
+
+    const loadPaymentDetails = async () => {
+      setLoadingDetails(true);
+      setDetailsError("");
+      try {
+        const payload = await apiFetch(`/payments/failed/${orderId}`);
+        const details = normalizeFailedPaymentDetails(payload, orderId);
+        setOrder(details.order);
+        setItems(details.items);
+      } catch (err) {
+        setDetailsError(err?.message || "Unable to load payment details.");
+      } finally {
+        setLoadingDetails(false);
+      }
+    };
+
+    loadPaymentDetails();
+  }, []);
 
   return (
     <main className="min-h-screen bg-white text-black mt-12">
@@ -41,11 +109,17 @@ export default function PaymentFailedPage() {
           className="mt-4 text-3xl md:text-4xl font-semibold"
           style={{ fontFamily: "var(--font-display)" }}
         >
-          We couldn't process your payment
+          We couldn&apos;t process your payment
         </h1>
         <p className="mt-4 text-sm text-black/60">
           Please try again or use a different payment method.
         </p>
+        {loadingDetails && (
+          <p className="mt-4 text-sm text-black/60">Loading order details...</p>
+        )}
+        {detailsError && (
+          <p className="mt-4 text-sm text-red-600">{detailsError}</p>
+        )}
         <div className="mt-10 grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
           <div className="rounded-sm border border-black/10 bg-white p-6 shadow-sm">
             <p className="text-xs uppercase tracking-[0.2em] text-black/50">

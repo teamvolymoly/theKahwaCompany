@@ -140,8 +140,33 @@ export default function CheckoutPage() {
       document.body.appendChild(script);
     });
 
-  const redirectPaymentFailed = () => {
-    window.location.href = "/payment-failed";
+  const getOrderQuery = (orderId) =>
+    orderId ? `?order_id=${encodeURIComponent(orderId)}` : "";
+
+  const markPaymentSuccess = async (orderId) => {
+    if (!orderId) return;
+    await apiFetch(`/payments/success/${orderId}`);
+  };
+
+  const markPaymentFailed = async (orderId) => {
+    if (!orderId) return;
+    await apiFetch(`/payments/failed/${orderId}`);
+  };
+
+  const tryMarkPaymentFailed = async (orderId) => {
+    try {
+      await markPaymentFailed(orderId);
+    } catch {
+      // Keep the user moving to the failed-payment page even if status logging fails.
+    }
+  };
+
+  const redirectPaymentSuccess = (orderId) => {
+    window.location.href = `/payment-success${getOrderQuery(orderId)}`;
+  };
+
+  const redirectPaymentFailed = (orderId) => {
+    window.location.href = `/payment-failed${getOrderQuery(orderId)}`;
   };
 
   const handlePayNow = async () => {
@@ -179,6 +204,7 @@ export default function CheckoutPage() {
       if (!order?.razorpay_order_id) {
         throw new Error("Razorpay order id is missing.");
       }
+      const appOrderId = order?.order_id;
 
       const options = {
         key: order?.key || process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
@@ -206,10 +232,12 @@ export default function CheckoutPage() {
                 razorpay_signature: response.razorpay_signature,
               }),
             });
-            window.location.href = "/payment-success";
+            await markPaymentSuccess(appOrderId);
+            redirectPaymentSuccess(appOrderId);
           } catch (err) {
             setPaymentError(err?.message || "Payment verification failed.");
-            redirectPaymentFailed();
+            await tryMarkPaymentFailed(appOrderId);
+            redirectPaymentFailed(appOrderId);
           }
         },
         modal: {
@@ -223,12 +251,13 @@ export default function CheckoutPage() {
       };
 
       const razorpay = new window.Razorpay(options);
-      razorpay.on("payment.failed", (resp) => {
+      razorpay.on("payment.failed", async (resp) => {
         setPaymentError(
           resp?.error?.description || "Payment failed. Please try again.",
         );
         setProcessingPayment(false);
-        redirectPaymentFailed();
+        await tryMarkPaymentFailed(appOrderId);
+        redirectPaymentFailed(appOrderId);
       });
       razorpay.open();
     } catch (err) {

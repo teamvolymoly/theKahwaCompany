@@ -149,7 +149,15 @@ Base behavior:
     Used in:
     - app/checkout/page.jsx
 
-32) POST /api/auth/refresh (internal retry on 401 inside apiFetch)
+32) GET /payments/success/{order_id}
+    Used in:
+    - app/checkout/page.jsx
+
+33) GET /payments/failed/{order_id}
+    Used in:
+    - app/checkout/page.jsx
+
+34) POST /api/auth/refresh (internal retry on 401 inside apiFetch)
     Used in:
     - utils/api.js
 
