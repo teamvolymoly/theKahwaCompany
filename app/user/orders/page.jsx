@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/app/context/AuthContext";
 import { apiFetch } from "@/utils/api";
+
 const STATUS_OPTIONS = [
   "All",
   "Pending",
@@ -21,13 +22,12 @@ const normalizeOrder = (order) => ({
   id: order.id || order.order_id,
   date: order.placed_on || order.date || order.created_at || "",
   status: order.status || "Processing",
+  payment_status: order.payment_status || "",
   total: order.total ?? order.amount ?? 0,
   currency: order.currency || "INR",
-  product_name:
-    order.product_name ||
-    (order.items_count
-      ? `${order.items_count} item${order.items_count > 1 ? "s" : ""}`
-      : ""),
+  items_count: order.items_count ?? order.items?.length ?? 0,
+  product_name: order.product_name || "",
+  product_variant: order.product_variant || order.variant_name || "",
 });
 
 export default function OrdersPage() {
@@ -47,6 +47,7 @@ export default function OrdersPage() {
   });
   const [loadingOrders, setLoadingOrders] = useState(false);
   const [error, setError] = useState("");
+
   useEffect(() => {
     if (!loading && !isAuthenticated) {
       router.push("/auth/login?next=/user/orders");
@@ -68,10 +69,12 @@ export default function OrdersPage() {
         if (status !== "All") params.set("status", status.toLowerCase());
         const data = await apiFetch(`/orders?${params.toString()}`);
         if (!active) return;
-        const items = Array.isArray(data?.items) ? data.items : [];
+
+        const payload = data?.data || data || {};
+        const items = Array.isArray(payload?.items) ? payload.items : [];
         setOrders(items.map(normalizeOrder));
         setPagination(
-          data?.pagination || {
+          payload?.pagination || {
             page,
             total_pages: 1,
             total_items: items.length,
@@ -97,9 +100,12 @@ export default function OrdersPage() {
   const visibleOrders = useMemo(
     () =>
       orders.filter((order) => {
+        const query = search.toLowerCase();
         const matchesSearch =
-          !search ||
-          String(order.id).toLowerCase().includes(search.toLowerCase());
+          !query ||
+          String(order.id).toLowerCase().includes(query) ||
+          order.product_name.toLowerCase().includes(query) ||
+          order.product_variant.toLowerCase().includes(query);
         const matchesFrom = !dateFrom || String(order.date) >= dateFrom;
         const matchesTo = !dateTo || String(order.date) <= dateTo;
         return matchesSearch && matchesFrom && matchesTo;
@@ -134,7 +140,7 @@ export default function OrdersPage() {
             href="/shop"
             className="self-start text-xs font-semibold uppercase tracking-[0.2em] text-black/60 hover:text-black inline-flex items-center gap-2"
           >
-            Continue shopping <span aria-hidden="true">›</span>
+            Continue shopping <span aria-hidden="true">&rsaquo;</span>
           </Link>
         </div>
 
@@ -199,7 +205,7 @@ export default function OrdersPage() {
                     setSearch(e.target.value);
                     setPage(1);
                   }}
-                  placeholder="Search order ID..."
+                  placeholder="Search order ID or product..."
                   className="mt-2 w-full rounded-sm border border-black/20 px-3 py-2 text-sm outline-none focus:border-black"
                 />
               </div>
@@ -242,23 +248,30 @@ export default function OrdersPage() {
                 <Link
                   key={order.id}
                   href={`/user/orders/${order.id || order.order_id}`}
-                  className="rounded-sm border border-black/10 bg-gray-50 p-4 flex flex-col gap-2 md:flex-row md:items-center md:justify-between hover:border-black/40 transition cursor-pointer"
+                  className="rounded-sm border border-black/10 bg-gray-50 p-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between hover:border-black/40 transition cursor-pointer"
                 >
-                  <div>
+                  <div className="min-w-0">
                     <p className="text-sm font-semibold">
                       {order.id || order.order_id}
                     </p>
                     <p className="text-xs text-black/50">
                       {order.date || order.created_at}
                     </p>
-                    {order.product_name && (
-                      <p className="text-xs text-black/60">
-                        {order.product_name}
+                    <p className="mt-1 text-xs text-black/60">
+                      {order.product_name || "Order item"}
+                      {order.product_variant ? ` - ${order.product_variant}` : ""}
+                      {order.items_count
+                        ? ` (${order.items_count} item${order.items_count > 1 ? "s" : ""})`
+                        : ""}
+                    </p>
+                  </div>
+                  <div className="text-sm text-black/60 md:text-center">
+                    <p>{order.status || "Processing"}</p>
+                    {order.payment_status && (
+                      <p className="text-xs text-black/45">
+                        Payment: {order.payment_status}
                       </p>
                     )}
-                  </div>
-                  <div className="text-sm text-black/60">
-                    {order.status || "Processing"}
                   </div>
                   <div className="text-sm font-semibold">
                     {formatMoney(order.total || order.amount, order.currency)}

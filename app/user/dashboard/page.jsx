@@ -9,6 +9,17 @@ import { apiFetch } from "@/utils/api";
 const formatMoney = (value, currency = "INR") =>
   `${currency === "INR" ? "₹" : currency} ${Number(value ?? 0) || 0}`;
 
+const normalizeOrder = (order, currency = "INR") => ({
+  id: order.id || order.order_id,
+  date: order.placed_on || order.date || order.created_at || "",
+  status: order.status || "Processing",
+  payment_status: order.payment_status || "",
+  total: formatMoney(order.total ?? order.amount, order.currency || currency),
+  product_name: order.product_name || "",
+  product_variant: order.product_variant || order.variant_name || "",
+  items_count: order.items_count ?? order.items?.length ?? 0,
+});
+
 export default function DashboardPage() {
   const router = useRouter();
   const { isAuthenticated, loading } = useAuth();
@@ -39,17 +50,23 @@ export default function DashboardPage() {
       setDashboardLoading(true);
       setDashboardError("");
       try {
-        const [dashboardRes, addressRes] = await Promise.all([
+        const [dashboardRes, addressRes, ordersRes] = await Promise.all([
           apiFetch("/user/dashboard"),
           apiFetch("/addresses"),
+          apiFetch("/orders?page=1&limit=5"),
         ]);
         if (!active) return;
 
         const dashboard = dashboardRes?.data || dashboardRes || {};
+        const ordersPayload = ordersRes?.data || ordersRes || {};
         const nextStats = dashboard.stats || {};
         const currency = nextStats.currency || "INR";
+        const orderItems = Array.isArray(ordersPayload.items)
+          ? ordersPayload.items
+          : dashboard.recent_orders || [];
+
         setStats([
-          { label: "Total orders", value: String(nextStats.total_orders ?? 0) },
+          { label: "Total orders", value: String(nextStats.total_orders ?? orderItems.length ?? 0) },
           {
             label: "Orders in transit",
             value: String(nextStats.active_orders ?? 0),
@@ -63,14 +80,7 @@ export default function DashboardPage() {
             value: formatMoney(nextStats.total_spent, currency),
           },
         ]);
-        setRecentOrders(
-          (dashboard.recent_orders || []).map((order) => ({
-            id: order.id || order.order_id,
-            date: order.placed_on || order.date || order.created_at || "",
-            status: order.status || "Processing",
-            total: formatMoney(order.total, order.currency || currency),
-          })),
-        );
+        setRecentOrders(orderItems.slice(0, 5).map((order) => normalizeOrder(order, currency)));
         setAddresses(Array.isArray(addressRes) ? addressRes : addressRes?.data || []);
       } catch (err) {
         if (active) {
@@ -129,7 +139,7 @@ export default function DashboardPage() {
         </div>
 
         <div className="mt-10 grid gap-6 lg:grid-cols-[1.4fr_0.6fr]">
-          <div className=" py-8">
+          <div className="py-8">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-xs uppercase tracking-[0.093em] text-black/80">
@@ -149,13 +159,27 @@ export default function DashboardPage() {
                 <Link
                   key={order.id}
                   href={`/user/orders/${order.id}`}
-                  className="rounded-sm shadow-sm bg-gray-50 p-4 flex flex-col gap-2 md:flex-row md:items-center md:justify-between hover:border-black/30 border border-transparent transition cursor-pointer"
+                  className="rounded-sm shadow-sm bg-gray-50 p-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between hover:border-black/30 border border-transparent transition cursor-pointer"
                 >
-                  <div>
+                  <div className="min-w-0">
                     <p className="text-sm font-semibold">{order.id}</p>
                     <p className="text-xs text-black/50">{order.date}</p>
+                    <p className="mt-1 text-xs text-black/60">
+                      {order.product_name || "Order item"}
+                      {order.product_variant ? ` - ${order.product_variant}` : ""}
+                      {order.items_count
+                        ? ` (${order.items_count} item${order.items_count > 1 ? "s" : ""})`
+                        : ""}
+                    </p>
                   </div>
-                  <div className="text-sm text-black/60">{order.status}</div>
+                  <div className="text-sm text-black/60 md:text-center">
+                    <p>{order.status}</p>
+                    {order.payment_status && (
+                      <p className="text-xs text-black/45">
+                        Payment: {order.payment_status}
+                      </p>
+                    )}
+                  </div>
                   <div className="text-sm font-semibold">{order.total}</div>
                 </Link>
               ))}

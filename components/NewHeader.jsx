@@ -24,11 +24,39 @@ export default function NewHeader() {
   const [isOfferOpen, setIsOfferOpen] = useState(true);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
+  const [searchPagination, setSearchPagination] = useState(null);
+  const [searchLoading, setSearchLoading] = useState(false);
+  const [searchError, setSearchError] = useState("");
   const profileRef = useRef(null);
+  const searchRef = useRef(null);
   const { isAuthenticated, user, loading, authLoading, logout } = useAuth();
   const [cartCount, setCartCount] = useState(0);
   const [headerCategories, setHeaderCategories] = useState([]);
   const closeShopDropdown = () => setIsShopOpen(false);
+
+  const closeSearch = () => {
+    setIsSearchOpen(false);
+    setSearchError("");
+  };
+
+  const submitSearch = (e) => {
+    e?.preventDefault();
+    const query = searchQuery.trim();
+    if (!query) return;
+    closeSearch();
+    router.push(`/shop?search=${encodeURIComponent(query)}`);
+  };
+
+  const openProduct = (product) => {
+    const slugOrId = product.slug || product.id;
+    if (!slugOrId) return;
+    closeSearch();
+    setSearchQuery("");
+    router.push(`/product/${slugOrId}`);
+  };
 
   const handleLogout = async () => {
     setIsLoggingOut(true);
@@ -50,6 +78,27 @@ export default function NewHeader() {
     }
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [isProfileOpen]);
+
+  useEffect(() => {
+    function handleClickOutside(e) {
+      if (searchRef.current && !searchRef.current.contains(e.target)) {
+        closeSearch();
+      }
+    }
+
+    function handleEscape(e) {
+      if (e.key === "Escape") closeSearch();
+    }
+
+    if (isSearchOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+      document.addEventListener("keydown", handleEscape);
+    }
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleEscape);
+    };
+  }, [isSearchOpen]);
 
   useEffect(() => {
     const syncCartCount = () => {
@@ -89,6 +138,48 @@ export default function NewHeader() {
     };
     loadHeader();
   }, []);
+
+  useEffect(() => {
+    const query = searchQuery.trim();
+    if (!isSearchOpen || query.length < 2) {
+      setSearchResults([]);
+      setSearchPagination(null);
+      setSearchError("");
+      setSearchLoading(false);
+      return;
+    }
+
+    let active = true;
+    const loadResults = async () => {
+      setSearchLoading(true);
+      setSearchError("");
+      try {
+        const params = new URLSearchParams({
+          q: query,
+          page: "1",
+          limit: "10",
+        });
+        const data = await apiFetch(`/products/search?${params.toString()}`);
+        if (!active) return;
+        const payload = data?.data || data || {};
+        setSearchResults(Array.isArray(payload.items) ? payload.items : []);
+        setSearchPagination(payload.pagination || null);
+      } catch (e) {
+        if (!active) return;
+        setSearchResults([]);
+        setSearchPagination(null);
+        setSearchError(e?.message || "Unable to search products.");
+      } finally {
+        if (active) setSearchLoading(false);
+      }
+    };
+
+    const timer = window.setTimeout(loadResults, 250);
+    return () => {
+      active = false;
+      window.clearTimeout(timer);
+    };
+  }, [isSearchOpen, searchQuery]);
 
   return (
     <header
@@ -216,17 +307,110 @@ export default function NewHeader() {
 
               {/* Search, login/profile, cart */}
               <div className="flex items-center gap-3 lg:gap-4">
-                <button
-                  type="button"
-                  className="hidden sm:inline-flex items-center justify-center cursor-pointer"
-                  aria-label="Search"
-                >
-                  <img
-                    src="/icons/search.svg"
-                    className="h-8 w-8 lg:h-9 lg:w-9"
-                    alt="Search"
-                  />
-                </button>
+                <div className="relative" ref={searchRef}>
+                  <button
+                    type="button"
+                    className="inline-flex items-center justify-center cursor-pointer"
+                    aria-label="Search"
+                    aria-expanded={isSearchOpen}
+                    onClick={() => {
+                      setIsSearchOpen((prev) => !prev);
+                      setIsShopOpen(false);
+                    }}
+                  >
+                    <img
+                      src="/icons/search.svg"
+                      className="h-8 w-8 lg:h-9 lg:w-9"
+                      alt="Search"
+                    />
+                  </button>
+
+                  {isSearchOpen && (
+                    <div className="absolute right-0 top-full z-50 mt-4 w-[min(92vw,420px)] rounded-sm border border-black/10 bg-white shadow-2xl">
+                      <form onSubmit={submitSearch} className="p-4">
+                        <label className="text-xs uppercase tracking-[0.12em] text-black/50">
+                          Search products
+                        </label>
+                        <div className="mt-2 flex items-center gap-2 border-b border-black/20 pb-2">
+                          <input
+                            autoFocus
+                            type="search"
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            placeholder="Search kahwa..."
+                            className="min-w-0 flex-1 bg-transparent text-sm text-black outline-none placeholder:text-black/40"
+                          />
+                          <button
+                            type="submit"
+                            className="shrink-0 rounded-full bg-black px-4 py-2 text-xs font-semibold uppercase tracking-[0.08em] text-white disabled:opacity-40"
+                            disabled={!searchQuery.trim()}
+                          >
+                            Search
+                          </button>
+                        </div>
+                      </form>
+
+                      <div className="max-h-[380px] overflow-y-auto px-2 pb-2">
+                        {searchQuery.trim().length < 2 ? (
+                          <p className="px-2 py-4 text-sm text-black/50">
+                            Type at least 2 characters to search.
+                          </p>
+                        ) : searchLoading ? (
+                          <p className="px-2 py-4 text-sm text-black/50">
+                            Searching products...
+                          </p>
+                        ) : searchError ? (
+                          <p className="px-2 py-4 text-sm text-red-600">
+                            {searchError}
+                          </p>
+                        ) : searchResults.length === 0 ? (
+                          <p className="px-2 py-4 text-sm text-black/50">
+                            No products found.
+                          </p>
+                        ) : (
+                          <div className="grid gap-1">
+                            {searchResults.map((product) => (
+                              <button
+                                key={product.id || product.slug}
+                                type="button"
+                                onClick={() => openProduct(product)}
+                                className="flex w-full items-center gap-3 rounded-sm px-2 py-3 text-left hover:bg-black/5"
+                              >
+                                <div className="h-14 w-14 shrink-0 rounded-sm bg-gray-50 p-1">
+                                  {product.img ? (
+                                    <img
+                                      src={product.img}
+                                      alt={product.name}
+                                      className="h-full w-full object-contain"
+                                    />
+                                  ) : null}
+                                </div>
+                                <div className="min-w-0 flex-1">
+                                  <p className="truncate text-sm font-semibold text-black">
+                                    {product.name}
+                                  </p>
+                                  <p className="truncate text-xs text-black/55">
+                                    {product.variant_name || "View product"}
+                                  </p>
+                                </div>
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+
+                      {searchPagination?.total_items > searchResults.length && (
+                        <button
+                          type="button"
+                          onClick={submitSearch}
+                          className="w-full border-t border-black/10 px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.08em] text-black hover:bg-black/5"
+                        >
+                          View all {searchPagination.total_items} results
+                        </button>
+                      )}
+                    </div>
+                  )}
+                </div>
 
                 <div
                   className="relative hidden sm:flex items-center"

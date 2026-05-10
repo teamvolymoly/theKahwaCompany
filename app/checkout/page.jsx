@@ -140,22 +140,68 @@ export default function CheckoutPage() {
       document.body.appendChild(script);
     });
 
+  const normalizePaymentAttempt = (payload) => {
+    const data = payload?.data || payload || {};
+    const rawId = data.id || data.order?.id || "";
+    const rawOrderId =
+      data.razorpay_order_id ||
+      data.razorpayOrderId ||
+      data.razorpay_order?.id ||
+      data.razorpayOrder?.id ||
+      data.order_id;
+    const razorpayOrderId =
+      rawOrderId ||
+      (String(rawId).startsWith("order_") ? rawId : "") ||
+      data.razorpay?.order_id ||
+      "";
+    const paymentAttemptId =
+      data.payment_attempt_id ||
+      data.paymentAttemptId ||
+      data.payment_attempt?.id ||
+      data.payment?.payment_attempt_id ||
+      data.payment?.id ||
+      (typeof data.payment_attempt !== "object" ? data.payment_attempt : "") ||
+      data.attempt_id ||
+      data.payment_id ||
+      data.order_id ||
+      (!String(rawId).startsWith("order_") ? rawId : "");
+
+    return {
+      ...data,
+      payment_attempt_id: paymentAttemptId,
+      razorpay_order_id: razorpayOrderId,
+      amount: data.amount || data.razorpay?.amount,
+      currency: data.currency || data.razorpay?.currency || "INR",
+      key: data.key || data.razorpay_key || data.key_id,
+    };
+  };
+
   const getOrderQuery = (orderId) =>
     orderId ? `?order_id=${encodeURIComponent(orderId)}` : "";
 
-  const markPaymentSuccess = async (orderId) => {
-    if (!orderId) return;
-    await apiFetch(`/payments/success/${orderId}`);
+  const getPaymentAttemptQuery = (paymentAttemptId) =>
+    paymentAttemptId
+      ? `?payment_attempt_id=${encodeURIComponent(paymentAttemptId)}`
+      : "";
+
+  const logPaymentFailure = async (attempt, failure = {}) => {
+    if (!attempt?.payment_attempt_id) return;
+    await apiFetch("/razorpay/failure", {
+      method: "POST",
+      body: JSON.stringify({
+        payment_attempt_id: attempt.payment_attempt_id,
+        razorpay_order_id: attempt.razorpay_order_id,
+        razorpay_payment_id: failure?.metadata?.payment_id || failure?.payment_id || "",
+        code: failure?.code || "",
+        reason: failure?.reason || failure?.description || "Payment failed",
+        description: failure?.description || failure?.message || "",
+      }),
+    });
   };
 
-  const markPaymentFailed = async (orderId) => {
-    if (!orderId) return;
-    await apiFetch(`/payments/failed/${orderId}`);
-  };
-
-  const tryMarkPaymentFailed = async (orderId) => {
+  const tryLogPaymentFailure = async (attempt, failure) => {
     try {
-      await markPaymentFailed(orderId);
+      await logPaymentFailure(attempt, failure);
     } catch {
       // Keep the user moving to the failed-payment page even if status logging fails.
     }
@@ -165,8 +211,10 @@ export default function CheckoutPage() {
     window.location.href = `/payment-success${getOrderQuery(orderId)}`;
   };
 
-  const redirectPaymentFailed = (orderId) => {
-    window.location.href = `/payment-failed${getOrderQuery(orderId)}`;
+  const redirectPaymentFailed = (paymentAttemptId) => {
+    window.location.href = `/payment-failed${getPaymentAttemptQuery(
+      paymentAttemptId,
+    )}`;
   };
 
   const handlePayNow = async () => {
@@ -192,27 +240,36 @@ export default function CheckoutPage() {
     }
     try {
       const orderPayload = {
+        amount: total,
+        currency: totals.currency || "INR",
         address_id: selectedAddressId,
         contact: deliveryPhone || profile.phone,
         name: profile.name,
         email: profile.email,
       };
-      const order = await apiFetch("/razorpay/order", {
+      const attemptResponse = await apiFetch("/razorpay/order", {
         method: "POST",
         body: JSON.stringify(orderPayload),
       });
-      if (!order?.razorpay_order_id) {
-        throw new Error("Razorpay order id is missing.");
+      const attempt = normalizePaymentAttempt(attemptResponse);
+      if (!attempt?.razorpay_order_id || !attempt?.payment_attempt_id) {
+        const keys = Object.keys(attemptResponse?.data || attemptResponse || {});
+        throw new Error(
+          `Payment attempt response is missing ${
+            !attempt?.razorpay_order_id
+              ? "razorpay_order_id"
+              : "payment_attempt_id"
+          }. Response keys: ${keys.join(", ") || "none"}.`,
+        );
       }
-      const appOrderId = order?.order_id;
 
       const options = {
-        key: order?.key || process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
-        amount: order?.amount,
-        currency: order?.currency || "INR",
+        key: attempt?.key || process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+        amount: attempt?.amount,
+        currency: attempt?.currency || "INR",
         name: "The Kahwa Company",
         description: "Order payment",
-        order_id: order?.razorpay_order_id,
+        order_id: attempt?.razorpay_order_id,
         prefill: {
           name: profile.name,
           email: profile.email,
@@ -220,24 +277,37 @@ export default function CheckoutPage() {
         },
         notes: {
           address_id: String(selectedAddressId),
-          order_id: order?.order_id || "",
+          payment_attempt_id: String(attempt.payment_attempt_id),
         },
         handler: async (response) => {
           try {
-            await apiFetch("/razorpay/verify", {
+            const verified = await apiFetch("/razorpay/verify", {
               method: "POST",
               body: JSON.stringify({
+                payment_attempt_id: attempt.payment_attempt_id,
                 razorpay_order_id: response.razorpay_order_id,
                 razorpay_payment_id: response.razorpay_payment_id,
                 razorpay_signature: response.razorpay_signature,
               }),
             });
-            await markPaymentSuccess(appOrderId);
-            redirectPaymentSuccess(appOrderId);
+            const realOrderId =
+              verified?.order_id ||
+              verified?.data?.order_id ||
+              verified?.order?.id ||
+              attempt.order_id;
+            if (!realOrderId) {
+              throw new Error("Order id is missing after payment verification.");
+            }
+            localStorage.setItem("cart_count", "0");
+            window.dispatchEvent(new Event("cartchange"));
+            redirectPaymentSuccess(realOrderId);
           } catch (err) {
             setPaymentError(err?.message || "Payment verification failed.");
-            await tryMarkPaymentFailed(appOrderId);
-            redirectPaymentFailed(appOrderId);
+            await tryLogPaymentFailure(attempt, {
+              reason: "Payment verification failed",
+              description: err?.message || "",
+            });
+            redirectPaymentFailed(attempt.payment_attempt_id);
           }
         },
         modal: {
@@ -256,8 +326,8 @@ export default function CheckoutPage() {
           resp?.error?.description || "Payment failed. Please try again.",
         );
         setProcessingPayment(false);
-        await tryMarkPaymentFailed(appOrderId);
-        redirectPaymentFailed(appOrderId);
+        await tryLogPaymentFailure(attempt, resp?.error || {});
+        redirectPaymentFailed(attempt.payment_attempt_id);
       });
       razorpay.open();
     } catch (err) {

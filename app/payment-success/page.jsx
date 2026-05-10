@@ -192,6 +192,8 @@ export default function PaymentSuccessPage() {
         setDelivery(details.delivery);
         setItems(details.items);
         setBill(details.bill);
+        localStorage.setItem("cart_count", "0");
+        window.dispatchEvent(new Event("cartchange"));
       } catch (err) {
         setDetailsError(err?.message || "Unable to load payment details.");
       } finally {

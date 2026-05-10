@@ -11,22 +11,37 @@ const formatMoney = (value) => {
 
 const normalizeFailedPaymentDetails = (payload, orderId) => {
   const data = payload?.data || payload || {};
-  const order = data.order || data.payment || data;
-  const totals = data.totals || data.summary || data.bill || order;
+  const payment = data.payment || data.order || data;
+  const customer = data.customer || {};
+  const totals = data.totals || data.summary || data.bill || payment;
   const products = data.items || data.products || data.order_items || [];
-  const total = totals.final_total ?? totals.total ?? order.total ?? order.amount;
+  const total =
+    totals.final_total ?? totals.total ?? payment.total ?? payment.amount;
 
   return {
     order: {
-      id: order.order_id || order.id || orderId || "Order",
-      attemptedOn: order.attempted_at || order.created_at || order.date || "",
-      paymentMethod: order.payment_method || "Razorpay",
+      id:
+        payment.payment_attempt_id ||
+        payment.id ||
+        payment.razorpay_order_id ||
+        orderId ||
+        "Payment attempt",
+      razorpayOrderId: payment.razorpay_order_id || "",
+      attemptedOn:
+        payment.attempted_at || payment.created_at || payment.date || "",
+      paymentMethod: payment.payment_method || "Razorpay",
       total: formatMoney(total),
-      email: order.email || data.email || "",
-      phone: order.contact || order.phone || data.contact || data.phone || "",
+      email: customer.email || payment.email || data.email || "",
+      phone:
+        customer.phone ||
+        payment.contact ||
+        payment.phone ||
+        data.contact ||
+        data.phone ||
+        "",
       failureReason:
         data.failure_reason ||
-        order.failure_reason ||
+        payment.failure_reason ||
         data.message ||
         "Payment authorization failed. Please try again.",
     },
@@ -74,10 +89,12 @@ export default function PaymentFailedPage() {
   const [detailsError, setDetailsError] = useState("");
 
   useEffect(() => {
-    const orderId = new URLSearchParams(window.location.search).get("order_id");
-    if (!orderId) {
+    const params = new URLSearchParams(window.location.search);
+    const paymentAttemptId =
+      params.get("payment_attempt_id") || params.get("order_id");
+    if (!paymentAttemptId) {
       setLoadingDetails(false);
-      setDetailsError("Order id is missing.");
+      setDetailsError("Payment attempt id is missing.");
       return;
     }
 
@@ -85,8 +102,8 @@ export default function PaymentFailedPage() {
       setLoadingDetails(true);
       setDetailsError("");
       try {
-        const payload = await apiFetch(`/payments/failed/${orderId}`);
-        const details = normalizeFailedPaymentDetails(payload, orderId);
+        const payload = await apiFetch(`/payments/failed/${paymentAttemptId}`);
+        const details = normalizeFailedPaymentDetails(payload, paymentAttemptId);
         setOrder(details.order);
         setItems(details.items);
       } catch (err) {
@@ -128,10 +145,20 @@ export default function PaymentFailedPage() {
             <div className="mt-4 grid gap-4 sm:grid-cols-2 text-sm text-black/70">
               <div>
                 <p className="text-xs uppercase tracking-[0.2em] text-black/50">
-                  Order ID
+                  Attempt ID
                 </p>
                 <p className="mt-1 font-semibold text-black">{order.id}</p>
               </div>
+              {order.razorpayOrderId && (
+                <div>
+                  <p className="text-xs uppercase tracking-[0.2em] text-black/50">
+                    Razorpay order
+                  </p>
+                  <p className="mt-1 font-semibold text-black">
+                    {order.razorpayOrderId}
+                  </p>
+                </div>
+              )}
               <div>
                 <p className="text-xs uppercase tracking-[0.2em] text-black/50">
                   Attempted on
@@ -188,7 +215,7 @@ export default function PaymentFailedPage() {
 
           <div className="rounded-sm border border-black/10 bg-gray-50 p-6 shadow-sm">
             <p className="text-xs uppercase tracking-[0.2em] text-black/50">
-              Items in this order
+              Items in this payment attempt
             </p>
             <div className="mt-4 space-y-4">
               {items.map((item) => (
@@ -217,8 +244,7 @@ export default function PaymentFailedPage() {
               ))}
             </div>
             <p className="mt-6 text-xs text-black/50">
-              Your order is reserved. Complete payment within 30 minutes to
-              avoid cancellation.
+              Your cart is still available. Retry payment when you are ready.
             </p>
           </div>
         </div>
