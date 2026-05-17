@@ -20,6 +20,121 @@ const normalizeOrder = (order, currency = "INR") => ({
   items_count: order.items_count ?? order.items?.length ?? 0,
 });
 
+const EMPTY_REVIEW_FORM = {
+  rating: 5,
+  title: "",
+  comment: "",
+};
+
+const normalizeReviewItem = (item) => ({
+  order_id: item.order_id,
+  order_item_id: item.order_item_id,
+  product_id: item.product_id,
+  variant_id: item.variant_id,
+  product_name: item.product_name || "",
+  variant_name: item.variant_name || "",
+  image: item.image || "",
+  delivered_date: item.delivered_date || "",
+  can_review: Boolean(item.can_review),
+  reason: item.reason || "",
+  review: item.review || null,
+});
+
+const isPaidDeliveredOrder = (order) =>
+  String(order?.status || "").toLowerCase() === "delivered" &&
+  (!order?.payment_status ||
+    String(order.payment_status).toLowerCase() === "paid");
+
+const ReviewModal = ({
+  form,
+  item,
+  loading,
+  message,
+  onChange,
+  onClose,
+  onSubmit,
+}) => {
+  if (!item) return null;
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-6"
+      role="dialog"
+      aria-modal="true"
+    >
+      <div className="relative w-full max-w-lg rounded-sm bg-white p-6 shadow-lg">
+        <button
+          type="button"
+          onClick={onClose}
+          className="absolute right-4 top-4 rounded-full border border-black/20 px-3 py-1 text-xs uppercase tracking-[0.08em] text-black/70 hover:border-black"
+        >
+          Close
+        </button>
+        <p className="text-xs uppercase tracking-[0.12em] text-black/50">
+          Product review
+        </p>
+        <h2 className="mt-2 pr-16 text-xl font-semibold text-black">
+          {item.product_name}
+        </h2>
+        <p className="mt-1 text-sm text-black/55">{item.variant_name}</p>
+        <form onSubmit={onSubmit} className="mt-6 grid gap-4">
+          <div>
+            <label className="text-xs uppercase tracking-[0.12em] text-black/50">
+              Rating
+            </label>
+            <select
+              name="rating"
+              value={form.rating}
+              onChange={onChange}
+              className="mt-2 w-full rounded-sm border border-black/20 px-3 py-2 text-sm outline-none focus:border-black"
+            >
+              {[5, 4, 3, 2, 1].map((rating) => (
+                <option key={rating} value={rating}>
+                  {rating} star{rating > 1 ? "s" : ""}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="text-xs uppercase tracking-[0.12em] text-black/50">
+              Title
+            </label>
+            <input
+              name="title"
+              value={form.title}
+              onChange={onChange}
+              placeholder="Loved it"
+              className="mt-2 w-full rounded-sm border border-black/20 px-3 py-2 text-sm outline-none focus:border-black"
+            />
+          </div>
+          <div>
+            <label className="text-xs uppercase tracking-[0.12em] text-black/50">
+              Comment
+            </label>
+            <textarea
+              name="comment"
+              value={form.comment}
+              onChange={onChange}
+              required
+              rows={5}
+              placeholder="Tell us what you thought."
+              className="mt-2 w-full rounded-sm border border-black/20 px-3 py-2 text-sm outline-none focus:border-black"
+            />
+          </div>
+          {message && <p className="text-sm text-black/60">{message}</p>}
+          <button
+            type="submit"
+            disabled={loading}
+            className="rounded-full bg-black px-6 py-3 text-xs font-semibold uppercase tracking-[0.08em] text-white disabled:opacity-60"
+          >
+            {loading ? "Saving..." : "Submit review"}
+          </button>
+        </form>
+      </div>
+    </div>
+  );
+};
+
 export default function DashboardPage() {
   const router = useRouter();
   const { isAuthenticated, loading } = useAuth();
@@ -30,6 +145,11 @@ export default function DashboardPage() {
     { label: "Amount spent", value: "₹ 0" },
   ]);
   const [recentOrders, setRecentOrders] = useState([]);
+  const [reviewItems, setReviewItems] = useState([]);
+  const [reviewItem, setReviewItem] = useState(null);
+  const [reviewForm, setReviewForm] = useState(EMPTY_REVIEW_FORM);
+  const [reviewSaving, setReviewSaving] = useState(false);
+  const [reviewMessage, setReviewMessage] = useState("");
   const [addresses, setAddresses] = useState([]);
   const [dashboardLoading, setDashboardLoading] = useState(true);
   const [dashboardError, setDashboardError] = useState("");
@@ -50,10 +170,11 @@ export default function DashboardPage() {
       setDashboardLoading(true);
       setDashboardError("");
       try {
-        const [dashboardRes, addressRes, ordersRes] = await Promise.all([
+        const [dashboardRes, addressRes, ordersRes, reviewsRes] = await Promise.all([
           apiFetch("/user/dashboard"),
           apiFetch("/addresses"),
           apiFetch("/orders?page=1&limit=5"),
+          apiFetch("/reviews/eligible").catch(() => null),
         ]);
         if (!active) return;
 
@@ -81,6 +202,13 @@ export default function DashboardPage() {
           },
         ]);
         setRecentOrders(orderItems.slice(0, 5).map((order) => normalizeOrder(order, currency)));
+        const eligibleItems = reviewsRes?.items || reviewsRes?.data?.items || [];
+        setReviewItems(
+          eligibleItems
+            .map(normalizeReviewItem)
+            .filter((item) => item.can_review)
+            .slice(0, 4),
+        );
         setAddresses(Array.isArray(addressRes) ? addressRes : addressRes?.data || []);
       } catch (err) {
         if (active) {
@@ -96,6 +224,51 @@ export default function DashboardPage() {
       active = false;
     };
   }, [loading, isAuthenticated]);
+
+  const openReviewModal = (item) => {
+    setReviewItem(item);
+    setReviewForm(EMPTY_REVIEW_FORM);
+    setReviewMessage("");
+  };
+
+  const handleReviewChange = (event) => {
+    const { name, value } = event.target;
+    setReviewForm((prev) => ({
+      ...prev,
+      [name]: name === "rating" ? Number(value) : value,
+    }));
+  };
+
+  const handleReviewSubmit = async (event) => {
+    event.preventDefault();
+    if (!reviewItem?.order_item_id) return;
+    setReviewSaving(true);
+    setReviewMessage("");
+    try {
+      await apiFetch("/reviews", {
+        method: "POST",
+        body: JSON.stringify({
+          order_item_id: reviewItem.order_item_id,
+          rating: reviewForm.rating,
+          title: reviewForm.title,
+          comment: reviewForm.comment,
+        }),
+      });
+      setReviewItems((prev) =>
+        prev.filter((item) => item.order_item_id !== reviewItem.order_item_id),
+      );
+      setReviewMessage("Review submitted. It will appear after approval.");
+    } catch (err) {
+      const message = err?.message || "Unable to save review.";
+      setReviewMessage(
+        message.toLowerCase().includes("not found")
+          ? "Review API is not available on the live server yet. Please confirm /api/reviews is deployed."
+          : message,
+      );
+    } finally {
+      setReviewSaving(false);
+    }
+  };
 
   return (
     <main className="min-h-screen bg-white text-black mt-14">
@@ -138,6 +311,69 @@ export default function DashboardPage() {
           ))}
         </div>
 
+        <div className="mt-10 rounded-sm border border-black/10 bg-white p-6 shadow-sm">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+              <div>
+                <p className="text-xs uppercase tracking-[0.093em] text-black/80">
+                  Give review
+                </p>
+                <h2 className="mt-2 text-xl font-semibold">
+                  Delivered items waiting for feedback
+                </h2>
+              </div>
+              <Link
+                href="/user/orders"
+                className="self-start rounded-sm border border-black/60 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-black hover:border-black"
+              >
+                View delivered orders
+              </Link>
+            </div>
+            {reviewItems.length > 0 ? (
+              <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+                {reviewItems.map((item) => (
+                  <div
+                    key={item.order_item_id}
+                    className="rounded-sm border border-black/10 bg-gray-50 p-4"
+                  >
+                    <div className="flex gap-3">
+                      <div className="h-16 w-16 shrink-0 rounded-sm bg-white p-2">
+                        {item.image ? (
+                          <img
+                            src={item.image}
+                            alt={item.product_name}
+                            className="h-full w-full object-contain"
+                          />
+                        ) : null}
+                      </div>
+                      <div className="min-w-0">
+                        <p className="truncate text-sm font-semibold text-black">
+                          {item.product_name}
+                        </p>
+                        <p className="text-xs text-black/60">
+                          {item.variant_name}
+                        </p>
+                        <p className="mt-1 text-xs text-black/45">
+                          Delivered {item.delivered_date || "-"}
+                        </p>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => openReviewModal(item)}
+                      className="mt-4 w-full rounded-full border border-black px-4 py-2 text-xs font-semibold uppercase tracking-[0.08em] text-black hover:bg-black hover:text-white"
+                    >
+                      Give review
+                    </button>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="mt-4 text-sm text-black/60">
+                Delivered products that can be reviewed will appear here. You can also open any delivered order to review its items.
+              </p>
+            )}
+          </div>
+
         <div className="mt-10 grid gap-6 lg:grid-cols-[1.4fr_0.6fr]">
           <div className="py-8">
             <div className="flex items-center justify-between">
@@ -177,6 +413,11 @@ export default function DashboardPage() {
                     {order.payment_status && (
                       <p className="text-xs text-black/45">
                         Payment: {order.payment_status}
+                      </p>
+                    )}
+                    {isPaidDeliveredOrder(order) && (
+                      <p className="mt-2 text-xs font-semibold uppercase tracking-[0.08em] text-black">
+                        Give review
                       </p>
                     )}
                   </div>
@@ -219,6 +460,15 @@ export default function DashboardPage() {
           </div>
         </div>
       </section>
+      <ReviewModal
+        form={reviewForm}
+        item={reviewItem}
+        loading={reviewSaving}
+        message={reviewMessage}
+        onChange={handleReviewChange}
+        onClose={() => setReviewItem(null)}
+        onSubmit={handleReviewSubmit}
+      />
     </main>
   );
 }

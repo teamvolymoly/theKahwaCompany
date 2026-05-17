@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useParams } from "next/navigation";
+import Link from "next/link";
 import { apiFetch } from "@/utils/api";
 import { dummyProducts, dummyReviews } from "@/utils/dummyData";
 import ProductCard from "@/components/ProductCard";
@@ -1225,12 +1226,12 @@ export default function ProductDetail() {
                     })}
                   </div>
 
-                  <button
-                    type="button"
-                    className="mt-6 w-full rounded-sm border border-black/20 bg-white px-4 py-3 text-xs uppercase tracking-[0.08em] font-semibold text-black/80 transition hover:border-black/40 cursor-pointer"
+                  <Link
+                    href="/user/orders"
+                    className="mt-6 inline-flex w-full justify-center rounded-sm border border-black/20 bg-white px-4 py-3 text-xs font-semibold uppercase tracking-[0.08em] text-black/80 transition hover:border-black/40"
                   >
-                    Write a review
-                  </button>
+                    Review delivered orders
+                  </Link>
                 </div>
 
                 <div className="space-y-5">
