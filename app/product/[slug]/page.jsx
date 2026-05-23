@@ -23,6 +23,8 @@ const normalizeReview = (review) => ({
   images: Array.isArray(review.images) ? review.images : [],
 });
 
+const sampleReviews = dummyReviews.slice(0, 2).map(normalizeReview);
+
 export default function ProductDetail() {
   const { slug } = useParams();
   const [product, setProduct] = useState(null);
@@ -106,24 +108,32 @@ export default function ProductDetail() {
           ? reviewRes.items
           : normalized.reviews?.items;
         const reviewSummary = reviewRes?.summary || normalized.reviews || {};
+        const normalizedReviewItems = Array.isArray(reviewItems)
+          ? reviewItems.map(normalizeReview)
+          : [];
+        const displayReviews =
+          normalizedReviewItems.length > 0
+            ? normalizedReviewItems
+            : sampleReviews;
         setProduct({
           ...normalized,
           reviews: {
             ...reviewSummary,
             average_rating:
-              reviewSummary.average_rating ?? reviewSummary.rating ?? 0,
+              reviewSummary.average_rating ??
+              reviewSummary.rating ??
+              (displayReviews.length
+                ? displayReviews.reduce((sum, r) => sum + (r.rating || 0), 0) /
+                  displayReviews.length
+                : 0),
             count:
               reviewSummary.total_reviews ??
               reviewSummary.count ??
-              reviewItems?.length ??
+              displayReviews.length ??
               0,
           },
         });
-        setReviews(
-          Array.isArray(reviewItems)
-            ? reviewItems.map(normalizeReview)
-            : dummyReviews,
-        );
+        setReviews(displayReviews);
       } catch (err) {
         alert(err?.message || "Product not found.");
         const normalizedFallback = {
@@ -136,7 +146,7 @@ export default function ProductDetail() {
         setActiveImage(0);
         setVariants(normalizedFallback.variants || []);
         setSelectedVariant((normalizedFallback.variants || [])[0] ?? null);
-        setReviews(dummyReviews);
+        setReviews(sampleReviews);
       }
     };
     if (slug) load();
