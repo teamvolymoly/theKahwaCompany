@@ -1,9 +1,7 @@
 import "./globals.css";
 import { Inter, Baskervville } from "next/font/google";
 import { AuthProvider } from "./context/AuthContext";
-import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import AddBar from "@/components/AddBar";
 import NewHeader from "@/components/NewHeader";
 import ToastHost from "@/components/ToastHost";
 
@@ -33,8 +31,6 @@ export default function RootLayout({ children }) {
         className={`${inter.variable} ${baskervville.variable} antialiased`}
       >
         <AuthProvider>
-          {/* <AddBar /> */}
-          {/* <Header /> */}
           <NewHeader />
           <ToastHost />
           {children}

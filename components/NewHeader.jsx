@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/app/context/AuthContext";
-import { Squash as Hamburger, Squash } from "hamburger-react";
+import { Squash } from "hamburger-react";
 import { apiFetch } from "@/utils/api";
 
 const toCategoryParam = (value) =>
@@ -279,10 +279,6 @@ export default function NewHeader() {
                   </svg>
                 </button>
                 <div className="hidden md:inline-flex items-center cursor-pointer">
-                  {/* <MenuButton
-                  isOpen={isShopOpen}
-                  onToggle={() => setIsShopOpen((prev) => !prev)}
-                /> */}
                   <Squash
                     toggled={isShopOpen}
                     toggle={setIsShopOpen}
