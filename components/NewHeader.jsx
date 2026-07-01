@@ -259,7 +259,7 @@ export default function NewHeader() {
               <div className="flex items-center gap-3 lg:gap-4">
                 <button
                   type="button"
-                  className="md:hidden inline-flex items-center justify-center rounded border border-gray-300 p-2"
+                  className="md:hidden inline-flex items-center justify-center  p-2"
                   aria-label="Open menu"
                   aria-expanded={isOpen}
                   onClick={() => setIsOpen((prev) => !prev)}
@@ -303,10 +303,13 @@ export default function NewHeader() {
 
               {/* Search, login/profile, cart */}
               <div className="flex items-center gap-3 lg:gap-4">
-                <div className="relative" ref={searchRef}>
+                <div
+                  className="relative inline-flex items-center justify-center cursor-pointer"
+                  ref={searchRef}
+                >
                   <button
                     type="button"
-                    className="inline-flex items-center justify-center cursor-pointer"
+                    className=" "
                     aria-label="Search"
                     aria-expanded={isSearchOpen}
                     onClick={() => {
@@ -316,13 +319,18 @@ export default function NewHeader() {
                   >
                     <img
                       src="/icons/search.svg"
-                      className="h-8 w-8 lg:h-9 lg:w-9"
+                      className="h-10 w-8 lg:h-9 lg:w-9"
                       alt="Search"
                     />
                   </button>
 
                   {isSearchOpen && (
-                    <div className="absolute right-0 top-full z-50 mt-4 w-[min(92vw,420px)] rounded-sm border border-black/10 bg-white shadow-2xl">
+                    <div
+                      className="fixed inset-x-4 top-20 z-50
+    sm:absolute sm:inset-x-auto sm:top-full sm:right-0 sm:mt-4
+    sm:w-96
+    rounded-sm border border-black/10 bg-white shadow-2xl bg-white"
+                    >
                       <form onSubmit={submitSearch} className="p-4">
                         <label className="text-xs uppercase tracking-[0.12em] text-black/50">
                           Search products
@@ -491,7 +499,7 @@ export default function NewHeader() {
                 isOpen ? "max-h-[760px] opacity-100" : "max-h-0 opacity-0"
               }`}
             >
-              <div className="border-t border-gray-200 py-4">
+              <div className="border-t border-gray-800 py-4">
                 <nav className="flex flex-col gap-4 text-sm font-medium">
                   <Link
                     href="/"
@@ -547,7 +555,7 @@ export default function NewHeader() {
                       ))}
                     </div>
                   </details>
-                  <details className="group">
+                  {/* <details className="group">
                     <summary className="flex cursor-pointer list-none items-center justify-between hover:text-gray-700">
                       Gifts
                       <svg
@@ -587,7 +595,7 @@ export default function NewHeader() {
                         Press
                       </Link>
                     </div>
-                  </details>
+                  </details> */}
                   {!loading && isAuthenticated ? (
                     <div className="pt-4 border-t border-gray-200">
                       <Link
@@ -611,7 +619,14 @@ export default function NewHeader() {
                         {isLoggingOut ? "Logging out..." : "Logout"}
                       </button>
                     </div>
-                  ) : null}
+                  ) : (
+                    <Link
+                      href="/auth/login"
+                      className="block py-2 text-gray-700 hover:text-gray-900"
+                    >
+                      Login / Sign Up
+                    </Link>
+                  )}
                 </nav>
               </div>
             </div>

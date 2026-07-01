@@ -25,7 +25,6 @@ const normalizePriceRange = (range) => {
 export default function ShopClient() {
   const searchParams = useSearchParams();
   const [products, setProducts] = useState([]);
-  const [filteredProducts, setFilteredProducts] = useState([]);
   const [filters, setFilters] = useState({
     categories: [],
     subcategories: [],
@@ -166,7 +165,6 @@ export default function ShopClient() {
           };
         });
         setProducts(normalized);
-        setFilteredProducts(normalized);
         setPagination(
           data?.pagination || {
             page,
@@ -178,7 +176,6 @@ export default function ShopClient() {
       } catch (err) {
         setError(err?.message || "Failed to load products.");
         setProducts([]);
-        setFilteredProducts([]);
         setPagination({ page: 1, limit, total_items: 0, total_pages: 1 });
       } finally {
         setLoading(false);
@@ -690,7 +687,7 @@ export default function ShopClient() {
             <div className="flex-1">
               <div className="mb-8 mt-[2px] flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <p className="text-sm text-black/60">
-                  Showing {filteredProducts.length} of{" "}
+                  Showing {products.length} of{" "}
                   {pagination.total_items} products
                 </p>
                 <div className="flex items-center gap-3 text-sm text-[#4e5a50]">
@@ -745,13 +742,13 @@ export default function ShopClient() {
                     Loading products...
                   </div>
                 )}
-                {!loading && filteredProducts.length === 0 && (
+                {!loading && products.length === 0 && (
                   <div className="col-span-full text-sm text-black/60">
                     No products found for these filters.
                   </div>
                 )}
                 {!loading &&
-                  filteredProducts.map((p) => (
+                  products.map((p) => (
                     <ProductCard key={p.id} product={p} />
                   ))}
               </div>

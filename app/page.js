@@ -4,7 +4,7 @@ import Link from "next/link";
 
 import { apiFetch } from "@/utils/api";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Navigation, Pagination, EffectFade, Autoplay } from "swiper/modules";
+import { Navigation, Pagination } from "swiper/modules";
 import { useEffect, useState } from "react";
 import "swiper/css";
 import "swiper/css/navigation";
@@ -12,23 +12,12 @@ import "swiper/css/pagination";
 import HeroSection from "@/components/HeroSection";
 import ProductCard from "@/components/ProductCard";
 
-const toSlug = (value) =>
-  value
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/(^-|-$)/g, "");
-
 export default function Home() {
   const [categories, setCategories] = useState([]);
   const [products, setProducts] = useState([]);
   const [blogPosts, setBlogPosts] = useState([]);
   const [loadingProducts, setLoadingProducts] = useState(false);
   const [loadingCategories, setLoadingCategories] = useState(false);
-  const slides = [
-    { title: "Slider 1", image: "./products/W1.png" },
-    { title: "Slider 2", image: "./products/W2.png" },
-    { title: "Slider 3", image: "./products/W3.png" },
-  ];
   const testimonials = [
     {
       name: "Wendy Rose",
@@ -154,62 +143,6 @@ export default function Home() {
     <>
       <main>
         <HeroSection />
-        {/* Hero Section old */}
-        {/* <section id="home" className="w-full">
-          <Swiper
-            modules={[Navigation, Pagination, EffectFade, Autoplay]}
-            slidesPerView={1}
-            spaceBetween={0}
-            navigation
-            pagination={{ clickable: true }}
-            effect="fade"
-            fadeEffect={{ crossFade: true }}
-            loop
-            autoplay={{ delay: 4500, disableOnInteraction: false }}
-            speed={900}
-            className="w-full hero-swiper"
-          >
-            {slides.map((slide) => (
-              <SwiperSlide key={slide.title}>
-                <article
-                  className="hero-slide relative w-full min-h-[70vh] h-[600px] flex items-center justify-center bg-center bg-cover"
-                  style={{ backgroundImage: `url(${slide.image})` }}
-                >
-                  <div className="absolute inset-0 bg-gradient-to-br from-black/90 via-black/70 to-black/30" />
-                  <div className="relative container mx-auto px-4 py-12 sm:px-6 lg:px-12">
-                    <div className="max-w-2xl text-white">
-                      <p className="text-xs uppercase tracking-[0.4em] mb-4 sm:text-sm text-[#FFBF00]">
-                        {slide.title}
-                      </p>
-                      <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-semibold mb-6">
-                        Elevate your kahwa ritual
-                      </h1>
-                      <p className="text-sm sm:text-base text-white/75 max-w-xl">
-                        Small-batch blends crafted with saffron, cardamom, and
-                        slow-brewed warmth. Discover signatures and seasonal
-                        infusions.
-                      </p>
-                      <div className="mt-8 flex flex-wrap gap-4">
-                        <Link
-                          href="/shop"
-                          className="inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-xs sm:text-sm font-semibold uppercase tracking-[0.25em] text-black"
-                        >
-                          Shop blends
-                        </Link>
-                        <Link
-                          href="#about"
-                          className="inline-flex items-center gap-2 rounded-full border border-white/70 px-6 py-3 text-xs sm:text-sm font-semibold uppercase tracking-[0.25em] text-white hover:border-white"
-                        >
-                          Our story
-                        </Link>
-                      </div>
-                    </div>
-                  </div>
-                </article>
-              </SwiperSlide>
-            ))}
-          </Swiper>
-        </section> */}
 
         {/* About Kahwa Section */}
         <section
@@ -299,8 +232,6 @@ export default function Home() {
               modules={[Navigation, Pagination]}
               slidesPerView={1.1}
               spaceBetween={18}
-              // navigation
-              // pagination={{ clickable: false }}
               breakpoints={{
                 640: { slidesPerView: 2.1, spaceBetween: 22 },
                 1024: { slidesPerView: 3.2, spaceBetween: 26 },
@@ -471,153 +402,6 @@ export default function Home() {
           </div>
         </section>
 
-        {/* products section -- 1 */}
-        {/* <section id="blends" className="bg-[#fbf8f2]">
-          <div className="container mx-auto px-4 py-16">
-            <div className="text-center mb-10">
-              <p className="text-xs uppercase tracking-[0.3em] text-[#7a634b] mb-3">
-                KAHWA BLENDS
-              </p>
-              <h2 className="text-3xl md:text-4xl font-semibold text-[#2f241b]">
-                Explore our range
-              </h2>
-            </div>
-
-            <Swiper
-              modules={[Navigation, Pagination]}
-              slidesPerView={1.1}
-              spaceBetween={20}
-              navigation
-              pagination={{ clickable: true }}
-              breakpoints={{
-                640: { slidesPerView: 2.1, spaceBetween: 24 },
-                1024: { slidesPerView: 3.2, spaceBetween: 28 },
-                1280: { slidesPerView: 4, spaceBetween: 32 },
-              }}
-              className="kahwa-products-swiper pb-12"
-            >
-              {products.map((product) => (
-                <SwiperSlide key={`blend-${product.name}`}>
-                  <Link
-                    href={`/product/${toSlug(product.name)}`}
-                    className="group h-full rounded-3xl bg-white/70 p-5 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl"
-                  >
-                    <div className="relative rounded-2xl bg-white p-5">
-                      <span className="absolute left-4 top-4 rounded-full bg-[#FFBF00] px-3 py-1 text-[10px] font-semibold uppercase tracking-widest text-black">
-                        {product.badge}
-                      </span>
-                      <img
-                        src={product.image}
-                        alt={product.name}
-                        className="mx-auto h-52 w-auto object-contain transition duration-300 group-hover:scale-[1.03]"
-                      />
-                    </div>
-                    <div className="mt-5">
-                      <div className="flex items-center gap-2 text-xs text-[#FFBF00]">
-                        <span className="tracking-[0.2em] uppercase">
-                          {product.subtitle}
-                        </span>
-                      </div>
-                      <h3 className="mt-2 text-lg font-semibold text-[#2f241b]">
-                        {product.name}
-                      </h3>
-                      <div className="mt-3 flex items-center gap-2 text-sm text-[#7a634b]">
-                        <span className="text-[#2f241b] font-semibold">
-                          {product.price}
-                        </span>
-                        <span className="line-through">{product.oldPrice}</span>
-                      </div>
-                      <div className="mt-2 flex items-center gap-2 text-xs text-[#7a634b]">
-                        <span>{"?".repeat(5)}</span>
-                        <span>({product.reviews})</span>
-                      </div>
-                      <span className="mt-4 inline-flex w-full items-center justify-center rounded-full border border-[#2f241b] px-4 py-2 text-xs font-semibold uppercase tracking-widest text-[#2f241b] transition group-hover:bg-[#2f241b] group-hover:text-white">
-                        View product
-                      </span>
-                    </div>
-                  </Link>
-                </SwiperSlide>
-              ))}
-            </Swiper>
-          </div>
-        </section> */}
-
-        {/* products section -- 3 */}
-        {/* <section id="bestsellers" className="bg-white">
-          <div className="container mx-auto px-4 py-16">
-            <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
-              <h2 className="text-3xl md:text-4xl font-semibold text-[#2f241b]">
-                Bestselling Teas
-              </h2>
-              <Link
-                href="/shop"
-                className="self-start rounded-full border border-[#2f241b] px-5 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-[#2f241b]"
-              >
-                View all products
-              </Link>
-            </div>
-
-            <Swiper
-              modules={[Navigation]}
-              slidesPerView={1.1}
-              spaceBetween={20}
-              navigation
-              breakpoints={{
-                640: { slidesPerView: 2.1, spaceBetween: 24 },
-                1024: { slidesPerView: 3.1, spaceBetween: 28 },
-                1280: { slidesPerView: 4, spaceBetween: 32 },
-              }}
-              className="kahwa-cards-swiper mt-10"
-            >
-              {products.map((product) => (
-                <SwiperSlide key={`cards-${product.name}`}>
-                  <Link
-                    href={`/product/${toSlug(product.name)}`}
-                    className="h-full rounded-3xl border border-gray-100 bg-white p-6 shadow-sm"
-                  >
-                    <div className="flex items-start justify-between">
-                      <span className="rounded-full bg-[#FFBF00] px-3 py-1 text-[10px] font-semibold uppercase tracking-widest text-black">
-                        {product.badge}
-                      </span>
-                      <button
-                        type="button"
-                        className="rounded-full border border-gray-200 p-2 text-gray-500"
-                        aria-label="Add to wishlist"
-                      >
-                        ?
-                      </button>
-                    </div>
-                    <div className="mt-6 flex items-center justify-center">
-                      <img
-                        src={product.image}
-                        alt={product.name}
-                        className="h-44 w-auto object-contain"
-                      />
-                    </div>
-                    <div className="mt-6">
-                      <div className="text-xs text-[#7a634b]">
-                        {"?".repeat(5)} ({product.reviews})
-                      </div>
-                      <h3 className="mt-2 text-lg font-semibold text-[#2f241b]">
-                        {product.name}
-                      </h3>
-                      <div className="mt-3 flex items-center gap-2 text-sm text-[#7a634b]">
-                        <span className="text-[#2f241b] font-semibold">
-                          {product.price}
-                        </span>
-                        <span className="line-through">{product.oldPrice}</span>
-                      </div>
-                    </div>
-                    <span className="mt-6 inline-flex w-full items-center justify-center rounded-full bg-[#2f241b] px-4 py-2 text-xs font-semibold uppercase tracking-widest text-white transition hover:bg-[#1f1711]">
-                      View product
-                    </span>
-                  </Link>
-                </SwiperSlide>
-              ))}
-            </Swiper>
-          </div>
-        </section> */}
-
         {/* Blog section */}
         <section id="blog" className="bg-white">
           <div className="container mx-auto px-4 py-16">
@@ -726,37 +510,17 @@ export default function Home() {
       </main>
 
       <style jsx global>{`
-        .kahwa-products-swiper .swiper-button-next,
-        .kahwa-products-swiper .swiper-button-prev {
-          color: #2f241b;
-        }
-
-        .kahwa-products-swiper .swiper-pagination-bullet {
-          background: #cbb89f;
-          opacity: 1;
-        }
-
-        .kahwa-products-swiper .swiper-pagination-bullet-active {
-          background: #7a634b;
-          width: 18px;
-          border-radius: 999px;
-        }
-
         .kahwa-tiles-swiper .swiper-button-next,
-        .kahwa-tiles-swiper .swiper-button-prev,
-        .kahwa-cards-swiper .swiper-button-next,
-        .kahwa-cards-swiper .swiper-button-prev {
+        .kahwa-tiles-swiper .swiper-button-prev {
           color: #2f241b;
         }
 
-        .kahwa-tiles-swiper .swiper-pagination-bullet,
-        .kahwa-cards-swiper .swiper-pagination-bullet {
+        .kahwa-tiles-swiper .swiper-pagination-bullet {
           background: #d5c6b4;
           opacity: 1;
         }
 
-        .kahwa-tiles-swiper .swiper-pagination-bullet-active,
-        .kahwa-cards-swiper .swiper-pagination-bullet-active {
+        .kahwa-tiles-swiper .swiper-pagination-bullet-active {
           background: #2f241b;
         }
       `}</style>

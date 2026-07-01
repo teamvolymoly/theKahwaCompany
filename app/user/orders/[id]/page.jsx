@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
-import { jsPDF } from "jspdf";
 import { useAuth } from "@/app/context/AuthContext";
 import { apiFetch } from "@/utils/api";
 
@@ -335,6 +334,7 @@ export default function OrderDetailPage() {
   const handleDownloadInvoice = async () => {
     if (!order) return;
 
+    const { jsPDF } = await import("jspdf");
     const logoDataUrl = await fetchImageAsDataURL("/logo/LOGO_TKC-02.png");
     const doc = new jsPDF({ unit: "pt", format: "a4" });
     const pageWidth = doc.internal.pageSize.getWidth();

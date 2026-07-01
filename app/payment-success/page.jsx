@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { jsPDF } from "jspdf";
 import { apiFetch } from "@/utils/api";
 
 const formatMoney = (value) => {
@@ -215,6 +214,7 @@ export default function PaymentSuccessPage() {
   };
 
   const handleDownloadInvoice = async () => {
+    const { jsPDF } = await import("jspdf");
     const logoDataUrl = await fetchImageAsDataURL("/logo/LOGO_TKC-02.png");
     const doc = new jsPDF({ unit: "pt", format: "a4" });
     const pageWidth = doc.internal.pageSize.getWidth();

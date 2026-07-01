@@ -30,7 +30,7 @@ export default function AboutPage() {
           <div className="rounded-3xl border border-black/10 bg-white p-8 shadow-sm">
             <h2 className="text-xl font-semibold">A ritual from Kashmir</h2>
             <p className="mt-4 text-sm text-black/60">
-              Kahwa is more than a tea - it's a tradition. We source fine green
+              Kahwa is more than a tea - it&apos;s a tradition. We source fine green
               tea leaves, saffron, and whole spices to craft blends that honor
               Kashmiri hospitality while feeling modern and uplifting.
             </p>

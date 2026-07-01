@@ -25,7 +25,7 @@ export function AuthProvider({ children }) {
   const [authLoading, setAuthLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const setToken = (nextToken) => {
+  const setToken = useCallback((nextToken) => {
     if (nextToken) {
       localStorage.setItem("auth_token", nextToken);
       setTokenState(nextToken);
@@ -33,7 +33,7 @@ export function AuthProvider({ children }) {
       localStorage.removeItem("auth_token");
       setTokenState(null);
     }
-  };
+  }, []);
 
   const reloadUser = useCallback(async () => {
     const stored = localStorage.getItem("auth_token");
@@ -57,16 +57,21 @@ export function AuthProvider({ children }) {
       setLoading(false);
       return null;
     }
-  }, []);
+  }, [setToken]);
 
   useEffect(() => {
-    reloadUser();
+    const initialReload = window.setTimeout(() => {
+      reloadUser();
+    }, 0);
     const handleStorage = () => reloadUser();
     window.addEventListener("storage", handleStorage);
-    return () => window.removeEventListener("storage", handleStorage);
+    return () => {
+      window.clearTimeout(initialReload);
+      window.removeEventListener("storage", handleStorage);
+    };
   }, [reloadUser]);
 
-  const login = async ({ email, password }) => {
+  const login = useCallback(async ({ email, password }) => {
     setAuthLoading(true);
     setError(null);
     try {
@@ -89,9 +94,9 @@ export function AuthProvider({ children }) {
       setError(err?.message || "Login failed");
       return { ok: false, error: err };
     }
-  };
+  }, [reloadUser, setToken]);
 
-  const logout = async () => {
+  const logout = useCallback(async () => {
     setAuthLoading(true);
     try {
       await apiFetch("/auth/logout", { method: "POST" });
@@ -101,9 +106,9 @@ export function AuthProvider({ children }) {
     setUser(null);
     setToken(null);
     setAuthLoading(false);
-  };
+  }, [setToken]);
 
-  const refresh = async () => {
+  const refresh = useCallback(async () => {
     setAuthLoading(true);
     try {
       const res = await apiFetch("/auth/refresh", { method: "POST" });
@@ -115,11 +120,16 @@ export function AuthProvider({ children }) {
       setAuthLoading(false);
       return { ok: false, error: err };
     }
-  };
+  }, [setToken]);
 
-  const hasRole = (roleName) => user?.roles?.includes(roleName);
-  const hasAnyRole = (...roleNames) =>
-    user?.roles?.some((r) => roleNames.includes(r));
+  const hasRole = useCallback(
+    (roleName) => user?.roles?.includes(roleName),
+    [user],
+  );
+  const hasAnyRole = useCallback(
+    (...roleNames) => user?.roles?.some((r) => roleNames.includes(r)),
+    [user],
+  );
 
   const value = useMemo(
     () => ({
@@ -137,7 +147,20 @@ export function AuthProvider({ children }) {
       hasRole,
       hasAnyRole,
     }),
-    [user, token, loading, authLoading, error]
+    [
+      user,
+      token,
+      loading,
+      authLoading,
+      error,
+      login,
+      logout,
+      refresh,
+      reloadUser,
+      setToken,
+      hasRole,
+      hasAnyRole,
+    ],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

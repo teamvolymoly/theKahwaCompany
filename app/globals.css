@@ -49,35 +49,6 @@ body {
   font-family: var(--font-body);
 }
 
-/* Hero swiper styling */
-.hero-swiper .swiper-button-next,
-.hero-swiper .swiper-button-prev {
-  color: #fff !important;
-  width: 44px;
-  height: 44px;
-  border: 1px solid rgba(255, 255, 255, 0.7);
-  border-radius: 999px;
-  backdrop-filter: blur(6px);
-  background: rgba(0, 0, 0, 0.35);
-}
-.hero-swiper .swiper-button-next::after,
-.hero-swiper .swiper-button-prev::after {
-  font-size: 14px;
-  font-weight: 700;
-  color: #fff !important;
-}
-.hero-swiper .swiper-pagination-bullet {
-  width: 10px;
-  height: 10px;
-  background: rgba(255, 255, 255, 0.4) !important;
-  opacity: 1;
-  border: 1px solid rgba(255, 255, 255, 0.7);
-}
-.hero-swiper .swiper-pagination-bullet-active {
-  background: #fff;
-  border-color: #fff;
-}
-
 /* Testimonials swiper styling */
 .testimonials-swiper .swiper-button-next,
 .testimonials-swiper .swiper-button-prev {
@@ -93,20 +64,6 @@ body {
   font-size: 14px;
   font-weight: 700;
 }
-.hero-slide {
-  background-color: #000;
-  background-blend-mode: luminosity;
-  animation: hero-zoom 8s ease-out forwards;
-}
-@keyframes hero-zoom {
-  from {
-    background-size: 105%;
-  }
-  to {
-    background-size: 115%;
-  }
-}
-
 @theme inline {
   --font-heading: var(--font-sans);
   --font-sans: var(--font-sans);

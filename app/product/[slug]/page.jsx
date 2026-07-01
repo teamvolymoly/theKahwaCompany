@@ -236,19 +236,20 @@ export default function ProductDetail() {
       const cart = await apiFetch("/cart");
       const cartItems = Array.isArray(cart?.items) ? cart.items : [];
       const targetVariantId = Number(selectedVariant?.id);
-      const alreadyInCart = cartItems.some(
-        (item) => {
-          const itemVariantId = Number(item?.variant_id || item?.variant?.id);
-          if (Number.isFinite(itemVariantId) && Number.isFinite(targetVariantId)) {
-            return itemVariantId === targetVariantId;
-          }
-          return (
-            item.product_name === product?.name &&
-            (item.variant_name || item?.variant?.variant_name || "") ===
-              (selectedVariant?.variant_name || selectedVariant?.name || "")
-          );
-        },
-      );
+      const alreadyInCart = cartItems.some((item) => {
+        const itemVariantId = Number(item?.variant_id || item?.variant?.id);
+        if (
+          Number.isFinite(itemVariantId) &&
+          Number.isFinite(targetVariantId)
+        ) {
+          return itemVariantId === targetVariantId;
+        }
+        return (
+          item.product_name === product?.name &&
+          (item.variant_name || item?.variant?.variant_name || "") ===
+            (selectedVariant?.variant_name || selectedVariant?.name || "")
+        );
+      });
       if (alreadyInCart) {
         window.dispatchEvent(
           new CustomEvent("toast", {
@@ -426,6 +427,7 @@ export default function ProductDetail() {
           image: item.image_url || "",
         }))
       : [];
+
   const ingredients =
     ingredientsFromApi.length > 0 ? ingredientsFromApi : fallbackIngredients;
   const useIngredientSwiper = ingredients.length > 1;
@@ -451,7 +453,6 @@ export default function ProductDetail() {
       </div>
     );
   }
-
   return (
     <>
       <main className="bg-white text-black mt-22">
@@ -593,57 +594,45 @@ export default function ProductDetail() {
           </div>
         </section>
 
-        <section className="relative overflow-hidden">
-          <div className="container mx-auto px-4 lg:px-8 mx-auto pt-8  pb-12 lg:pb-16 grid gap-10 lg:grid-cols-[110px_1.1fr_1fr]">
-            <div className="order-2 flex gap-3 overflow-x-auto pb-2 lg:order-1 lg:flex-col lg:overflow-visible lg:pb-0">
-              {images.map((img, i) => (
-                <button
-                  key={img.id ?? i}
-                  onClick={() => setActiveImage(i)}
-                  className={`h-20 w-20 shrink-0 overflow-hidden rounded-sm border bg-white transition ${
-                    activeImage === i
-                      ? "border-black shadow-sm"
-                      : "border-black/10"
-                  }`}
-                  aria-label={`Show image ${i + 1}`}
-                >
-                  <img
-                    src={img.image_url}
-                    alt={`${product.name} thumbnail ${i + 1}`}
-                    className="h-full w-full object-cover"
-                  />
-                </button>
-              ))}
-            </div>
-
-            <div className="order-1 lg:order-2">
-              <div className="rounded-sm border border-black/10 bg-white p-6 shadow-[0_22px_60px_rgba(0,0,0,0.08)]">
+        <section className="relative overflow-hidden mx-auto px-4 lg:px-8">
+          <div className="container pt-4 pb-12 lg:pb-16 grid gap-8 lg:gap-10  grid-cols-1 lg:grid-cols-7">
+            <div className="order-1 lg:order-2 lg:col-span-3">
+              <div className="py-4 sm:py-6">
                 {mainImage ? (
                   <img
                     src={mainImage}
                     alt={product.name}
-                    className="h-[280px] sm:h-[360px] lg:h-[420px] w-full object-contain"
+                    className="h-[260px] w-full rounded-sm object-contain sm:h-[360px] lg:h-[420px] lg:object-cover cursor-pointer"
                   />
                 ) : (
-                  <div className="flex h-[420px] items-center justify-center text-sm text-black/50">
+                  <div className="flex h-[260px] sm:h-[360px] lg:h-[420px] items-center justify-center text-sm text-black/50">
                     No image available
                   </div>
                 )}
               </div>
-              {/* <div className="mt-6 flex flex-wrap gap-3 text-xs uppercase tracking-[0.3em] text-black/50">
-                <span className="rounded-full border border-black/10 bg-white px-4 py-2 text-[#FFBF00]">
-                  Small batch
-                </span>
-                <span className="rounded-full border border-black/10 bg-white px-4 py-2 text-[#FFBF00]">
-                  Organic leaves
-                </span>
-                <span className="rounded-full border border-black/10 bg-white px-4 py-2 text-[#FFBF00]">
-                  Hand picked
-                </span>
-              </div> */}
+              <div className="order-2 flex gap-3 overflow-x-auto pb-2 lg:order-1 lg:justify-between lg:overflow-visible lg:pb-0">
+                {images.map((img, i) => (
+                  <button
+                    key={img.id ?? i}
+                    onClick={() => setActiveImage(i)}
+                    className={`h-22 w-22 sm:h-22 sm:w-22 shrink-0 overflow-hidden rounded-sm border bg-white transition cursor-pointer ${
+                      activeImage === i
+                        ? "border-black shadow-sm"
+                        : "border-black/10"
+                    }`}
+                    aria-label={`Show image ${i + 1}`}
+                  >
+                    <img
+                      src={img.image_url}
+                      alt={`${product.name} thumbnail ${i + 1}`}
+                      className="h-full w-full object-cover"
+                    />
+                  </button>
+                ))}
+              </div>
             </div>
 
-            <div className="order-3">
+            <div className="order-3 lg:col-span-4">
               <div className="w-fit px-4 py-1 mt-4 text-sm bg-[#FFF1C3] text-yellow-600 uppercase tracking-[0.05em] rounded-sm">
                 {product.tag_line_1 ||
                   product.tag_line ||
@@ -696,9 +685,12 @@ export default function ProductDetail() {
                   className="text-4xl font-semibold text-[#1c2230]"
                   // style={{ fontFamily: "var(--font-basker)" }}
                 >
-                  {selectedVariant?.formatted_price || selectedVariant?.price ? (
+                  {selectedVariant?.formatted_price ||
+                  selectedVariant?.price ? (
                     <>
-                      ₹ {selectedVariant?.formatted_price ?? selectedVariant?.price}
+                      ₹{" "}
+                      {selectedVariant?.formatted_price ??
+                        selectedVariant?.price}
                     </>
                   ) : (
                     ""
@@ -759,39 +751,43 @@ export default function ProductDetail() {
                 </div>
               </div>
 
-              <div className="mt-6 flex flex-wrap justify-between items-center gap-4">
-                <p className="text-sm uppercase tracking-[0.08em] text-black/70">
-                  Quantity
-                </p>
-                <div className="flex items-center gap-3 rounded-sm border border-black/10 bg-white px-4 py-3">
-                  <button
-                    type="button"
-                    onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                    className="text-lg cursor-pointer"
-                    aria-label="Decrease quantity"
-                  >
-                    -
-                  </button>
-                  <input
-                    type="text"
-                    inputMode="numeric"
-                    pattern="[0-9]*"
-                    value={quantity}
-                    onChange={(e) => {
-                      const digitsOnly = e.target.value.replace(/\D/g, "");
-                      const next = parseInt(digitsOnly || "1", 10);
-                      setQuantity(Number.isFinite(next) && next > 0 ? next : 1);
-                    }}
-                    className="w-14 bg-transparent border-x border-black/10 text-center text-sm outline-none "
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setQuantity((q) => q + 1)}
-                    className="text-lg cursor-pointer"
-                    aria-label="Increase quantity"
-                  >
-                    +
-                  </button>
+              <div className="mt-6 flex w-full flex-col gap-4">
+                <div className="flex w-full items-center justify-between gap-4 sm:justify-start">
+                  <p className="text-sm uppercase tracking-[0.08em] text-black/70">
+                    Quantity
+                  </p>
+                  <div className="flex shrink-0 items-center gap-3 rounded-sm border border-black/10 bg-white px-4 py-3">
+                    <button
+                      type="button"
+                      onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+                      className="text-lg cursor-pointer"
+                      aria-label="Decrease quantity"
+                    >
+                      -
+                    </button>
+                    <input
+                      type="text"
+                      inputMode="numeric"
+                      pattern="[0-9]*"
+                      value={quantity}
+                      onChange={(e) => {
+                        const digitsOnly = e.target.value.replace(/\D/g, "");
+                        const next = parseInt(digitsOnly || "1", 10);
+                        setQuantity(
+                          Number.isFinite(next) && next > 0 ? next : 1,
+                        );
+                      }}
+                      className="w-10 bg-transparent border-x border-black/10 text-center text-sm outline-none sm:w-14"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setQuantity((q) => q + 1)}
+                      className="text-lg cursor-pointer"
+                      aria-label="Increase quantity"
+                    >
+                      +
+                    </button>
+                  </div>
                 </div>
                 {/* <button
                   type="button"
@@ -801,7 +797,7 @@ export default function ProductDetail() {
                 </button> */}
                 <button
                   onClick={addToCart}
-                  className="sm:w-auto md:w-full rounded-sm whitespace-nowrap bg-gradient-to-r from-[#7a8177] to-[#6a716a] px-8 py-4 text-sm font-semibold uppercase tracking-[0.15em] text-white transition hover:from-[#5f665e] hover:to-[#525a53] cursor-pointer"
+                  className="w-full rounded-sm whitespace-nowrap bg-gradient-to-r from-[#7a8177] to-[#6a716a] px-8 py-4 text-sm font-semibold uppercase tracking-[0.15em] text-white transition hover:from-[#5f665e] hover:to-[#525a53] cursor-pointer sm:w-fit md:w-full"
                 >
                   Add to cart
                 </button>
@@ -952,7 +948,7 @@ export default function ProductDetail() {
                     <img
                       src={img.image_url}
                       alt={`${product.name} gallery ${index + 1}`}
-                      className="h-full w-full object-cover "
+                      className="h-full w-full object-cover rounded-sm"
                     />
                   </button>
                 ))}
@@ -960,23 +956,23 @@ export default function ProductDetail() {
             </div>
 
             {hasRituals && (
-              <div className="space-y-6 mt-10">
+              <div className="space-y-6 mt-10 lg:mt-14">
                 <h3 className="text-2xl lg:text-3xl font-semibold">
                   Brewing Rituals
                 </h3>
-                <div className="grid gap-8 grid-cols-1 md:grid-cols-2">
+                <div className="grid grid-cols-1 gap-5 lg:grid-cols-2 lg:gap-6">
                   {hotRitualItems.length > 0 && (
-                    <div className="w-full text-black">
+                    <div className="w-full rounded-sm bg-gray-50 p-5 text-black">
                       <h4 className="text-lg font-semibold">
                         {hotGroup?.title || "Hot Brew"}
                       </h4>
-                      <div className="mt-4 grid gap-4 sm:grid-cols-2">
+                      <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
                         {hotRitualItems.map((item, index) => (
                           <div
                             key={`hot-ritual-${index}`}
-                            className="flex items-center gap-3 text-base text-black"
+                            className="flex min-w-0 items-center gap-3 text-sm sm:text-base text-black"
                           >
-                            <span className="flex h-14 w-14 items-center justify-center rounded-full bg-white">
+                            <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-white">
                               <img
                                 src={item.image_url || item.image}
                                 alt={
@@ -985,24 +981,26 @@ export default function ProductDetail() {
                                 className="h-10 w-10 object-contain"
                               />
                             </span>
-                            {item.text || item.description}
+                            <span className="min-w-0 flex-1 whitespace-normal break-words leading-relaxed">
+                              {item.text || item.description}
+                            </span>
                           </div>
                         ))}
                       </div>
                     </div>
                   )}
                   {icedRitualItems.length > 0 && (
-                    <div className="w-full text-black">
+                    <div className="w-full rounded-sm bg-gray-50 p-5 text-black">
                       <h4 className="text-lg font-semibold">
                         {icedGroup?.title || "Iced Brew"}
                       </h4>
-                      <div className="mt-4 flex flex-wrap gap-3">
+                      <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
                         {icedRitualItems.map((item, index) => (
                           <div
                             key={`iced-ritual-${index}`}
-                            className="flex items-center gap-3 text-base text-black"
+                            className="flex min-w-0 items-center gap-3 text-sm sm:text-base text-black"
                           >
-                            <span className="flex h-14 w-14 items-center justify-center rounded-full bg-white">
+                            <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-white">
                               <img
                                 src={item.image_url || item.image}
                                 alt={
@@ -1011,7 +1009,9 @@ export default function ProductDetail() {
                                 className="h-10 w-10 object-contain"
                               />
                             </span>
-                            {item.text || item.description}
+                            <span className="min-w-0 flex-1 whitespace-normal break-words leading-relaxed">
+                              {item.text || item.description}
+                            </span>
                           </div>
                         ))}
                       </div>
@@ -1021,14 +1021,40 @@ export default function ProductDetail() {
               </div>
             )}
 
-            <div className="space-y-4 mt-10">
+            <div className="space-y-4 mt-10 lg:mt-14">
               <div className="flex items-center justify-between">
                 <h3 className="text-2xl lg:text-3xl font-semibold">
                   Ingredients
                 </h3>
               </div>
 
-              <div className="flex items-center justify-between gap-2">
+              <div className="hidden grid-cols-2 gap-5 sm:grid-cols-3 lg:grid xl:grid-cols-4">
+                {ingredients.map((item) => (
+                  <div
+                    key={`desktop-${item.id}`}
+                    className="rounded-sm  bg-gray-50 p-4"
+                  >
+                    <div className="flex aspect-square items-center justify-center ">
+                      {item.image ? (
+                        <img
+                          src={item.image}
+                          alt={item.name}
+                          className="h-full w-full object-contain rounded-sm"
+                        />
+                      ) : (
+                        <div className="flex h-full w-full items-center justify-center text-xs text-black/40">
+                          No image
+                        </div>
+                      )}
+                    </div>
+                    <p className="mt-4 text-sm font-medium uppercase tracking-[0.08em] text-black">
+                      {item.name}
+                    </p>
+                  </div>
+                ))}
+              </div>
+
+              <div className="flex items-center justify-between gap-2 lg:hidden">
                 <button
                   type="button"
                   onClick={() => ingredientsRef.current?.slidePrev()}
@@ -1057,25 +1083,25 @@ export default function ProductDetail() {
                       1280: { slidesPerView: 4.2, spaceBetween: 10 },
                       1536: { slidesPerView: 5.2, spaceBetween: 10 },
                     }}
-                    className="pb-6"
+                    className="min-w-0 flex-1 pb-6"
                   >
                     {ingredients.map((item) => (
                       <SwiperSlide key={item.id}>
-                        <div className="w-full mr-0">
-                          <div className="w-full aspect-square p-4">
+                        <div className="w-full mr-0 rounded-sm border border-black/10 bg-gray-50 p-3">
+                          <div className="w-full aspect-square rounded-sm bg-white p-4">
                             {item.image ? (
                               <img
                                 src={item.image}
                                 alt={item.name}
-                                className="h-full w-full object-contain rounded-sm"
+                                className="h-full w-full object-contain"
                               />
                             ) : (
-                              <div className="flex h-full w-full items-center justify-center rounded-sm border border-black/10 bg-white text-xs text-black/40">
+                              <div className="flex h-full w-full items-center justify-center text-xs text-black/40">
                                 No image
                               </div>
                             )}
                           </div>
-                          <p className=" ms-4 text-sm uppercase tracking-[0.08em] text-black">
+                          <p className="mt-3 text-sm uppercase tracking-[0.08em] text-black">
                             {item.name}
                           </p>
                         </div>
@@ -1118,11 +1144,8 @@ export default function ProductDetail() {
               </div>
             </div>
 
-            <div className="mt-12 rounded-sm border border-black/10 bg-[#FBF9F2] p-6 lg:p-8">
+            <div className="mt-12">
               <div className="flex flex-col gap-2">
-                <p className="text-xs uppercase tracking-[0.3em] text-black/50">
-                  Need Help?
-                </p>
                 <h3 className="text-2xl lg:text-3xl font-semibold">FAQs</h3>
                 <p className="text-sm text-black/60">
                   Answers to the most common questions about this tea.
@@ -1132,13 +1155,15 @@ export default function ProductDetail() {
                 <div className="mt-6 divide-y divide-black/10 rounded-sm border border-black/10 bg-white">
                   {product.faqs.map((faq, index) => (
                     <details key={`faq-${index}`} className="group p-5">
-                      <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-sm font-semibold text-black">
+                      <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-sm font-semibold text-black bg-gray-50 p-4 rounded-sm transition group-open:bg-gray-100">
                         <span>{faq.question}</span>
                         <span className="text-black/40 transition group-open:rotate-45">
                           +
                         </span>
                       </summary>
-                      <p className="mt-3 text-sm text-black/70">{faq.answer}</p>
+                      <p className="mt-3 px-4 text-sm text-black/70">
+                        {faq.answer}
+                      </p>
                     </details>
                   ))}
                 </div>
