@@ -352,7 +352,8 @@ export default function HeroSection() {
           <h2>botanicals and tradition</h2>
         </div>
         <p className="font-thin text-base sm:text-md md:text-lg text-black/80">
-          Thoughtfully crafted with nature's finest ingredients to bring warmth,
+          Thoughtfully crafted with nature's finest ingredients to bring warmth,{" "}
+          <br />
           wellness, and mindful rituals to your everyday life.
         </p>
       </div>{" "}
@@ -406,7 +407,7 @@ export default function HeroSection() {
           Loading hero...
         </div>
       )}
-      <div className="absolute bottom-0 sm:bottom-0 md:bottom-10 lg:bottom-20 xl:bottom-30 z-10">
+      <div className="relative z-10 mb-10 -mt-8 md:absolute md:bottom-10 md:mb-0 md:mt-0 lg:bottom-20 xl:bottom-30">
         <Link href="/shop" className="cursor-pointer">
           <ShopNowButton className="cursor-pointer" />
         </Link>
