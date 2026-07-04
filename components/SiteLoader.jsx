@@ -32,7 +32,7 @@ export default function SiteLoader() {
 
   return (
     <div
-      className={`fixed inset-0 z-[9999] flex items-center justify-center bg-[#fbfaf5] transition-all duration-500 ${
+      className={`fixed inset-0 z-[9999] flex items-center justify-center bg-white transition-all duration-500 ${
         isExiting
           ? "pointer-events-none opacity-0 scale-105"
           : "opacity-100 scale-100"

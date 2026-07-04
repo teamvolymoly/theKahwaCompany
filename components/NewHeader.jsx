@@ -739,7 +739,7 @@ export default function NewHeader() {
                       onClick={closeShopDropdown}
                     >
                       <img
-                        src="/products/amazon/Resizing_Amazon5.png"
+                        src="/bg/TKC Website Images/Products Image.png"
                         alt="Kashmiri Kahwa"
                         className="h-full w-full object-cover transition-transform duration-300 hover:scale-105 "
                       />

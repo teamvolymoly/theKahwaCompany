@@ -347,14 +347,16 @@ export default function HeroSection() {
     >
       {/* Hero text */}
       <div className="relative z-10 text-center mt-20 sm:mt-24 lg:mt-28 flex flex-col gap-4 max-w-3xl px-4">
-        <div className="font-(family-name:--font-basker) uppercase text-2xl sm:text-3xl md:text-4xl mt-6 mb-6 text-[#1c2230] drop-shadow-sm">
-          <h2 className="mb-2">Discover a blend of</h2>
+        <div className="font-(family-name:--font-basker) uppercase text-2xl sm:text-3xl md:text-4xl mt-6 mb-4 text-[#1c2230] drop-shadow-sm">
+          <h2 className="mb-0 md:mb-2">Discover a blend of</h2>
           <h2>botanicals and tradition</h2>
         </div>
-        <p className="font-thin text-base sm:text-md md:text-lg text-black/80">
-          Thoughtfully crafted with nature's finest ingredients to bring warmth,{" "}
-          <br />
-          wellness, and mindful rituals to your everyday life.
+        <p className="font-thin text-base text-sm md:text-md md:text-lg text-black/80">
+          Thoughtfully crafted with nature's finest ingredients to bring warmth,
+          <span className=" md:block mt-0 md:mt-1">
+            {" "}
+            wellness, and mindful rituals to your everyday life.
+          </span>
         </p>
       </div>{" "}
       {/* Carousel */}
