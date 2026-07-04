@@ -4,13 +4,20 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { apiFetch } from "@/utils/api";
-import { dummyProducts, dummyReviews } from "@/utils/dummyData";
+import { dummyReviews } from "@/utils/dummyData";
 import ProductCard from "@/components/ProductCard";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
-import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
+import {
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  RotateCcwIcon,
+  XIcon,
+  ZoomInIcon,
+  ZoomOutIcon,
+} from "lucide-react";
 
 const normalizeReview = (review) => ({
   id: review.id,
@@ -28,26 +35,22 @@ const sampleReviews = dummyReviews.slice(0, 2).map(normalizeReview);
 export default function ProductDetail() {
   const { slug } = useParams();
   const [product, setProduct] = useState(null);
+  const [error, setError] = useState("");
   const [images, setImages] = useState([]);
   const [variants, setVariants] = useState([]);
   const [reviews, setReviews] = useState([]);
   const [selectedVariant, setSelectedVariant] = useState(null);
   const [quantity, setQuantity] = useState(1);
   const [activeImage, setActiveImage] = useState(0);
-  const ingredientsRef = useRef(null);
-  const galleryRef = useRef(null);
-  const brewingHotRef = useRef(null);
-  const brewingColdRef = useRef(null);
   const [previewIndex, setPreviewIndex] = useState(null);
+  const [previewZoom, setPreviewZoom] = useState(1);
+  const ingredientsRef = useRef(null);
   const [reviewPreview, setReviewPreview] = useState(null);
 
   useEffect(() => {
     const load = async () => {
       const safeSlug = Array.isArray(slug) ? slug[0] : slug;
-      const fallback =
-        dummyProducts.find(
-          (p) => p.slug === safeSlug || String(p.id) === String(safeSlug),
-        ) || dummyProducts[0];
+      setError("");
       try {
         const [prod, reviewRes] = await Promise.all([
           apiFetch(`/products/${encodeURIComponent(safeSlug)}`),
@@ -58,37 +61,17 @@ export default function ProductDetail() {
         if (!prod || !prod.id) {
           throw new Error("Product not found.");
         }
-        const resolved = prod || fallback;
         const normalized = {
-          ...fallback,
-          ...resolved,
-          tag_line_1:
-            resolved?.tag_line_1 ||
-            resolved?.tag_line ||
-            fallback.tag_line_1 ||
-            fallback.tag_line,
-          tag_line_2:
-            resolved?.tag_line_2 ||
-            resolved?.short_description ||
-            fallback.tag_line_2 ||
-            fallback.short_description,
-          images: Array.isArray(resolved?.images)
-            ? resolved.images
-            : fallback.images || [],
-          ingredients_list: Array.isArray(resolved?.ingredients_list)
-            ? resolved.ingredients_list
-            : fallback.ingredients_list || [],
-          variants: Array.isArray(resolved?.variants)
-            ? resolved.variants
-            : fallback.variants || [],
-          reviews: resolved?.reviews || fallback.reviews || {},
-          price: resolved?.price ?? fallback.price,
-          discount_price: resolved?.discount_price ?? fallback.discount_price,
-          compare_price: resolved?.compare_price ?? fallback.compare_price,
-          oldPrice:
-            resolved?.compare_price ??
-            resolved?.discount_price ??
-            fallback.oldPrice,
+          ...prod,
+          tag_line_1: prod.tag_line_1 || prod.tag_line || "",
+          tag_line_2: prod.tag_line_2 || prod.short_description || "",
+          images: Array.isArray(prod.images) ? prod.images : [],
+          ingredients_list: Array.isArray(prod.ingredients_list)
+            ? prod.ingredients_list
+            : [],
+          variants: Array.isArray(prod.variants) ? prod.variants : [],
+          reviews: prod.reviews || {},
+          oldPrice: prod.compare_price,
         };
 
         const imageList = normalized.images || [];
@@ -135,18 +118,13 @@ export default function ProductDetail() {
         });
         setReviews(displayReviews);
       } catch (err) {
-        alert(err?.message || "Product not found.");
-        const normalizedFallback = {
-          ...fallback,
-          tag_line_1: fallback.tag_line_1 || fallback.tag_line,
-          tag_line_2: fallback.tag_line_2 || fallback.short_description,
-        };
-        setProduct(normalizedFallback);
-        setImages(normalizedFallback.images || []);
+        setError(err?.message || "Product not found.");
+        setProduct(null);
+        setImages([]);
         setActiveImage(0);
-        setVariants(normalizedFallback.variants || []);
-        setSelectedVariant((normalizedFallback.variants || [])[0] ?? null);
-        setReviews(sampleReviews);
+        setVariants([]);
+        setSelectedVariant(null);
+        setReviews([]);
       }
     };
     if (slug) load();
@@ -282,58 +260,48 @@ export default function ProductDetail() {
     }
   };
 
-  const shareUrl = typeof window !== "undefined" ? window.location.href : "";
-  const shareText = encodeURIComponent(product?.name || "Check this product");
-
-  const handleShare = (platform) => {
-    if (!shareUrl) return;
-    const encodedUrl = encodeURIComponent(shareUrl);
-    let url = "";
-    if (platform === "facebook") {
-      url = `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`;
-    } else if (platform === "twitter") {
-      url = `https://twitter.com/intent/tweet?url=${encodedUrl}&text=${shareText}`;
-    } else if (platform === "whatsapp") {
-      url = `https://wa.me/?text=${shareText}%20${encodedUrl}`;
-    } else if (platform === "copy") {
-      navigator.clipboard?.writeText(shareUrl);
-      return;
-    }
-    if (url) window.open(url, "_blank", "noopener,noreferrer");
-  };
-
   const mainImage =
     images[activeImage]?.image_url || images[0]?.image_url || "";
-  const galleryImages =
-    images.length > 0
-      ? images
-      : [
-          { id: "g1", image_url: "/products/packets/11.png" },
-          { id: "g2", image_url: "/products/packets/12.png" },
-          { id: "g3", image_url: "/products/packets/13.png" },
-          { id: "g4", image_url: "/products/packets/14.png" },
-          { id: "g5", image_url: "/products/packets/15.png" },
-          { id: "g6", image_url: "/products/packets/16.png" },
-          { id: "g7", image_url: "/products/packets/17.png" },
-          { id: "g8", image_url: "/products/packets/18.png" },
-        ];
-  const isPreviewOpen = previewIndex !== null;
-  const currentPreview =
-    previewIndex !== null ? galleryImages[previewIndex] : null;
-  const isReviewPreviewOpen = reviewPreview !== null;
+  const previewImage =
+    previewIndex !== null ? images[previewIndex]?.image_url : "";
+  const isPreviewOpen = previewIndex !== null && Boolean(previewImage);
   const reviewImages = reviewPreview?.images || [];
-  const reviewImageIndex = reviewPreview?.index ?? 0;
+
+  const openPreview = (index = activeImage) => {
+    if (!images.length) return;
+    const safeIndex = Math.max(0, Math.min(index, images.length - 1));
+    setPreviewIndex(safeIndex);
+    setPreviewZoom(1);
+  };
+
+  const closePreview = () => {
+    setPreviewIndex(null);
+    setPreviewZoom(1);
+  };
+
+  const showPreviewImage = (index) => {
+    if (!images.length) return;
+    const nextIndex = (index + images.length) % images.length;
+    setPreviewIndex(nextIndex);
+    setActiveImage(nextIndex);
+    setPreviewZoom(1);
+  };
 
   const handlePrevPreview = () => {
     if (previewIndex === null) return;
-    setPreviewIndex(
-      (previewIndex - 1 + galleryImages.length) % galleryImages.length,
-    );
+    showPreviewImage(previewIndex - 1);
   };
 
   const handleNextPreview = () => {
     if (previewIndex === null) return;
-    setPreviewIndex((previewIndex + 1) % galleryImages.length);
+    showPreviewImage(previewIndex + 1);
+  };
+
+  const zoomPreview = (step) => {
+    setPreviewZoom((current) => {
+      const next = Math.round((current + step) * 100) / 100;
+      return Math.max(1, Math.min(3, next));
+    });
   };
 
   const handleOpenReviewPreview = (images, index) => {
@@ -383,43 +351,7 @@ export default function ProductDetail() {
   const icedRitualItems = icedGroup?.items || [];
   const hasRituals = productBrewingRituals.length > 0;
 
-  const ingredientsBase = [
-    {
-      name: "Chamomile Flower",
-      image:
-        "/products/Ingredient/Chamomile_FLower_8047e7b1-6c54-41fe-acbd-18bfb030db44.avif",
-    },
-    {
-      name: "Green Tea",
-      image:
-        "/products/Ingredient/Green_Tea_388daaf2-1c37-4633-87dd-56c85e28b05c.avif",
-    },
-    {
-      name: "Lemongrass",
-      image:
-        "/products/Ingredient/Lemongrass_9ef65a92-6a72-4453-9f4b-43502c336528.avif",
-    },
-    {
-      name: "Orange Peel",
-      image:
-        "/products/Ingredient/Orange_Peel_a61b1d6a-6890-43fd-bef5-86528a0bd763.avif",
-    },
-    {
-      name: "Peppermint",
-      image:
-        "/products/Ingredient/Peppermint_952ac752-d54d-4f23-8f76-d659cd96c75c.avif",
-    },
-    {
-      name: "Spearmint",
-      image:
-        "/products/Ingredient/Spearmint_3cecd63e-bcdd-4904-a59e-bf260f503075.avif",
-    },
-  ];
-  const fallbackIngredients = Array.from({ length: 10 }).map((_, index) => {
-    const item = ingredientsBase[index % ingredientsBase.length];
-    return { ...item, id: `ing-${index}-${item.name}` };
-  });
-  const ingredientsFromApi =
+  const ingredients =
     product?.ingredients_list?.length > 0
       ? product.ingredients_list.map((item, index) => ({
           id: `ing-${index}-${item.name || "ingredient"}`,
@@ -427,14 +359,13 @@ export default function ProductDetail() {
           image: item.image_url || "",
         }))
       : [];
-
-  const ingredients =
-    ingredientsFromApi.length > 0 ? ingredientsFromApi : fallbackIngredients;
   const useIngredientSwiper = ingredients.length > 1;
 
-  const discoverMore = dummyProducts
-    .filter((p) => p.id !== product?.id)
-    .slice(0, 4);
+  const discoverMore = (
+    product?.related_products ||
+    product?.recommended_products ||
+    []
+  ).slice(0, 4);
 
   if (!product) {
     return (
@@ -447,7 +378,7 @@ export default function ProductDetail() {
             className="mt-6 text-2xl"
             style={{ fontFamily: "var(--font-display)" }}
           >
-            Loading product details...
+            {error || "Loading product details..."}
           </p>
         </div>
       </div>
@@ -458,130 +389,102 @@ export default function ProductDetail() {
       <main className="bg-white text-black mt-22">
         {isPreviewOpen && (
           <div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-6"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-4 sm:p-6"
             role="dialog"
             aria-modal="true"
+            aria-label={`${product.name} image preview`}
           >
             <button
               type="button"
-              onClick={() => setPreviewIndex(null)}
-              className="absolute right-6 top-6 flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-white/10 text-lg text-white cursor-pointer"
+              onClick={closePreview}
+              className="absolute right-4 top-4 z-10 flex h-11 w-11 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white transition hover:bg-white/20"
               aria-label="Close preview"
             >
-              ×
+              <XIcon className="h-5 w-5" />
             </button>
-            <div className="relative max-h-[80vh] w-full max-w-4xl overflow-hidden rounded-lg bg-white p-6">
-              <button
-                type="button"
-                onClick={handlePrevPreview}
-                className="absolute left-4 top-1/2 -translate-y-1/2 px-4 py-3 text-2xl text-black/70 hover:text-black cursor-pointer"
-                aria-label="Previous image"
-              >
-                ‹
-              </button>
-              <button
-                type="button"
-                onClick={handleNextPreview}
-                className="absolute right-4 top-1/2 -translate-y-1/2 px-4 py-3 text-2xl text-black/70 hover:text-black cursor-pointer"
-                aria-label="Next image"
-              >
-                ›
-              </button>
-              <img
-                src={currentPreview?.image_url || galleryImages[0]?.image_url}
-                alt={`${product.name} preview`}
-                className="h-[70vh] w-full object-contain"
-              />
-              <div className="mt-4 flex flex-col items-center gap-3">
-                {/* <div className="text-xs uppercase tracking-[0.3em] text-black/40">
-                  {previewIndex !== null
-                    ? `Image ${previewIndex + 1} of ${galleryImages.length}`
-                    : ""}
-                </div> */}
-                <div className="flex flex-wrap items-center justify-center gap-2">
-                  {galleryImages.map((_, index) => (
+
+            <div className="relative flex h-[82vh] w-full max-w-6xl flex-col overflow-hidden rounded-sm bg-white">
+              <div className="flex items-center justify-between gap-3 border-b border-black/10 px-4 py-3">
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-semibold text-black">
+                    {product.name}
+                  </p>
+                  <p className="text-xs text-black/50">
+                    Image {(previewIndex ?? 0) + 1} of {images.length}
+                  </p>
+                </div>
+                <div className="flex shrink-0 items-center gap-1">
+                  <button
+                    type="button"
+                    onClick={() => zoomPreview(-0.25)}
+                    disabled={previewZoom <= 1}
+                    className="flex h-10 w-10 items-center justify-center rounded-sm border border-black/10 text-black/70 transition hover:border-black/30 disabled:cursor-not-allowed disabled:opacity-35"
+                    aria-label="Zoom out"
+                  >
+                    <ZoomOutIcon className="h-4 w-4" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setPreviewZoom(1)}
+                    disabled={previewZoom === 1}
+                    className="flex h-10 w-10 items-center justify-center rounded-sm border border-black/10 text-black/70 transition hover:border-black/30 disabled:cursor-not-allowed disabled:opacity-35"
+                    aria-label="Reset zoom"
+                  >
+                    <RotateCcwIcon className="h-4 w-4" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => zoomPreview(0.25)}
+                    disabled={previewZoom >= 3}
+                    className="flex h-10 w-10 items-center justify-center rounded-sm border border-black/10 text-black/70 transition hover:border-black/30 disabled:cursor-not-allowed disabled:opacity-35"
+                    aria-label="Zoom in"
+                  >
+                    <ZoomInIcon className="h-4 w-4" />
+                  </button>
+                  <span className="hidden w-14 text-right text-xs text-black/50 sm:block">
+                    {Math.round(previewZoom * 100)}%
+                  </span>
+                </div>
+              </div>
+
+              <div className="relative min-h-0 flex-1 overflow-auto bg-gray-50">
+                {images.length > 1 && (
+                  <>
                     <button
-                      key={`dot-${index}`}
                       type="button"
-                      onClick={() => setPreviewIndex(index)}
-                      className={`h-2.5 w-2.5 rounded-full border transition cursor-pointer ${
-                        index === previewIndex
-                          ? "border-black bg-black"
-                          : "border-black/30 bg-transparent"
-                      }`}
-                      aria-label={`Go to image ${index + 1}`}
-                    />
-                  ))}
+                      onClick={handlePrevPreview}
+                      className="absolute left-3 top-1/2 z-10 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-black/10 bg-white/90 text-black shadow-sm transition hover:border-black/30"
+                      aria-label="Previous image"
+                    >
+                      <ChevronLeftIcon className="h-5 w-5" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleNextPreview}
+                      className="absolute right-3 top-1/2 z-10 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-black/10 bg-white/90 text-black shadow-sm transition hover:border-black/30"
+                      aria-label="Next image"
+                    >
+                      <ChevronRightIcon className="h-5 w-5" />
+                    </button>
+                  </>
+                )}
+
+                <div className="flex min-h-full items-center justify-center p-6">
+                  <img
+                    src={previewImage}
+                    alt={`${product.name} preview`}
+                    className="max-h-[68vh] max-w-full object-contain transition-transform duration-200"
+                    style={{
+                      transform: `scale(${previewZoom})`,
+                      transformOrigin: "center",
+                    }}
+                  />
                 </div>
               </div>
             </div>
           </div>
         )}
-        {isReviewPreviewOpen && (
-          <div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-6"
-            role="dialog"
-            aria-modal="true"
-          >
-            <button
-              type="button"
-              onClick={() => setReviewPreview(null)}
-              className="absolute right-6 top-6 flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-white/10 text-lg text-white"
-              aria-label="Close review preview"
-            >
-              ×
-            </button>
-            <div className="relative max-h-[80vh] w-full max-w-3xl overflow-hidden rounded-lg bg-white p-6">
-              <button
-                type="button"
-                onClick={handlePrevReviewPreview}
-                className="absolute left-4 top-1/2 -translate-y-1/2 rounded-full border border-black/10 bg-white/90 px-4 py-3 text-2xl text-black/70 hover:text-black"
-                aria-label="Previous review image"
-              >
-                ‹
-              </button>
-              <button
-                type="button"
-                onClick={handleNextReviewPreview}
-                className="absolute right-4 top-1/2 -translate-y-1/2 rounded-full border border-black/10 bg-white/90 px-4 py-3 text-2xl text-black/70 hover:text-black"
-                aria-label="Next review image"
-              >
-                ›
-              </button>
-              <img
-                src={reviewImages[reviewImageIndex]}
-                alt={`Customer review image ${reviewImageIndex + 1}`}
-                className="h-[65vh] w-full object-contain"
-              />
-              <div className="mt-4 flex flex-col items-center gap-3">
-                <div className="text-xs uppercase tracking-[0.3em] text-black/40">
-                  {reviewImages.length
-                    ? `Image ${reviewImageIndex + 1} of ${reviewImages.length}`
-                    : ""}
-                </div>
-                <div className="flex flex-wrap items-center justify-center gap-2">
-                  {reviewImages.map((_, index) => (
-                    <button
-                      key={`review-dot-${index}`}
-                      type="button"
-                      onClick={() =>
-                        setReviewPreview((prev) =>
-                          prev ? { ...prev, index } : prev,
-                        )
-                      }
-                      className={`h-2.5 w-2.5 rounded-full border transition ${
-                        index === reviewImageIndex
-                          ? "border-black bg-black"
-                          : "border-black/30 bg-transparent"
-                      }`}
-                      aria-label={`Go to review image ${index + 1}`}
-                    />
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
+
         <section className="">
           <div className="container mx-auto px-4 lg:px-8 mx-auto  pt-6">
             <div className="mt-2 flex flex-wrap items-center gap-2 text-sm text-black/50">
@@ -602,6 +505,7 @@ export default function ProductDetail() {
                   <img
                     src={mainImage}
                     alt={product.name}
+                    onClick={() => openPreview(activeImage)}
                     className="h-[260px] w-full rounded-sm object-contain sm:h-[360px] lg:h-[420px] lg:object-cover cursor-pointer"
                   />
                 ) : (
@@ -633,22 +537,22 @@ export default function ProductDetail() {
             </div>
 
             <div className="order-3 lg:col-span-4">
-              <div className="w-fit px-4 py-1 mt-4 text-sm bg-[#FFF1C3] text-yellow-600 uppercase tracking-[0.05em] rounded-sm">
-                {product.tag_line_1 ||
-                  product.tag_line ||
-                  "A delightful blend to brighten your day."}
-              </div>
+              {(product.tag_line_1 || product.tag_line) && (
+                <div className="w-fit px-4 py-1 mt-4 text-sm bg-[#FFF1C3] text-yellow-600 uppercase tracking-[0.05em] rounded-sm">
+                  {product.tag_line_1 || product.tag_line}
+                </div>
+              )}
               <h1
                 className="text-4xl leading-tight lg:text-5xl uppercase tracking-[0.02em] mt-3 text-[#1c2230]"
                 style={{ fontFamily: "var(--font-basker)" }}
               >
                 {product.name}
               </h1>
-              <p className="mt-3 text-sm text-black uppercase tracking-[0.05em] ">
-                {product.tag_line_2 ||
-                  product.short_description ||
-                  "Crafted for a refined, aromatic sip."}
-              </p>
+              {(product.tag_line_2 || product.short_description) && (
+                <p className="mt-3 text-sm text-black uppercase tracking-[0.05em] ">
+                  {product.tag_line_2 || product.short_description}
+                </p>
+              )}
 
               <div className="mt-3 flex gap-3 border-b border-black/10 pb-8 text-black/60">
                 <div className="flex items-center gap-1">
@@ -706,50 +610,48 @@ export default function ProductDetail() {
                 )}
               </div>
 
-              <div className="mt-8 ">
-                <p className="text-sm uppercase tracking-[0.08em] text-black/70">
-                  Net Quantity
-                </p>
-                {/* {selectedVariant?.variant_name && (
-                  <p className="mt-2 text-xs uppercase tracking-[0.12em] text-black/50">
-                    {selectedVariant.variant_name}
+              {variants.length > 0 && (
+                <div className="mt-8 ">
+                  <p className="text-sm uppercase tracking-[0.08em] text-black/70">
+                    Net Quantity
                   </p>
-                )} */}
 
-                <div className="flex flex-wrap gap-3 mt-3">
-                  {variants.map((v) =>
-                    (() => {
-                      const weightMeta = getWeightMeta(v);
-                      const primaryLabel = weightMeta?.label || v.variant_name;
-                      const secondaryLabel = weightMeta
-                        ? `${weightMeta.cups} cups`
-                        : null;
-                      return (
-                        <button
-                          key={v.id}
-                          onClick={() => setSelectedVariant(v)}
-                          className={`rounded-sm border border-black/10 px-6 py-3 text-sm cursor-pointer transition ${
-                            selectedVariant?.id === v.id
-                              ? "bg-gradient-to-r from-[#5f665e] to-[#525a53] text-white"
-                              : "border-black/10 bg-white text-black hover:border-black/50"
-                          }`}
-                        >
-                          <div className="flex flex-col items-center gap-1">
-                            <span className="text-sm font-semibold">
-                              {primaryLabel}
-                            </span>
-                            {secondaryLabel && (
-                              <span className="text-[11px] uppercase font-semibold tracking-[0.1em] ">
-                                {secondaryLabel}
+                  <div className="flex flex-wrap gap-3 mt-3">
+                    {variants.map((v) =>
+                      (() => {
+                        const weightMeta = getWeightMeta(v);
+                        const primaryLabel =
+                          weightMeta?.label || v.variant_name;
+                        const secondaryLabel = weightMeta
+                          ? `${weightMeta.cups} cups`
+                          : null;
+                        return (
+                          <button
+                            key={v.id}
+                            onClick={() => setSelectedVariant(v)}
+                            className={`rounded-sm border border-black/10 px-6 py-3 text-sm cursor-pointer transition ${
+                              selectedVariant?.id === v.id
+                                ? "bg-gradient-to-r from-[#5f665e] to-[#525a53] text-white"
+                                : "border-black/10 bg-white text-black hover:border-black/50"
+                            }`}
+                          >
+                            <div className="flex flex-col items-center gap-1">
+                              <span className="text-sm font-semibold">
+                                {primaryLabel}
                               </span>
-                            )}
-                          </div>
-                        </button>
-                      );
-                    })(),
-                  )}
+                              {secondaryLabel && (
+                                <span className="text-[11px] uppercase font-semibold tracking-[0.1em] ">
+                                  {secondaryLabel}
+                                </span>
+                              )}
+                            </div>
+                          </button>
+                        );
+                      })(),
+                    )}
+                  </div>
                 </div>
-              </div>
+              )}
 
               <div className="mt-6 flex w-full flex-col gap-4">
                 <div className="flex w-full items-center justify-between gap-4 sm:justify-start">
@@ -789,171 +691,34 @@ export default function ProductDetail() {
                     </button>
                   </div>
                 </div>
-                {/* <button
-                  type="button"
-                  className="rounded-sm border border-black/10 bg-white px-6 py-4 text-xs uppercase tracking-[0.3em] text-black transition hover:border-black"
-                >
-                  Save for later
-                </button> */}
-                <button
-                  onClick={addToCart}
-                  className="w-full rounded-sm whitespace-nowrap bg-gradient-to-r from-[#7a8177] to-[#6a716a] px-8 py-4 text-sm font-semibold uppercase tracking-[0.15em] text-white transition hover:from-[#5f665e] hover:to-[#525a53] cursor-pointer sm:w-fit md:w-full"
-                >
-                  Add to cart
-                </button>
+                {selectedVariant && (
+                  <button
+                    onClick={addToCart}
+                    className="w-full rounded-sm whitespace-nowrap bg-gradient-to-r from-[#7a8177] to-[#6a716a] px-8 py-4 text-sm font-semibold uppercase tracking-[0.15em] text-white transition hover:from-[#5f665e] hover:to-[#525a53] cursor-pointer sm:w-fit md:w-full"
+                  >
+                    Add to cart
+                  </button>
+                )}
               </div>
-
-              {/* <div className="mt-6 flex flex-wrap items-center gap-2 text-[10px] sm:text-xs uppercase tracking-[0.2em] text-black/60">
-                <span className="text-black/70">Share:</span>
-                <button
-                  type="button"
-                  onClick={() => handleShare("facebook")}
-                  className="inline-flex items-center gap-2 rounded-sm border border-black/10 px-2.5 py-2 text-black/70 transition hover:border-black/40"
-                  aria-label="Share on Facebook"
-                >
-                  <img
-                    src="/products/packets/11.png"
-                    alt="Facebook"
-                    width="16"
-                    height="16"
-                    className="h-4 w-4 object-contain"
-                  />
-                  Facebook
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleShare("twitter")}
-                  className="inline-flex items-center gap-2 rounded-sm border border-black/10 px-2.5 py-2 text-black/70 transition hover:border-black/40"
-                  aria-label="Share on X"
-                >
-                  <img
-                    src="/products/packets/12.png"
-                    alt="X"
-                    width="16"
-                    height="16"
-                    className="h-4 w-4 object-contain"
-                  />
-                  X
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleShare("whatsapp")}
-                  className="inline-flex items-center gap-2 rounded-sm border border-black/10 px-2.5 py-2 text-black/70 transition hover:border-black/40"
-                  aria-label="Share on WhatsApp"
-                >
-                  <img
-                    src="/products/packets/13.png"
-                    alt="WhatsApp"
-                    width="16"
-                    height="16"
-                    className="h-4 w-4 object-contain"
-                  />
-                  WhatsApp
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleShare("copy")}
-                  className="inline-flex items-center gap-2 rounded-sm border border-black/10 px-2.5 py-2 text-black/70 transition hover:border-black/40"
-                  aria-label="Copy link"
-                >
-                  <img
-                    src="/products/packets/14.png"
-                    alt="Copy link"
-                    width="16"
-                    height="16"
-                    className="h-4 w-4 object-contain"
-                  />
-                  Copy link
-                </button>
-              </div> */}
-
-              {/* <div className="mt-10 grid gap-3 text-sm text-black/60">
-                <div className="flex items-center justify-between border-b border-black/10 pb-3">
-                  <span>Origin</span>
-                  <span>Highland gardens</span>
-                </div>
-                <div className="flex items-center justify-between border-b border-black/10 pb-3">
-                  <span>Steep time</span>
-                  <span>3-4 minutes</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span>Serving size</span>
-                  <span>2g per cup</span>
-                </div>
-              </div> */}
             </div>
           </div>
         </section>
 
         <section className=" container mx-auto px-4 lg:px-8 border-t border-black/10 bg-white">
           <div className=" py-14">
-            <div>
-              <h2
-                className="text-2xl lg:text-3xl font-semibold"
-                style={{ fontFamily: "var(--font-display)" }}
-              >
-                Product Description
-              </h2>
-              <p className="mt-4 text-base leading-relaxed text-black/80">
-                {product.description}
-              </p>
-            </div>
-
-            <div className="space-y-4 mt-6">
-              {/* <h3 className="text-lg uppercase tracking-[0.2em] text-black/50">
-                Gallery
-              </h3> */}
-              <div className="flex items-center justify-between">
-                <div className="flex gap-2 md:hidden">
-                  <button
-                    type="button"
-                    onClick={() =>
-                      galleryRef.current?.scrollBy({
-                        left: -220,
-                        behavior: "smooth",
-                      })
-                    }
-                    className="h-10 w-10 rounded-sm border border-black/10 text-black/60"
-                    aria-label="Scroll gallery left"
-                  >
-                    ‹
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() =>
-                      galleryRef.current?.scrollBy({
-                        left: 220,
-                        behavior: "smooth",
-                      })
-                    }
-                    className="h-10 w-10 rounded-sm border border-black/10 text-black/60"
-                    aria-label="Scroll gallery right"
-                  >
-                    ›
-                  </button>
-                </div>
+            {product.description && (
+              <div>
+                <h2
+                  className="text-2xl lg:text-3xl font-semibold"
+                  style={{ fontFamily: "var(--font-display)" }}
+                >
+                  Product Description
+                </h2>
+                <p className="mt-4 text-base leading-relaxed text-black/80">
+                  {product.description}
+                </p>
               </div>
-              <div
-                ref={galleryRef}
-                className="flex gap-4 overflow-x-auto pb-2 snap-x snap-mandatory"
-              >
-                {galleryImages.map((img, index) => (
-                  <button
-                    type="button"
-                    key={img.id ?? index}
-                    onClick={() => setPreviewIndex(index)}
-                    className="min-w-[160px] h-60 snap-start rounded-sm border border-black/10 bg-white transition hover:border-black/40 cursor-pointer"
-                    aria-label={`Open image ${index + 1}`}
-                  >
-                    <img
-                      src={img.image_url}
-                      alt={`${product.name} gallery ${index + 1}`}
-                      className="h-full w-full object-cover rounded-sm"
-                    />
-                  </button>
-                ))}
-              </div>
-            </div>
+            )}
 
             {hasRituals && (
               <div className="space-y-6 mt-10 lg:mt-14">
@@ -1021,180 +786,175 @@ export default function ProductDetail() {
               </div>
             )}
 
-            <div className="space-y-4 mt-10 lg:mt-14">
-              <div className="flex items-center justify-between">
-                <h3 className="text-2xl lg:text-3xl font-semibold">
-                  Ingredients
-                </h3>
-              </div>
+            {ingredients.length > 0 && (
+              <div className="space-y-4 mt-10 lg:mt-14">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-2xl lg:text-3xl font-semibold">
+                    Ingredients
+                  </h3>
+                </div>
 
-              <div className="hidden grid-cols-2 gap-5 sm:grid-cols-3 lg:grid xl:grid-cols-4">
-                {ingredients.map((item) => (
-                  <div
-                    key={`desktop-${item.id}`}
-                    className="rounded-sm  bg-gray-50 p-4"
-                  >
-                    <div className="flex aspect-square items-center justify-center ">
-                      {item.image ? (
-                        <img
-                          src={item.image}
-                          alt={item.name}
-                          className="h-full w-full object-contain rounded-sm"
-                        />
-                      ) : (
-                        <div className="flex h-full w-full items-center justify-center text-xs text-black/40">
-                          No image
-                        </div>
-                      )}
+                <div className="hidden grid-cols-2 gap-5 sm:grid-cols-3 lg:grid xl:grid-cols-4">
+                  {ingredients.map((item) => (
+                    <div key={`desktop-${item.id}`} className="rounded-sm">
+                      <div className="flex aspect-square items-center justify-center ">
+                        {item.image ? (
+                          <img
+                            src={item.image}
+                            alt={item.name}
+                            className="h-full w-full object-contain rounded-sm"
+                          />
+                        ) : (
+                          <div className="flex h-full w-full items-center justify-center text-xs text-black/40">
+                            No image
+                          </div>
+                        )}
+                      </div>
+                      <p className="mt-4 text-sm font-medium uppercase tracking-[0.08em] text-black">
+                        {item.name}
+                      </p>
                     </div>
-                    <p className="mt-4 text-sm font-medium uppercase tracking-[0.08em] text-black">
-                      {item.name}
-                    </p>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
 
-              <div className="flex items-center justify-between gap-2 lg:hidden">
-                <button
-                  type="button"
-                  onClick={() => ingredientsRef.current?.slidePrev()}
-                  className="h-10 w-fit text-black/60 cursor-pointer"
-                  aria-label="Scroll ingredients left"
-                  disabled={!useIngredientSwiper}
-                >
-                  <ChevronLeftIcon />
-                </button>
-                {useIngredientSwiper ? (
-                  <Swiper
-                    modules={[Navigation]}
-                    slidesPerView={1.2}
-                    spaceBetween={16}
-                    navigation={false}
-                    pagination={{ clickable: true }}
-                    scrollbar={{ draggable: true }}
-                    loop={ingredients.length > 4}
-                    onSwiper={(swiper) => {
-                      ingredientsRef.current = swiper;
-                    }}
-                    breakpoints={{
-                      480: { slidesPerView: 2.2, spaceBetween: 10 },
-                      768: { slidesPerView: 3.2, spaceBetween: 10 },
-                      1024: { slidesPerView: 4.2, spaceBetween: 10 },
-                      1280: { slidesPerView: 4.2, spaceBetween: 10 },
-                      1536: { slidesPerView: 5.2, spaceBetween: 10 },
-                    }}
-                    className="min-w-0 flex-1 pb-6"
+                <div className="flex items-center justify-between gap-2 lg:hidden">
+                  <button
+                    type="button"
+                    onClick={() => ingredientsRef.current?.slidePrev()}
+                    className="h-10 w-fit text-black/60 cursor-pointer"
+                    aria-label="Scroll ingredients left"
+                    disabled={!useIngredientSwiper}
                   >
-                    {ingredients.map((item) => (
-                      <SwiperSlide key={item.id}>
-                        <div className="w-full mr-0 rounded-sm border border-black/10 bg-gray-50 p-3">
-                          <div className="w-full aspect-square rounded-sm bg-white p-4">
+                    <ChevronLeftIcon />
+                  </button>
+                  {useIngredientSwiper ? (
+                    <Swiper
+                      modules={[Navigation]}
+                      slidesPerView={1.2}
+                      spaceBetween={16}
+                      navigation={false}
+                      pagination={{ clickable: true }}
+                      scrollbar={{ draggable: true }}
+                      loop={ingredients.length > 4}
+                      onSwiper={(swiper) => {
+                        ingredientsRef.current = swiper;
+                      }}
+                      breakpoints={{
+                        480: { slidesPerView: 2.2, spaceBetween: 10 },
+                        768: { slidesPerView: 3.2, spaceBetween: 10 },
+                        1024: { slidesPerView: 4.2, spaceBetween: 10 },
+                        1280: { slidesPerView: 4.2, spaceBetween: 10 },
+                        1536: { slidesPerView: 5.2, spaceBetween: 10 },
+                      }}
+                      className="min-w-0 flex-1 pb-6"
+                    >
+                      {ingredients.map((item) => (
+                        <SwiperSlide key={item.id}>
+                          <div className="w-full mr-0">
+                            <div className="w-full aspect-square">
+                              {item.image ? (
+                                <img
+                                  src={item.image}
+                                  alt={item.name}
+                                  className="h-full w-full object-contain rounded-sm"
+                                />
+                              ) : (
+                                <div className="flex h-full w-full items-center justify-center text-xs text-black/40">
+                                  No image
+                                </div>
+                              )}
+                            </div>
+                            <p className="mt-3 text-sm uppercase tracking-[0.08em] text-black">
+                              {item.name}
+                            </p>
+                          </div>
+                        </SwiperSlide>
+                      ))}
+                    </Swiper>
+                  ) : (
+                    <div className="flex flex-1 flex-wrap gap-4 pb-6">
+                      {ingredients.map((item) => (
+                        <div key={item.id} className="w-[160px]">
+                          <div className="w-full aspect-square p-4">
                             {item.image ? (
                               <img
                                 src={item.image}
                                 alt={item.name}
-                                className="h-full w-full object-contain"
+                                className="h-full w-full object-contain rounded-sm"
                               />
                             ) : (
-                              <div className="flex h-full w-full items-center justify-center text-xs text-black/40">
+                              <div className="flex h-full w-full items-center justify-center rounded-sm border border-black/10 bg-white text-xs text-black/40">
                                 No image
                               </div>
                             )}
                           </div>
-                          <p className="mt-3 text-sm uppercase tracking-[0.08em] text-black">
+                          <p className="ms-4 text-sm uppercase tracking-[0.08em] text-black">
                             {item.name}
                           </p>
                         </div>
-                      </SwiperSlide>
-                    ))}
-                  </Swiper>
-                ) : (
-                  <div className="flex flex-1 flex-wrap gap-4 pb-6">
-                    {ingredients.map((item) => (
-                      <div key={item.id} className="w-[160px]">
-                        <div className="w-full aspect-square p-4">
-                          {item.image ? (
-                            <img
-                              src={item.image}
-                              alt={item.name}
-                              className="h-full w-full object-contain rounded-sm"
-                            />
-                          ) : (
-                            <div className="flex h-full w-full items-center justify-center rounded-sm border border-black/10 bg-white text-xs text-black/40">
-                              No image
-                            </div>
-                          )}
-                        </div>
-                        <p className="ms-4 text-sm uppercase tracking-[0.08em] text-black">
-                          {item.name}
-                        </p>
-                      </div>
-                    ))}
-                  </div>
-                )}
-                <button
-                  type="button"
-                  onClick={() => ingredientsRef.current?.slideNext()}
-                  className="h-10 w-fit text-black/60 cursor-pointer"
-                  aria-label="Scroll ingredients right"
-                  disabled={!useIngredientSwiper}
-                >
-                  <ChevronRightIcon />
-                </button>
+                      ))}
+                    </div>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => ingredientsRef.current?.slideNext()}
+                    className="h-10 w-fit text-black/60 cursor-pointer"
+                    aria-label="Scroll ingredients right"
+                    disabled={!useIngredientSwiper}
+                  >
+                    <ChevronRightIcon />
+                  </button>
+                </div>
               </div>
-            </div>
+            )}
 
-            <div className="mt-12">
-              <div className="flex flex-col gap-2">
-                <h3 className="text-2xl lg:text-3xl font-semibold">FAQs</h3>
-                <p className="text-sm text-black/60">
-                  Answers to the most common questions about this tea.
-                </p>
-              </div>
-              {product?.faqs?.length ? (
+            {product?.faqs?.length > 0 && (
+              <div className="mt-12">
+                <div className="flex flex-col gap-2">
+                  <h3 className="text-2xl lg:text-3xl font-semibold">FAQs</h3>
+                  <p className="text-sm text-black/60">
+                    Answers to the most common questions about this tea.
+                  </p>
+                </div>
                 <div className="mt-6 divide-y divide-black/10 rounded-sm border border-black/10 bg-white">
                   {product.faqs.map((faq, index) => (
                     <details key={`faq-${index}`} className="group p-5">
-                      <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-sm font-semibold text-black bg-gray-50 p-4 rounded-sm transition group-open:bg-gray-100">
+                      <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-sm font-semibold text-black transition">
                         <span>{faq.question}</span>
                         <span className="text-black/40 transition group-open:rotate-45">
                           +
                         </span>
                       </summary>
-                      <p className="mt-3 px-4 text-sm text-black/70">
-                        {faq.answer}
-                      </p>
+                      <p className="mt-3 text-sm text-black/70">{faq.answer}</p>
                     </details>
                   ))}
                 </div>
-              ) : (
-                <p className="mt-4 text-sm text-black/50">
-                  No FAQs available for this product yet.
-                </p>
-              )}
-            </div>
+              </div>
+            )}
 
-            <div className="space-y-6 mt-10">
-              <div className="flex items-center justify-between">
-                <h3
-                  className="text-2xl lg:text-3xl font-semibold"
-                  style={{ fontFamily: "var(--font-display)" }}
-                >
-                  Discover More
-                </h3>
-                <button
-                  type="button"
-                  className="text-xs uppercase tracking-[0.08em] text-black/60"
-                >
-                  View all
-                </button>
+            {discoverMore.length > 0 && (
+              <div className="space-y-6 mt-10">
+                <div className="flex items-center justify-between">
+                  <h3
+                    className="text-2xl lg:text-3xl font-semibold"
+                    style={{ fontFamily: "var(--font-display)" }}
+                  >
+                    Discover More
+                  </h3>
+                  <Link
+                    href="/shop"
+                    className="text-xs uppercase tracking-[0.08em] text-black/60"
+                  >
+                    View all
+                  </Link>
+                </div>
+                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+                  {discoverMore.map((item) => (
+                    <ProductCard key={item.id} product={item} />
+                  ))}
+                </div>
               </div>
-              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-                {discoverMore.map((item) => (
-                  <ProductCard key={item.id} product={item} />
-                ))}
-              </div>
-            </div>
+            )}
           </div>
         </section>
 

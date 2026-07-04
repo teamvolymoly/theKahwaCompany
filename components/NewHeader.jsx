@@ -30,12 +30,17 @@ export default function NewHeader() {
   const [searchPagination, setSearchPagination] = useState(null);
   const [searchLoading, setSearchLoading] = useState(false);
   const [searchError, setSearchError] = useState("");
+  const mobileMenuRef = useRef(null);
   const profileRef = useRef(null);
   const searchRef = useRef(null);
   const { isAuthenticated, user, loading, authLoading, logout } = useAuth();
   const [cartCount, setCartCount] = useState(0);
   const [headerCategories, setHeaderCategories] = useState([]);
   const closeShopDropdown = () => setIsShopOpen(false);
+  const closeMobileMenu = () => {
+    setIsOpen(false);
+    setIsShopOpen(false);
+  };
 
   const closeSearch = () => {
     setIsSearchOpen(false);
@@ -78,6 +83,27 @@ export default function NewHeader() {
     }
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [isProfileOpen]);
+
+  useEffect(() => {
+    function handleClickOutside(e) {
+      if (mobileMenuRef.current && !mobileMenuRef.current.contains(e.target)) {
+        setIsOpen(false);
+      }
+    }
+
+    function handleEscape(e) {
+      if (e.key === "Escape") setIsOpen(false);
+    }
+
+    if (isOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+      document.addEventListener("keydown", handleEscape);
+    }
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleEscape);
+    };
+  }, [isOpen]);
 
   useEffect(() => {
     function handleClickOutside(e) {
@@ -254,7 +280,10 @@ export default function NewHeader() {
               style={{ zIndex: 1 }}
             />
           )}
-          <div className="relative z-10 container mx-auto px-4 lg:px-8">
+          <div
+            className="relative z-10 container mx-auto px-4 lg:px-8"
+            ref={mobileMenuRef}
+          >
             <div className="relative flex items-center justify-between py-4 lg:py-4">
               <div className="flex items-center gap-3 lg:gap-4">
                 <button
@@ -292,7 +321,7 @@ export default function NewHeader() {
               </div>
 
               <div className="absolute left-1/2 -translate-x-1/2 leading-none">
-                <Link href="/">
+                <Link href="/" onClick={closeMobileMenu}>
                   <img
                     src="/logo/LOGO_TKC-02.png"
                     alt="Logo"
@@ -309,10 +338,11 @@ export default function NewHeader() {
                 >
                   <button
                     type="button"
-                    className=" "
+                    className="cursor-pointer"
                     aria-label="Search"
                     aria-expanded={isSearchOpen}
                     onClick={() => {
+                      setIsOpen(false);
                       setIsSearchOpen((prev) => !prev);
                       setIsShopOpen(false);
                     }}
@@ -481,6 +511,7 @@ export default function NewHeader() {
                   href="/cart"
                   className="relative inline-flex items-center justify-center cursor-pointer"
                   aria-label="Cart"
+                  onClick={closeMobileMenu}
                 >
                   <img
                     src="/icons/shop.svg"
@@ -504,7 +535,7 @@ export default function NewHeader() {
                   <Link
                     href="/"
                     className="hover:text-gray-700"
-                    onClick={closeShopDropdown}
+                    onClick={closeMobileMenu}
                   >
                     Home
                   </Link>
@@ -524,7 +555,7 @@ export default function NewHeader() {
                         <Link
                           href="/shop"
                           className="hover:text-gray-900"
-                          onClick={closeShopDropdown}
+                          onClick={closeMobileMenu}
                         >
                           Shop all
                         </Link>
@@ -537,7 +568,7 @@ export default function NewHeader() {
                           <Link
                             href={`/shop?category=${category.slug}`}
                             className="hover:text-gray-900"
-                            onClick={closeShopDropdown}
+                            onClick={closeMobileMenu}
                           >
                             All {category.name}
                           </Link>
@@ -546,7 +577,7 @@ export default function NewHeader() {
                               key={sub.slug}
                               href={`/shop?category=${category.slug}&subcategory=${sub.slug}`}
                               className="hover:text-gray-900"
-                              onClick={closeShopDropdown}
+                              onClick={closeMobileMenu}
                             >
                               {sub.name}
                             </Link>
@@ -601,18 +632,23 @@ export default function NewHeader() {
                       <Link
                         href="/user/profile"
                         className="block py-2 text-gray-700 hover:text-gray-900"
+                        onClick={closeMobileMenu}
                       >
                         Profile
                       </Link>
                       <Link
                         href="/user/dashboard"
                         className="block py-2 text-gray-700 hover:text-gray-900"
+                        onClick={closeMobileMenu}
                       >
                         Dashboard
                       </Link>
                       <button
                         type="button"
-                        onClick={handleLogout}
+                        onClick={() => {
+                          closeMobileMenu();
+                          handleLogout();
+                        }}
                         disabled={isLoggingOut || authLoading}
                         className="w-full text-left py-2 text-red-600 disabled:opacity-70"
                       >
@@ -623,6 +659,7 @@ export default function NewHeader() {
                     <Link
                       href="/auth/login"
                       className="block py-2 text-gray-700 hover:text-gray-900"
+                      onClick={closeMobileMenu}
                     >
                       Login / Sign Up
                     </Link>
