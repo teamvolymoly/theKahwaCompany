@@ -4,6 +4,7 @@ import { AuthProvider } from "./context/AuthContext";
 import Footer from "@/components/Footer";
 import NewHeader from "@/components/NewHeader";
 import ToastHost from "@/components/ToastHost";
+import SiteLoader from "@/components/SiteLoader";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -32,6 +33,7 @@ export default function RootLayout({ children }) {
         className={`${inter.variable} ${baskervville.variable} antialiased`}
       >
         <AuthProvider>
+          <SiteLoader />
           <NewHeader />
           <ToastHost />
           {children}

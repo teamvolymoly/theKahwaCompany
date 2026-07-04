@@ -99,9 +99,7 @@ export default function HeroSection() {
     const container = containerRef.current;
     const cards = cardsRef.current.filter(Boolean).slice(0, count);
     if (!apiReady || !container || cards.length !== count) {
-      const id = requestAnimationFrame(() =>
-        setReadyTick((tick) => tick + 1),
-      );
+      const id = requestAnimationFrame(() => setReadyTick((tick) => tick + 1));
       return () => cancelAnimationFrame(id);
     }
 
@@ -349,15 +347,16 @@ export default function HeroSection() {
     >
       {/* Hero text */}
       <div className="relative z-10 text-center mt-20 sm:mt-24 lg:mt-28 flex flex-col gap-4 max-w-3xl px-4">
-        <div className="font-(family-name:--font-basker) uppercase text-3xl sm:text-4xl md:text-5xl mt-6 mb-6 text-[#1c2230] drop-shadow-sm">
-          <h2 className="mb-2">Where tradition</h2>
-          <h2>meets imagination</h2>
+        <div className="font-(family-name:--font-basker) uppercase text-2xl sm:text-3xl md:text-4xl mt-6 mb-6 text-[#1c2230] drop-shadow-sm">
+          <h2 className="mb-2">Discover a blend of</h2>
+          <h2>botanicals and tradition</h2>
         </div>
-        <p className="font-thin text-base sm:text-lg md:text-xl text-black/80">
-          Experience a Magical variety of Kahwa with different flavors and
-          contribute to a social cause
+        <p className="font-thin text-base sm:text-md md:text-lg text-black/80">
+          Thoughtfully crafted with nature's finest ingredients to bring warmth,
+          wellness, and mindful rituals to your everyday life.
         </p>
-      </div>      {/* Carousel */}
+      </div>{" "}
+      {/* Carousel */}
       {apiReady ? (
         <section
           ref={containerRef}
@@ -407,7 +406,6 @@ export default function HeroSection() {
           Loading hero...
         </div>
       )}
-
       <div className="absolute bottom-0 sm:bottom-0 md:bottom-10 lg:bottom-20 xl:bottom-30 z-10">
         <Link href="/shop" className="cursor-pointer">
           <ShopNowButton className="cursor-pointer" />
