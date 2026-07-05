@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { apiFetch } from "@/utils/api";
-import { dummyReviews } from "@/utils/dummyData";
+import { extractProductReviews } from "@/utils/reviews";
 import ProductCard from "@/components/ProductCard";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
@@ -18,19 +18,6 @@ import {
   ZoomInIcon,
   ZoomOutIcon,
 } from "lucide-react";
-
-const normalizeReview = (review) => ({
-  id: review.id,
-  name: review.name || review.customer_name || "Customer",
-  rating: Number(review.rating ?? 0) || 0,
-  review: review.review || review.comment || "",
-  date: review.date || review.created_at || "",
-  title: review.title || "",
-  location: review.location || "",
-  images: Array.isArray(review.images) ? review.images : [],
-});
-
-const sampleReviews = dummyReviews.slice(0, 2).map(normalizeReview);
 
 export default function ProductDetail() {
   const { slug } = useParams();
@@ -87,17 +74,11 @@ export default function ProductDetail() {
           null;
         setSelectedVariant(defaultVariant);
 
-        const reviewItems = Array.isArray(reviewRes?.items)
-          ? reviewRes.items
-          : normalized.reviews?.items;
-        const reviewSummary = reviewRes?.summary || normalized.reviews || {};
-        const normalizedReviewItems = Array.isArray(reviewItems)
-          ? reviewItems.map(normalizeReview)
-          : [];
-        const displayReviews =
-          normalizedReviewItems.length > 0
-            ? normalizedReviewItems
-            : sampleReviews;
+        const parsedReviews = extractProductReviews(
+          reviewRes || normalized.reviews || {},
+        );
+        const displayReviews = parsedReviews.items;
+        const reviewSummary = parsedReviews.summary || {};
         setProduct({
           ...normalized,
           reviews: {
@@ -152,18 +133,6 @@ export default function ProductDetail() {
     const percents = counts.map((c) => Math.round((c / total) * 100));
     return { counts, percents, totalReviews };
   }, [product, reviews]);
-
-  const reviewImageStrip = useMemo(() => {
-    const images = [];
-    reviews.forEach((r) => {
-      if (Array.isArray(r.images)) {
-        r.images.forEach((img) => {
-          if (img) images.push(img);
-        });
-      }
-    });
-    return images.slice(0, 8);
-  }, [reviews]);
 
   const getWeightMeta = (variant) => {
     if (!variant) return null;
@@ -481,6 +450,53 @@ export default function ProductDetail() {
                   />
                 </div>
               </div>
+            </div>
+          </div>
+        )}
+
+        {reviewPreview && reviewImages.length > 0 && (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-4 sm:p-6"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Customer review image preview"
+          >
+            <button
+              type="button"
+              onClick={() => setReviewPreview(null)}
+              className="absolute right-4 top-4 z-10 flex h-11 w-11 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white transition hover:bg-white/20"
+              aria-label="Close review image preview"
+            >
+              <XIcon className="h-5 w-5" />
+            </button>
+
+            <div className="relative flex h-[82vh] w-full max-w-5xl items-center justify-center overflow-hidden rounded-sm bg-white p-4">
+              {reviewImages.length > 1 && (
+                <>
+                  <button
+                    type="button"
+                    onClick={handlePrevReviewPreview}
+                    className="absolute left-3 top-1/2 z-10 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-black/10 bg-white/90 text-black shadow-sm transition hover:border-black/30"
+                    aria-label="Previous review image"
+                  >
+                    <ChevronLeftIcon className="h-5 w-5" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleNextReviewPreview}
+                    className="absolute right-3 top-1/2 z-10 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-black/10 bg-white/90 text-black shadow-sm transition hover:border-black/30"
+                    aria-label="Next review image"
+                  >
+                    <ChevronRightIcon className="h-5 w-5" />
+                  </button>
+                </>
+              )}
+
+              <img
+                src={reviewImages[reviewPreview.index]}
+                alt={`Customer review image ${reviewPreview.index + 1}`}
+                className="max-h-full max-w-full object-contain"
+              />
             </div>
           </div>
         )}
@@ -1030,40 +1046,6 @@ export default function ProductDetail() {
                 </div>
 
                 <div className="space-y-5">
-                  {reviewImageStrip.length > 0 && (
-                    <div className="rounded-sm border border-black/10 bg-white p-5">
-                      <div className="flex items-center justify-between">
-                        <p className="text-sm uppercase font-semibold tracking-[0.08em] text-black">
-                          Customer images
-                        </p>
-                        {/* <button
-                          type="button"
-                          className="text-[10px] uppercase tracking-[0.08em] text-black/50"
-                        >
-                          See all
-                        </button> */}
-                      </div>
-                      <div className="mt-4 flex flex-wrap gap-3">
-                        {reviewImageStrip.map((img, index) => (
-                          <button
-                            key={`review-strip-${index}`}
-                            type="button"
-                            onClick={() =>
-                              handleOpenReviewPreview(reviewImageStrip, index)
-                            }
-                            className="h-20 w-20 overflow-hidden rounded-sm border border-black/10 bg-white cursor-pointer"
-                            aria-label={`Open customer image ${index + 1}`}
-                          >
-                            <img
-                              src={img}
-                              alt={`Customer image ${index + 1}`}
-                              className="h-full w-full object-cover"
-                            />
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  )}
                   {reviews.length === 0 && (
                     <p className="text-sm text-black/50">
                       Share your first sip and review this tea.

@@ -195,9 +195,10 @@ export default function Footer() {
         </div>
 
         <div className="mt-12 border-t border-white/40 pt-6 text-xs text-white/80 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <p>Copyright (c) 2026 The Kahwa Company by volymoly</p>
+          <p>Copyright (c) 2026 The Kahwa Company</p>
           <div className="flex items-center gap-2">
-            <span className="text-white/80">volymoly</span>
+            <span className="text-white/80">Developed by :</span>{" "}
+            <span className="font-semibold uppercase">volymoly</span>
             {/* <span className="inline-flex h-7 w-7 items-center justify-center text-[10px]">
               <img
                 src="/logo/LOGO_TKC-03.png"

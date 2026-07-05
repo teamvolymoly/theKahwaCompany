@@ -150,7 +150,8 @@ export default function ShopClient() {
       if (!categoryMatch) return false;
       return (
         (categoryMatch.slug && categoryMatch.slug === selectedCategory) ||
-        toCategoryParam(categoryMatch.name) === toCategoryParam(selectedCategory)
+        toCategoryParam(categoryMatch.name) ===
+          toCategoryParam(selectedCategory)
       );
     });
   }, [filters.categories, filters.subcategories, selectedCategory]);
@@ -672,7 +673,7 @@ export default function ShopClient() {
     <>
       <section className="mt-12 mb-20 w-full h-[280px] ">
         <img
-          src="/products/W7.png"
+          src="/bg/TKC Website Images/banner_1.png"
           alt="Adv_1"
           className="w-full h-full object-cover object-center"
         />
@@ -1121,8 +1122,7 @@ export default function ShopClient() {
             <div className="flex-1">
               <div className="mb-8 mt-[2px] flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <p className="text-sm text-black/60">
-                  Showing {products.length} of{" "}
-                  {pagination.total_items} products
+                  Showing {products.length} of {pagination.total_items} products
                 </p>
                 <div className="hidden items-center gap-3 text-sm text-[#4e5a50] lg:flex">
                   <span className="font-semibold">Sort By:</span>
@@ -1182,9 +1182,7 @@ export default function ShopClient() {
                   </div>
                 )}
                 {!loading &&
-                  products.map((p) => (
-                    <ProductCard key={p.id} product={p} />
-                  ))}
+                  products.map((p) => <ProductCard key={p.id} product={p} />)}
               </div>
 
               {pagination.total_pages > 1 && (

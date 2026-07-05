@@ -352,7 +352,7 @@ export default function HeroSection() {
           <h2>botanicals and tradition</h2>
         </div>
         <p className="font-thin text-base text-sm md:text-md md:text-lg text-black/80">
-          Thoughtfully crafted with nature's finest ingredients to bring warmth,
+          Thoughtfully crafted with nature&apos;s finest ingredients to bring warmth,
           <span className=" md:block mt-0 md:mt-1">
             {" "}
             wellness, and mindful rituals to your everyday life.

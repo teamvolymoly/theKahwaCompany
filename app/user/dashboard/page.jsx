@@ -5,6 +5,11 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/app/context/AuthContext";
 import Link from "next/link";
 import { apiFetch } from "@/utils/api";
+import {
+  EMPTY_REVIEW_FORM,
+  buildReviewFormData,
+  extractEligibleReviewItems,
+} from "@/utils/reviews";
 
 const formatMoney = (value, currency = "INR") =>
   `${currency === "INR" ? "₹" : currency} ${Number(value ?? 0) || 0}`;
@@ -18,26 +23,6 @@ const normalizeOrder = (order, currency = "INR") => ({
   product_name: order.product_name || "",
   product_variant: order.product_variant || order.variant_name || "",
   items_count: order.items_count ?? order.items?.length ?? 0,
-});
-
-const EMPTY_REVIEW_FORM = {
-  rating: 5,
-  title: "",
-  comment: "",
-};
-
-const normalizeReviewItem = (item) => ({
-  order_id: item.order_id,
-  order_item_id: item.order_item_id,
-  product_id: item.product_id,
-  variant_id: item.variant_id,
-  product_name: item.product_name || "",
-  variant_name: item.variant_name || "",
-  image: item.image || "",
-  delivered_date: item.delivered_date || "",
-  can_review: Boolean(item.can_review),
-  reason: item.reason || "",
-  review: item.review || null,
 });
 
 const isPaidDeliveredOrder = (order) =>
@@ -121,6 +106,24 @@ const ReviewModal = ({
               className="mt-2 w-full rounded-sm border border-black/20 px-3 py-2 text-sm outline-none focus:border-black"
             />
           </div>
+          <div>
+            <label className="text-xs uppercase tracking-[0.12em] text-black/50">
+              Images optional
+            </label>
+            <input
+              name="images"
+              type="file"
+              accept="image/*"
+              multiple
+              onChange={onChange}
+              className="mt-2 w-full rounded-sm border border-black/20 px-3 py-2 text-sm file:mr-4 file:rounded-full file:border-0 file:bg-black file:px-4 file:py-2 file:text-xs file:font-semibold file:uppercase file:tracking-[0.08em] file:text-white"
+            />
+            {form.images?.length > 0 && (
+              <p className="mt-2 text-xs text-black/50">
+                {form.images.length} image{form.images.length > 1 ? "s" : ""} selected
+              </p>
+            )}
+          </div>
           {message && <p className="text-sm text-black/60">{message}</p>}
           <button
             type="submit"
@@ -202,10 +205,9 @@ export default function DashboardPage() {
           },
         ]);
         setRecentOrders(orderItems.slice(0, 5).map((order) => normalizeOrder(order, currency)));
-        const eligibleItems = reviewsRes?.items || reviewsRes?.data?.items || [];
+        const eligibleItems = extractEligibleReviewItems(reviewsRes);
         setReviewItems(
           eligibleItems
-            .map(normalizeReviewItem)
             .filter((item) => item.can_review)
             .slice(0, 4),
         );
@@ -232,10 +234,15 @@ export default function DashboardPage() {
   };
 
   const handleReviewChange = (event) => {
-    const { name, value } = event.target;
+    const { name, value, files } = event.target;
     setReviewForm((prev) => ({
       ...prev,
-      [name]: name === "rating" ? Number(value) : value,
+      [name]:
+        name === "rating"
+          ? Number(value)
+          : name === "images"
+            ? Array.from(files || [])
+            : value,
     }));
   };
 
@@ -245,14 +252,13 @@ export default function DashboardPage() {
     setReviewSaving(true);
     setReviewMessage("");
     try {
+      const formData = buildReviewFormData(
+        reviewItem.order_item_id,
+        reviewForm,
+      );
       await apiFetch("/reviews", {
         method: "POST",
-        body: JSON.stringify({
-          order_item_id: reviewItem.order_item_id,
-          rating: reviewForm.rating,
-          title: reviewForm.title,
-          comment: reviewForm.comment,
-        }),
+        body: formData,
       });
       setReviewItems((prev) =>
         prev.filter((item) => item.order_item_id !== reviewItem.order_item_id),

@@ -5,6 +5,11 @@ import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/app/context/AuthContext";
 import { apiFetch } from "@/utils/api";
+import {
+  EMPTY_REVIEW_FORM,
+  buildReviewFormData,
+  extractEligibleReviewItems,
+} from "@/utils/reviews";
 
 const formatMoney = (value, currency = "INR") =>
   `${currency === "INR" ? "₹" : currency} ${Number(value ?? 0) || 0}`;
@@ -17,12 +22,6 @@ const emptyAddress = {
   state: "",
   pincode: "",
   country: "",
-};
-
-const EMPTY_REVIEW_FORM = {
-  rating: 5,
-  title: "",
-  comment: "",
 };
 
 const normalizeOrderDetail = (payload, orderId) => {
@@ -91,10 +90,6 @@ const DetailItem = ({ label, value }) => (
     <p className="mt-1 text-sm font-semibold text-black">{value || "-"}</p>
   </div>
 );
-
-const isPaidDeliveredOrder = (order) =>
-  String(order?.status || "").toLowerCase() === "delivered" &&
-  String(order?.payment_status || "").toLowerCase() === "paid";
 
 const ReviewModal = ({
   form,
@@ -173,6 +168,24 @@ const ReviewModal = ({
               className="mt-2 w-full rounded-sm border border-black/20 px-3 py-2 text-sm outline-none focus:border-black"
             />
           </div>
+          <div>
+            <label className="text-xs uppercase tracking-[0.12em] text-black/50">
+              Images optional
+            </label>
+            <input
+              name="images"
+              type="file"
+              accept="image/*"
+              multiple
+              onChange={onChange}
+              className="mt-2 w-full rounded-sm border border-black/20 px-3 py-2 text-sm file:mr-4 file:rounded-full file:border-0 file:bg-black file:px-4 file:py-2 file:text-xs file:font-semibold file:uppercase file:tracking-[0.08em] file:text-white"
+            />
+            {form.images?.length > 0 && (
+              <p className="mt-2 text-xs text-black/50">
+                {form.images.length} image{form.images.length > 1 ? "s" : ""} selected
+              </p>
+            )}
+          </div>
           {message && (
             <p className="text-sm text-black/60">{message}</p>
           )}
@@ -181,7 +194,7 @@ const ReviewModal = ({
             disabled={loading}
             className="rounded-full bg-black px-6 py-3 text-xs font-semibold uppercase tracking-[0.08em] text-white disabled:opacity-60"
           >
-            {loading ? "Saving..." : item.review?.id ? "Update review" : "Submit review"}
+            {loading ? "Saving..." : "Submit review"}
           </button>
         </form>
       </div>
@@ -220,14 +233,11 @@ export default function OrderDetailPage() {
       try {
         const [data, eligibilityRes] = await Promise.all([
           apiFetch(`/orders/${encodeURIComponent(id)}`),
-          apiFetch(`/orders/${encodeURIComponent(id)}/review-eligibility`).catch(
-            () => null,
-          ),
+          apiFetch("/reviews/eligible").catch(() => null),
         ]);
         if (!active) return;
         setOrder(normalizeOrderDetail(data, id));
-        const eligibilityItems =
-          eligibilityRes?.items || eligibilityRes?.data?.items || [];
+        const eligibilityItems = extractEligibleReviewItems(eligibilityRes);
         setReviewEligibility(
           eligibilityItems.reduce((acc, item) => {
             acc[item.order_item_id] = item;
@@ -264,15 +274,21 @@ export default function OrderDetailPage() {
       rating: review?.rating || 5,
       title: review?.title || "",
       comment: review?.comment || "",
+      images: [],
     });
     setReviewMessage("");
   };
 
   const handleReviewChange = (event) => {
-    const { name, value } = event.target;
+    const { name, value, files } = event.target;
     setReviewForm((prev) => ({
       ...prev,
-      [name]: name === "rating" ? Number(value) : value,
+      [name]:
+        name === "rating"
+          ? Number(value)
+          : name === "images"
+            ? Array.from(files || [])
+            : value,
     }));
   };
 
@@ -282,21 +298,10 @@ export default function OrderDetailPage() {
     setReviewSaving(true);
     setReviewMessage("");
     try {
-      const payload = {
-        order_item_id: reviewItem.order_item_id,
-        rating: reviewForm.rating,
-        title: reviewForm.title,
-        comment: reviewForm.comment,
-      };
-      const response = reviewItem.review?.id
-        ? await apiFetch(`/reviews/${reviewItem.review.id}`, {
-            method: "PUT",
-            body: JSON.stringify(payload),
-          })
-        : await apiFetch("/reviews", {
-            method: "POST",
-            body: JSON.stringify(payload),
-          });
+      const response = await apiFetch("/reviews", {
+        method: "POST",
+        body: buildReviewFormData(reviewItem.order_item_id, reviewForm),
+      });
       const nextReview = response?.review || response?.data?.review || response;
       setReviewEligibility((prev) => ({
         ...prev,
@@ -635,11 +640,7 @@ export default function OrderDetailPage() {
                   reviewEligibility[item.id] ||
                   {};
                 const existingReview = eligibility.review;
-                const canReview =
-                  eligibility.can_review ||
-                  (!eligibility.reason &&
-                    isPaidDeliveredOrder(order) &&
-                    Boolean(item.order_item_id));
+                const canReview = Boolean(eligibility.can_review);
                 return (
                   <div
                     key={item.id || `${item.product_name}-${index}`}
@@ -667,14 +668,19 @@ export default function OrderDetailPage() {
                       <p className="text-xs text-black/50">
                         Unit: {formatMoney(item.price, order.currency)}
                       </p>
-                      {(canReview || existingReview) && (
+                      {canReview && (
                         <button
                           type="button"
                           onClick={() => openReviewModal(item)}
                           className="mt-3 rounded-full border border-black px-4 py-2 text-xs font-semibold uppercase tracking-[0.08em] text-black hover:bg-black hover:text-white"
                         >
-                          {existingReview ? "Edit review" : "Give review"}
+                          Give review
                         </button>
+                      )}
+                      {!canReview && existingReview && (
+                        <p className="mt-2 text-xs font-semibold uppercase tracking-[0.08em] text-black/55">
+                          Already reviewed
+                        </p>
                       )}
                       {!canReview && !existingReview && eligibility.reason && (
                         <p className="mt-2 text-xs text-black/45">

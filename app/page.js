@@ -3,8 +3,10 @@
 import Link from "next/link";
 
 import { apiFetch } from "@/utils/api";
+import { normalizeBlogList } from "@/utils/blogs";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination } from "swiper/modules";
+import { ArrowRight, CalendarDays, Clock, Quote, Star } from "lucide-react";
 import { useEffect, useState } from "react";
 import "swiper/css";
 import "swiper/css/navigation";
@@ -18,6 +20,7 @@ export default function Home() {
   const [blogPosts, setBlogPosts] = useState([]);
   const [loadingProducts, setLoadingProducts] = useState(false);
   const [loadingCategories, setLoadingCategories] = useState(false);
+  const [loadingBlogs, setLoadingBlogs] = useState(false);
   const testimonials = [
     {
       name: "Wendy Rose",
@@ -31,14 +34,14 @@ export default function Home() {
       date: "March 2022",
       rating: 5,
       quote:
-        "Smooth, aromatic, and perfectly balanced. The saffron notes are just right�warm and comforting.",
+        "Smooth, aromatic, and perfectly balanced. The saffron notes are just right, warm and comforting.",
     },
     {
       name: "Linda Reid",
       date: "July 2022",
       rating: 5,
       quote:
-        "Beautiful presentation and a clean, rich taste. Our guests loved it at our boutique caf�.",
+        "Beautiful presentation and a clean, rich taste. Our guests loved it at our boutique cafe.",
     },
     {
       name: "Camilla V.",
@@ -96,43 +99,14 @@ export default function Home() {
 
   useEffect(() => {
     const loadBlogs = async () => {
+      setLoadingBlogs(true);
       try {
         const data = await apiFetch("/home/blogs");
-        const list = Array.isArray(data)
-          ? data
-          : Array.isArray(data?.items)
-            ? data.items
-            : Array.isArray(data?.data)
-              ? data.data
-              : [];
-
-        const normalized = list.slice(0, 3).map((item, index) => {
-          const isoDate = item?.published_at || item?.created_at;
-          const parsedDate = isoDate ? new Date(isoDate) : null;
-          const formattedDate =
-            parsedDate && !Number.isNaN(parsedDate.getTime())
-              ? parsedDate.toLocaleDateString("en-US", {
-                  month: "long",
-                  day: "numeric",
-                  year: "numeric",
-                })
-              : "";
-
-          return {
-            id: item?.id || `fallback-blog-${index}`,
-            title: item?.title || "",
-            excerpt: item?.excerpt || "",
-            image: item?.featured_image_url || "",
-            date: formattedDate,
-            tag: "",
-            author: "",
-            read: "",
-          };
-        });
-
-        setBlogPosts(normalized);
+        setBlogPosts(normalizeBlogList(data).slice(0, 3));
       } catch {
         setBlogPosts([]);
+      } finally {
+        setLoadingBlogs(false);
       }
     };
 
@@ -415,96 +389,169 @@ export default function Home() {
                 </h2>
               </div>
               <Link
-                href="/#blog"
-                className="self-start text-xs font-semibold uppercase tracking-[0.2em] text-black/60 hover:text-black inline-flex items-center gap-2"
+                href="/blogs"
+                className="self-start text-xs font-semibold uppercase tracking-[0.05em] text-black/60 hover:text-black inline-flex items-center gap-2"
               >
-                View all blogs <span aria-hidden="true">�</span>
+                View all blogs <ArrowRight size={14} strokeWidth={1.8} />
               </Link>
             </div>
 
             <div className="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {blogPosts.map((post, index) => (
-                <Link
-                  key={post.id || `${post.title}-${index}`}
-                  href="/#blog"
-                  className="group overflow-hidden rounded-3xl border border-black/10 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-2xl"
-                >
-                  <div className="relative overflow-hidden bg-[#f2f2f2] h-56">
-                    <img
-                      src={post.image}
-                      alt={post.title}
-                      className="h-full w-full object-cover transition duration-300 group-hover:scale-[1.05]"
-                    />
-                    <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/70 to-transparent" />
-                    <div className="absolute left-4 bottom-4 text-white">
-                      <span className="text-[10px] uppercase tracking-[0.3em] text-white/70">
-                        {post.tag}
-                      </span>
-                      <div className="mt-2 text-xs text-white/80">
-                        {post.date}
+              {loadingBlogs && (
+                <div className="col-span-full rounded-sm border border-black/10 bg-white p-6 text-sm text-black/60">
+                  Loading stories...
+                </div>
+              )}
+              {!loadingBlogs && blogPosts.length === 0 && (
+                <div className="col-span-full rounded-sm border border-black/10 bg-white p-6 text-sm text-black/60">
+                  No blog posts available right now.
+                </div>
+              )}
+              {!loadingBlogs &&
+                blogPosts.map((post, index) => (
+                  <Link
+                    key={post.id || `${post.title}-${index}`}
+                    href={post.href}
+                    className="group overflow-hidden rounded-3xl border border-black/10 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-2xl"
+                  >
+                    <div className="relative overflow-hidden bg-[#f2f2f2] h-56">
+                      {post.image ? (
+                        <img
+                          src={post.image}
+                          alt={post.title}
+                          className="h-full w-full object-cover transition duration-300 group-hover:scale-[1.05]"
+                        />
+                      ) : null}
+                      <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/70 to-transparent" />
+                      <div className="absolute left-4 bottom-4 text-white">
+                        <span className="inline-flex items-center gap-2 text-xs text-white/85">
+                          <CalendarDays size={14} />
+                          {post.date}
+                        </span>
                       </div>
                     </div>
-                  </div>
-                  <div className="p-6">
-                    <h3 className="text-lg font-semibold text-black">
-                      {post.title}
-                    </h3>
-                    <p className="mt-3 text-sm text-black/60">{post.excerpt}</p>
-                    <div className="mt-5 flex items-center justify-between text-xs text-black/50">
-                      <span>{post.author}</span>
-                      <span>{post.read}</span>
+                    <div className="p-6">
+                      <h3 className="text-lg font-semibold text-black">
+                        {post.title}
+                      </h3>
+                      <p className="mt-3 text-sm text-black/60">
+                        {post.excerpt}
+                      </p>
+                      <div className="mt-5 flex items-center justify-between gap-4 text-xs text-black/50">
+                        <span className="inline-flex items-center gap-1.5">
+                          <Clock size={14} />
+                          {post.read || "Quick read"}
+                        </span>
+                        <span className="text-black/40">Kahwa journal</span>
+                      </div>
+                      <span className="mt-5 inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.03em] text-black transition group-hover:gap-3">
+                        Read article <ArrowRight size={14} strokeWidth={1.8} />
+                      </span>
                     </div>
-                    <span className="mt-5 inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-black">
-                      Read article <span aria-hidden="true">?</span>
-                    </span>
-                  </div>
-                </Link>
-              ))}
+                  </Link>
+                ))}
             </div>
           </div>
         </section>
 
         {/* Testimonial section */}
-        <section id="testimonials" className="bg-white">
-          <div className="container mx-auto px-4 py-16">
-            <div className="text-center">
-              <p className="text-xs uppercase tracking-[0.4em] text-black/50">
-                What our customer say!
-              </p>
-            </div>
+        <section id="testimonials" className="bg-white text-black">
+          <div className="container mx-auto px-4 py-14 md:py-20">
+            <div className="overflow-hidden rounded-[28px] border border-black/10 bg-[#f7f3eb]">
+              <div className="grid lg:grid-cols-[minmax(0,1fr)_360px]">
+                <div className="relative px-5 py-8 sm:px-8 md:px-12 lg:px-14 lg:py-14">
+                  <div className="pointer-events-none absolute right-8 top-8 hidden text-[#FFBF00]/20 md:block">
+                    <Quote size={72} strokeWidth={1.15} />
+                  </div>
 
-            <div className="mt-10">
-              <Swiper
-                modules={[Navigation]}
-                slidesPerView={1}
-                navigation
-                className="testimonials-swiper"
-              >
-                {testimonials.map((t) => (
-                  <SwiperSlide key={t.name}>
-                    <div className="mx-auto max-w-3xl text-center">
-                      <div className="flex justify-center gap-1 text-[#f59e0b] text-lg">
-                        {Array.from({ length: t.rating }).map((_, i) => (
-                          <span key={i}>?</span>
-                        ))}
-                      </div>
-                      <p className="mt-6 text-xl md:text-2xl text-black/80">
-                        ?{t.quote}?
-                      </p>
-                    </div>
-                  </SwiperSlide>
-                ))}
-              </Swiper>
-            </div>
+                  <div className="relative max-w-3xl">
+                    <p className="text-xs uppercase tracking-[0.4em] text-black/50">
+                      What our customers say
+                    </p>
+                    <div className="mt-4 h-px w-20 bg-[#FFBF00]" />
 
-            {/* <div className="mt-10 flex flex-wrap items-center justify-center gap-6 text-sm text-black/50">
-              {testimonials.map((t) => (
-                <div key={t.name} className="text-center">
-                  <p className="font-semibold text-black">{t.name}</p>
-                  <p className="text-xs text-black/50">{t.date}</p>
+                    <Swiper
+                      modules={[Navigation, Pagination]}
+                      slidesPerView={1}
+                      navigation
+                      pagination={{ clickable: true }}
+                      className="testimonials-swiper mt-8 pb-16"
+                    >
+                      {testimonials.map((t) => (
+                        <SwiperSlide key={t.name}>
+                          <article>
+                            <div
+                              className="flex gap-1 text-[#FFBF00]"
+                              aria-label={`${t.rating} out of 5 stars`}
+                            >
+                              {Array.from({ length: t.rating }).map((_, i) => (
+                                <Star
+                                  key={i}
+                                  size={17}
+                                  fill="currentColor"
+                                  strokeWidth={1.5}
+                                />
+                              ))}
+                            </div>
+
+                            <p className="mt-6 font-(family-name:--font-basker) text-2xl leading-[1.18] text-black sm:text-3xl lg:text-[38px]">
+                              {t.quote}
+                            </p>
+
+                            <div className="mt-8 flex items-center gap-4 border-t border-black/10 pt-6">
+                              <div className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-black text-xs font-semibold uppercase text-white">
+                                <span className="absolute bottom-1.5 h-px w-6 bg-[#FFBF00]" />
+                                {t.name
+                                  .split(" ")
+                                  .map((part) => part[0])
+                                  .join("")
+                                  .replace(".", "")
+                                  .slice(0, 2)}
+                              </div>
+                              <div>
+                                <p className="font-semibold text-black">
+                                  {t.name}
+                                </p>
+                                <p className="text-sm text-black/50">
+                                  {t.date}
+                                </p>
+                              </div>
+                            </div>
+                          </article>
+                        </SwiperSlide>
+                      ))}
+                    </Swiper>
+                  </div>
                 </div>
-              ))}
-            </div> */}
+
+                <aside className="relative min-h-[320px] overflow-hidden bg-black px-8 py-8 text-white lg:min-h-full">
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_38%,rgba(255,191,0,0.20),transparent_42%)]" />
+                  <div className="relative z-10 flex h-full flex-col">
+                    <div className="flex items-center justify-between text-xs uppercase tracking-[0.28em] text-white/55">
+                      <span>Verified reviews</span>
+                      <span>5.0</span>
+                    </div>
+
+                    <div className="my-8 flex flex-1 items-center justify-center">
+                      <img
+                        src="/products/tin/KLTIN1.png"
+                        alt="Kashmiri Kahwa tin"
+                        className="max-h-[300px] w-full object-contain drop-shadow-[0_24px_50px_rgba(255,191,0,0.18)]"
+                      />
+                    </div>
+
+                    <div className="border-t border-white/15 pt-5">
+                      <p className="text-xs uppercase tracking-[0.32em] text-[#FFBF00]">
+                        Customer notes
+                      </p>
+                      <h2 className="mt-3 text-2xl font-semibold leading-tight text-white">
+                        Sipped, shared, remembered.
+                      </h2>
+                    </div>
+                  </div>
+                </aside>
+              </div>
+            </div>
           </div>
         </section>
       </main>
