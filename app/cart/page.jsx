@@ -1,8 +1,9 @@
 "use client";
 
-import { Trash2 } from "lucide-react";
 import Link from "next/link";
+import { X } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
+
 import { apiFetch } from "@/utils/api";
 
 const EMPTY_SUMMARY = {
@@ -16,6 +17,37 @@ const EMPTY_SUMMARY = {
   free_shipping_threshold: 0,
 };
 
+const normalizeCartItem = (item) => {
+  const variant = item?.variant || {};
+  const product = variant?.product || {};
+  const primaryImage = variant?.primaryImage || product?.primaryImage || product?.image || {};
+  const quantity = Number(item?.quantity ?? item?.qty ?? 0) || 0;
+  const unitPrice = Number(item?.price ?? item?.unit_price ?? variant?.price ?? 0) || 0;
+
+  return {
+    ...item,
+    cart_item_id: item?.id || item?.cart_item_id || item?.cart_id || null,
+    variant_id: item?.variant_id || variant?.id || null,
+    quantity,
+    price: unitPrice,
+    subtotal: Number(item?.line_total ?? item?.subtotal ?? unitPrice * quantity) || 0,
+    product_name: item?.product_name || item?.name || product?.name || "",
+    variant_name:
+      item?.variant_name ||
+      (typeof item?.variant === "string" ? item.variant : "") ||
+      variant?.variant_name ||
+      variant?.name ||
+      "",
+    product_image:
+      item?.product_image ||
+      item?.image ||
+      primaryImage?.image_url ||
+      primaryImage?.url ||
+      product?.image_url ||
+      "",
+  };
+};
+
 export default function CartPage() {
   const [items, setItems] = useState([]);
   const [summary, setSummary] = useState(EMPTY_SUMMARY);
@@ -27,57 +59,11 @@ export default function CartPage() {
   const [couponLoading, setCouponLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const normalizeCartItem = (item) => {
-    const variant = item?.variant || {};
-    const product = variant?.product || {};
-    const primaryImage =
-      variant?.primaryImage ||
-      product?.primaryImage ||
-      product?.image ||
-      {};
-
-    const cartItemId = item?.id || item?.cart_item_id || item?.cart_id || null;
-    const variantId = item?.variant_id || variant?.id || null;
-    const quantity = Number(item?.quantity ?? item?.qty ?? 0) || 0;
-    const unitPrice =
-      Number(item?.price ?? item?.unit_price ?? variant?.price ?? 0) || 0;
-    const subtotal =
-      Number(item?.line_total ?? item?.subtotal ?? unitPrice * quantity) || 0;
-
-    return {
-      ...item,
-      cart_item_id: cartItemId,
-      variant_id: variantId,
-      quantity,
-      price: unitPrice,
-      subtotal,
-      product_name: item?.product_name || item?.name || product?.name || "",
-      variant_name:
-        item?.variant_name ||
-        item?.variant ||
-        variant?.variant_name ||
-        variant?.name ||
-        "",
-      product_image:
-        item?.product_image ||
-        item?.image ||
-        primaryImage?.image_url ||
-        primaryImage?.url ||
-        product?.image_url ||
-        "",
-    };
-  };
-
   const hydrateCart = useCallback((payload) => {
     const cart = payload?.items ? payload : payload?.data || {};
     const nextItems = Array.isArray(cart?.items) ? cart.items : [];
-    const normalized = nextItems.map(normalizeCartItem);
-
-    setItems(normalized);
-    setSummary({
-      ...EMPTY_SUMMARY,
-      ...(cart?.summary || {}),
-    });
+    setItems(nextItems.map(normalizeCartItem));
+    setSummary({ ...EMPTY_SUMMARY, ...(cart?.summary || {}) });
     setCoupon(cart?.coupon || null);
     setCouponCode(cart?.coupon?.code || "");
   }, []);
@@ -86,10 +72,9 @@ export default function CartPage() {
     setLoading(true);
     setError("");
     try {
-      const data = await apiFetch("/cart");
-      hydrateCart(data);
-    } catch (err) {
-      setError(err?.message || "Failed to load cart.");
+      hydrateCart(await apiFetch("/cart"));
+    } catch (loadError) {
+      setError(loadError?.message || "Failed to load cart.");
       setItems([]);
       setSummary(EMPTY_SUMMARY);
       setCoupon(null);
@@ -103,43 +88,42 @@ export default function CartPage() {
     loadCart();
   }, [loadCart]);
 
-  const subtotal = useMemo(
-    () => summary.subtotal ?? 0,
-    [summary.subtotal],
-  );
+  useEffect(() => {
+    const count = items.reduce((sum, item) => sum + (item.quantity || 0), 0);
+    localStorage.setItem("cart_count", String(count));
+    window.dispatchEvent(new Event("cartchange"));
+  }, [items]);
+
+  const subtotal = useMemo(() => summary.subtotal ?? 0, [summary.subtotal]);
   const freeShippingThreshold = summary.free_shipping_threshold ?? 0;
   const shipping = summary.shipping ?? 0;
   const discount = summary.discount_amount ?? 0;
   const finalTotal = summary.final_total ?? 0;
-  const total =
-    discount > 0 || finalTotal > 0 || subtotal === 0
-      ? finalTotal
-      : summary.total ?? subtotal + shipping;
-  const amountForFreeShipping =
-    freeShippingThreshold > 0 && subtotal < freeShippingThreshold
-      ? Math.max(0, freeShippingThreshold + 1 - subtotal)
-      : 0;
+  const total = discount > 0 || finalTotal > 0 || subtotal === 0
+    ? finalTotal
+    : summary.total ?? subtotal + shipping;
+  const amountForFreeShipping = freeShippingThreshold > 0 && subtotal < freeShippingThreshold
+    ? Math.max(0, freeShippingThreshold + 1 - subtotal)
+    : 0;
 
   const updateQty = async (item, delta) => {
     if (actionLoading) return;
-    const nextQty = Math.max(1, (item.quantity || 1) + delta);
     const itemId = item.cart_item_id || item.id;
     if (!itemId) {
       setError("Unable to update quantity.");
       return;
     }
+
     setActionLoading(true);
     setError("");
     try {
       await apiFetch(`/cart/${itemId}`, {
         method: "PUT",
-        body: JSON.stringify({
-          quantity: nextQty,
-        }),
+        body: JSON.stringify({ quantity: Math.max(1, item.quantity + delta) }),
       });
       await loadCart();
-    } catch (err) {
-      setError(err?.message || "Unable to update quantity.");
+    } catch (updateError) {
+      setError(updateError?.message || "Unable to update quantity.");
     } finally {
       setActionLoading(false);
     }
@@ -152,13 +136,14 @@ export default function CartPage() {
       setError("Unable to remove item.");
       return;
     }
+
     setActionLoading(true);
     setError("");
     try {
       await apiFetch(`/cart/${itemId}`, { method: "DELETE" });
       await loadCart();
-    } catch (err) {
-      setError(err?.message || "Unable to remove item.");
+    } catch (removeError) {
+      setError(removeError?.message || "Unable to remove item.");
     } finally {
       setActionLoading(false);
     }
@@ -167,7 +152,6 @@ export default function CartPage() {
   const applyCoupon = async (event) => {
     event.preventDefault();
     if (couponLoading) return;
-
     const code = couponCode.trim();
     if (!code) {
       setError("Please enter a coupon code.");
@@ -185,8 +169,8 @@ export default function CartPage() {
       });
       await loadCart();
       setCouponMessage("Coupon applied.");
-    } catch (err) {
-      setError(err?.message || "Unable to apply coupon.");
+    } catch (couponError) {
+      setError(couponError?.message || "Unable to apply coupon.");
     } finally {
       setCouponLoading(false);
     }
@@ -194,7 +178,6 @@ export default function CartPage() {
 
   const removeCoupon = async () => {
     if (couponLoading) return;
-
     setCouponLoading(true);
     setError("");
     setCouponMessage("");
@@ -207,188 +190,140 @@ export default function CartPage() {
       setCoupon(null);
       setCouponCode("");
       setCouponMessage("Coupon removed.");
-    } catch (err) {
-      setError(err?.message || "Unable to remove coupon.");
+    } catch (couponError) {
+      setError(couponError?.message || "Unable to remove coupon.");
     } finally {
       setCouponLoading(false);
     }
   };
 
-  useEffect(() => {
-    const count = items.reduce((sum, item) => sum + (item.quantity || 0), 0);
-    localStorage.setItem("cart_count", String(count));
-    window.dispatchEvent(new Event("cartchange"));
-  }, [items]);
-
   return (
-    <main className="min-h-screen bg-white text-black mt-12">
-      <section className="max-w-6xl mx-auto px-6 py-14">
-        <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-          <div>
-            <p className="text-xs uppercase tracking-[0.4em] text-black/60">
-              Shopping cart
-            </p>
-            <h1
-              className="mt-3 text-3xl md:text-4xl font-semibold"
-              style={{ fontFamily: "var(--font-display)" }}
-            >
-              Your Cart
-            </h1>
-          </div>
-          <Link
-            href="/shop"
-            className="self-start text-xs font-semibold uppercase tracking-[0.2em] text-black/60 hover:text-black inline-flex items-center gap-2"
-          >
-            Continue shopping <span aria-hidden="true">›</span>
-          </Link>
-        </div>
+    <main className="min-h-[650px] overflow-x-hidden bg-[#fdfefb] pt-[70px] text-[#1f241c]">
+      <section className="mx-auto max-w-[1230px] px-5 pb-[86px] pt-16 sm:px-8 sm:pt-[86px]">
+        <h1
+          className="text-[38px] font-normal uppercase leading-none text-[#344823] sm:text-[46px]"
+          style={{ fontFamily: "var(--font-basker)" }}
+        >
+          Cart
+        </h1>
 
-        <div className="mt-10 grid gap-8 lg:grid-cols-[1.4fr_0.6fr]">
-          <div className="rounded-sm border border-black/10 bg-white p-6 shadow-sm">
+        <div className="mt-10 grid items-start gap-5 lg:grid-cols-[minmax(0,2.05fr)_minmax(330px,1fr)]">
+          <section className="min-h-[405px] rounded-lg bg-[#f3f6ef] px-5 py-7 sm:px-8">
             {loading ? (
-              <p className="text-black/60">Loading your cart...</p>
+              <p className="py-12 text-center text-[#6f756a]">Loading your cart…</p>
             ) : items.length === 0 ? (
-              <p className="text-black/60">Your cart is empty.</p>
+              <div className="flex min-h-[320px] flex-col items-center justify-center text-center">
+                <p className="font-serif text-2xl text-[#3f532b]">Your cart is empty.</p>
+                <Link href="/shop" className="mt-5 border border-[#617447] px-6 py-2.5 text-sm text-[#52633d] transition hover:bg-[#e7ecdf]">
+                  Continue Shopping
+                </Link>
+              </div>
             ) : (
-              <div className="grid gap-6">
-                {items.map((item) => (
-                  <div
-                    key={item.id}
-                    className="relative flex flex-col gap-4 border-b border-black/10 pb-6 md:flex-row md:items-center"
-                  >
-                    <div className="h-24 w-24 overflow-hidden rounded-sm bg-black/5 p-3">
-                      <img
-                        src={item.product_image}
-                        alt={item.product_name}
-                        className="h-full w-full object-contain"
-                      />
-                    </div>
-                    <div className="flex-1 ">
-                      <h3 className="text-base font-semibold">
-                        {item.product_name}
-                      </h3>
-                      <p className="mt-2 text-sm text-black/60">
-                        {item.variant_name}
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-4">
-                      <button
-                        type="button"
-                        onClick={() => removeItem(item)}
-                        disabled={actionLoading}
-                        className=" text-xs uppercase tracking-[0.08em] text-black/70 hover:text-black flex items-center gap-1 cursor-pointer disabled:opacity-60"
-                      >
-                        <Trash2 size={15} />
-                      </button>
-                      <div className="flex items-center gap-3 rounded-sm border border-black/10 px-4 py-2">
-                        <button
-                          type="button"
-                          onClick={() => updateQty(item, -1)}
-                          disabled={actionLoading}
-                          className="text-lg cursor-pointer disabled:opacity-60"
-                        >
-                          -
-                        </button>
-                        <span className="text-sm">{item.quantity}</span>
-                        <button
-                          type="button"
-                          onClick={() => updateQty(item, 1)}
-                          disabled={actionLoading}
-                          className="text-lg cursor-pointer disabled:opacity-60"
-                        >
-                          +
-                        </button>
-                      </div>
-                      <div className="text-sm font-semibold">
-                        ₹ {item.subtotal ?? item.price * item.quantity}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
+              <>
+                <div className="hidden grid-cols-[minmax(0,1fr)_90px_150px_38px_92px] items-center gap-4 px-1 pb-4 text-sm uppercase lg:grid">
+                  <span className="pl-[110px]">Product</span>
+                  <span>Price</span>
+                  <span>Quantity</span>
+                  <span aria-hidden="true" />
+                  <span>Subtotal</span>
+                </div>
 
-          <div className="rounded-sm border border-black/10 bg-white p-6 shadow-sm">
-            <p className="text-xs uppercase tracking-[0.08em] text-black/50">
-              Order summary
-            </p>
-            {error && (
-              <div className="mt-4 rounded-sm border border-red-200 bg-red-50 px-4 py-3 text-xs uppercase tracking-[0.08em] text-red-700">
-                {error}
-              </div>
+                <div className="divide-y divide-[#dce0d8]">
+                  {items.map((item) => (
+                    <article
+                      key={item.cart_item_id || item.id}
+                      className="relative grid gap-5 py-6 lg:grid-cols-[minmax(0,1fr)_90px_150px_38px_92px] lg:items-center lg:gap-4"
+                    >
+                      <div className="flex min-w-0 items-center gap-5">
+                        <div className="h-[90px] w-[90px] shrink-0 overflow-hidden rounded bg-white">
+                          {item.product_image ? (
+                            <img src={item.product_image} alt={item.product_name} className="h-full w-full object-cover" />
+                          ) : (
+                            <div className="flex h-full items-center justify-center text-xs text-[#8b9086]">No image</div>
+                          )}
+                        </div>
+                        <div className="min-w-0 pr-8 lg:pr-0">
+                          <h2 className="font-serif text-lg uppercase leading-tight sm:text-xl">{item.product_name}</h2>
+                          {item.variant_name ? <p className="mt-2 text-sm">{item.variant_name}</p> : null}
+                        </div>
+                      </div>
+
+                      <div className="flex items-center justify-between text-base lg:block">
+                        <span className="text-xs uppercase text-[#73786f] lg:hidden">Price</span>
+                        <span>₹{item.price}</span>
+                      </div>
+
+                      <div className="flex items-center justify-between lg:block">
+                        <span className="text-xs uppercase text-[#73786f] lg:hidden">Quantity</span>
+                        <div className="grid h-9 w-[122px] grid-cols-3 overflow-hidden rounded border border-[#d6dad2] bg-white text-base">
+                          <button type="button" onClick={() => updateQty(item, -1)} disabled={actionLoading || item.quantity <= 1} className="cursor-pointer transition hover:bg-[#edf0e9] disabled:cursor-not-allowed disabled:opacity-40" aria-label={`Decrease ${item.product_name} quantity`}>−</button>
+                          <span className="flex items-center justify-center border-x border-[#d6dad2]">{item.quantity}</span>
+                          <button type="button" onClick={() => updateQty(item, 1)} disabled={actionLoading} className="cursor-pointer transition hover:bg-[#edf0e9] disabled:opacity-40" aria-label={`Increase ${item.product_name} quantity`}>+</button>
+                        </div>
+                      </div>
+
+                      <button type="button" onClick={() => removeItem(item)} disabled={actionLoading} className="absolute right-0 top-7 cursor-pointer text-[#9b9e98] transition hover:text-[#4d5e39] disabled:opacity-40 lg:static" aria-label={`Remove ${item.product_name}`}>
+                        <X className="h-6 w-6" strokeWidth={1.5} />
+                      </button>
+
+                      <div className="flex items-center justify-between text-base lg:block">
+                        <span className="text-xs uppercase text-[#73786f] lg:hidden">Subtotal</span>
+                        <span>₹{item.subtotal ?? item.price * item.quantity}</span>
+                      </div>
+                    </article>
+                  ))}
+                </div>
+              </>
             )}
-            <div className="mt-4 rounded-sm border border-dashed border-black/20 bg-black/5 px-4 py-3 text-xs uppercase tracking-[0.08em] text-black/70">
+          </section>
+
+          <aside className="rounded-lg bg-[#f3f6ef] px-6 py-7 sm:px-8">
+            <h2 className="text-[28px] font-semibold leading-none text-[#344823] sm:text-[32px]">Cart totals</h2>
+
+            {error ? <p className="mt-5 rounded bg-[#f8e8e4] px-4 py-3 text-sm text-[#8b352b]">{error}</p> : null}
+
+            <div className="mt-7 rounded bg-[#e5e9df] px-4 py-3 text-sm text-[#454a42]">
               {freeShippingThreshold > 0 && subtotal >= freeShippingThreshold
-                ? "You got free delivery."
+                ? "You got FREE delivery."
                 : freeShippingThreshold > 0
-                  ? `Add ₹ ${amountForFreeShipping} more for free delivery above ₹ ${freeShippingThreshold}.`
+                  ? `Add ₹${amountForFreeShipping} more to get FREE delivery on orders above ₹${freeShippingThreshold}.`
                   : "Shipping will be calculated at checkout."}
             </div>
-            <div className="mt-6 grid gap-3 text-sm text-black/70">
-              <div className="flex items-center justify-between">
-                <span>Subtotal</span>
-                <span>₹ {subtotal}</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span>Shipping</span>
-                <span>{shipping === 0 ? "Free" : `₹ ${shipping}`}</span>
-              </div>
-              {discount > 0 && (
-                <div className="flex items-center justify-between">
-                  <span>Discount</span>
-                  <span>{`- \u20b9 ${discount}`}</span>
-                </div>
-              )}
-              <div className="flex items-center justify-between border-t border-black/10 pt-3 text-black font-semibold">
-                <span>Total</span>
-                <span>₹ {total}</span>
-              </div>
-            </div>
 
-            <form className="mt-6" onSubmit={applyCoupon}>
-              <label className="text-xs uppercase tracking-[0.08em] text-black/50">
-                Coupon code
-              </label>
-              <div className="mt-3 flex items-center gap-2">
-                <input
-                  type="text"
-                  placeholder="KAHWA10"
-                  value={couponCode}
-                  onChange={(event) => setCouponCode(event.target.value)}
-                  disabled={couponLoading || Boolean(coupon)}
-                  className="flex-1 rounded-sm border  border-black/20 px-4 py-2 text-sm outline-none focus:border-black"
-                />
-                <button
-                  type={coupon ? "button" : "submit"}
-                  onClick={coupon ? removeCoupon : undefined}
-                  disabled={couponLoading}
-                  className="rounded-sm border border-black/20 px-4 py-2 text-sm font-semibold uppercase tracking-[0.1em] text-black cursor-pointer hover:bg-black hover:text-white transition disabled:opacity-60"
-                >
-                  {coupon
-                    ? couponLoading
-                      ? "Removing"
-                      : "Remove"
-                    : couponLoading
-                      ? "Applying"
-                      : "Apply"}
-                </button>
-              </div>
-              {couponMessage && (
-                <p className="mt-3 text-xs uppercase tracking-[0.08em] text-black/50">
-                  {couponMessage}
-                </p>
-              )}
-            </form>
-            <Link href="/checkout">
-              <button className="mt-8 w-full rounded-full bg-black px-4 py-3 text-xs font-semibold uppercase tracking-[0.08em] text-white cursor-pointer hover:bg-black/90 transition">
-                Proceed to checkout
+            <form className="mt-6 grid grid-cols-[minmax(0,1fr)_110px] gap-3 sm:grid-cols-[minmax(0,1fr)_118px]" onSubmit={applyCoupon}>
+              <input
+                aria-label="Coupon code"
+                type="text"
+                placeholder="Coupon Code"
+                value={couponCode}
+                onChange={(event) => setCouponCode(event.target.value)}
+                disabled={couponLoading || Boolean(coupon)}
+                className="min-w-0 flex-1 rounded-lg border border-[#7d904e] bg-transparent px-4 py-2.5 text-base outline-none placeholder:text-[#747970] focus:border-[#52653b]"
+              />
+              <button
+                type={coupon ? "button" : "submit"}
+                onClick={coupon ? removeCoupon : undefined}
+                disabled={couponLoading}
+                className="rounded-lg bg-[#6b8140] px-4 py-2.5 text-base text-white transition hover:bg-[#566a32] disabled:opacity-50"
+              >
+                {coupon ? (couponLoading ? "Removing" : "Remove") : couponLoading ? "Applying" : "Apply"}
               </button>
-            </Link>
-            <p className="mt-4 text-xs text-black/50">
-              Taxes and shipping are calculated at checkout.
-            </p>
-          </div>
+            </form>
+            {couponMessage ? <p className="mt-2 text-xs text-[#52633d]">{couponMessage}</p> : null}
+
+            <dl className="mt-7 space-y-3 text-base">
+              <div className="flex justify-between"><dt>Subtotal</dt><dd>₹{subtotal}</dd></div>
+              <div className="flex justify-between"><dt>Shipping</dt><dd>{shipping === 0 ? "Free" : `₹${shipping}`}</dd></div>
+              {discount > 0 ? <div className="flex justify-between text-[#52633d]"><dt>Discount</dt><dd>− ₹{discount}</dd></div> : null}
+              <div className="flex justify-between pt-1 text-xl"><dt>Total</dt><dd>₹{total}</dd></div>
+            </dl>
+
+            {items.length ? (
+              <Link href="/checkout" className="mt-9 flex h-11 w-full items-center justify-center rounded-lg bg-[#4f6139] text-base font-semibold text-white transition hover:bg-[#40502e]">
+                Proceed To Checkout
+              </Link>
+            ) : null}
+          </aside>
         </div>
       </section>
     </main>

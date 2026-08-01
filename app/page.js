@@ -1,576 +1,245 @@
-﻿﻿"use client";
+"use client";
 
 import Link from "next/link";
-
-import { apiFetch } from "@/utils/api";
-import { normalizeBlogList } from "@/utils/blogs";
-import { Swiper, SwiperSlide } from "swiper/react";
-import { Navigation, Pagination } from "swiper/modules";
-import { ArrowRight, CalendarDays, Clock, Quote, Star } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { useEffect, useState } from "react";
-import "swiper/css";
-import "swiper/css/navigation";
-import "swiper/css/pagination";
+
 import HeroSection from "@/components/HeroSection";
 import ProductCard from "@/components/ProductCard";
+import { apiFetch } from "@/utils/api";
+import { normalizeBlogList } from "@/utils/blogs";
+
+const fallbackArticles = [
+  {
+    id: "hibiscus-guide",
+    title: "Factors to Consider When Choosing Hibiscus Kahwa",
+    excerpt:
+      "Choosing the best chamomile tea comes down to eight key factors: ingredient quality, whole flowers over powder, organic where possible, and origin.",
+    href: "/blogs",
+    image: "/bg/TKC Website Images/Products Image.png",
+  },
+  {
+    id: "kashmiri-immunity",
+    title: "Immunity-Boosting Tea: Add To New Kashmiri Kahwa",
+    excerpt:
+      "Discover a comforting blend with aromatic botanicals and traditional spices, crafted for a mindful everyday ritual.",
+    href: "/blogs",
+    image: "/bg/TKC Website Images/Kashmiri Image.png",
+  },
+  {
+    id: "hibiscus-factors",
+    title: "Factors to Consider When Choosing Hibiscus Kahwa",
+    excerpt:
+      "Learn how ingredients, freshness, aroma, and careful small-batch blending shape a beautifully balanced cup.",
+    href: "/blogs",
+    image: "/bg/TKC Website Images/Hibiscus Image.png",
+  },
+];
+
+const normalizeProduct = (item) => {
+  const images = Array.isArray(item.images)
+    ? item.images
+    : (item.images ? Object.values(item.images).filter(Boolean) : []).map(
+        (url, index) => ({
+          id: `img-${item.id}-${index}`,
+          image_url: url,
+        }),
+      );
+
+  return {
+    ...item,
+    images,
+    oldPrice: item.compare_price || item.oldPrice,
+  };
+};
 
 export default function Home() {
-  const [categories, setCategories] = useState([]);
   const [products, setProducts] = useState([]);
-  const [blogPosts, setBlogPosts] = useState([]);
-  const [loadingProducts, setLoadingProducts] = useState(false);
-  const [loadingCategories, setLoadingCategories] = useState(false);
-  const [loadingBlogs, setLoadingBlogs] = useState(false);
-  const testimonials = [
-    {
-      name: "Wendy Rose",
-      date: "January 2022",
-      rating: 5,
-      quote:
-        "Fast delivery, excellent packaging and high quality product. The tea has a lovely flavour. This is a great place if you are interested in or want to discover teas.",
-    },
-    {
-      name: "Eleonora L.",
-      date: "March 2022",
-      rating: 5,
-      quote:
-        "Smooth, aromatic, and perfectly balanced. The saffron notes are just right, warm and comforting.",
-    },
-    {
-      name: "Linda Reid",
-      date: "July 2022",
-      rating: 5,
-      quote:
-        "Beautiful presentation and a clean, rich taste. Our guests loved it at our boutique cafe.",
-    },
-    {
-      name: "Camilla V.",
-      date: "October 2022",
-      rating: 5,
-      quote:
-        "Exceptional blends and elegant packaging. A premium experience from start to finish.",
-    },
-  ];
+  const [blogPosts, setBlogPosts] = useState(fallbackArticles);
+  const [loadingProducts, setLoadingProducts] = useState(true);
 
   useEffect(() => {
-    const loadData = async () => {
-      try {
-        setLoadingCategories(true);
-        setLoadingProducts(true);
-        const [filtersData, productsData] = await Promise.all([
-          apiFetch("/products/filters"),
-          apiFetch("/products?limit=8"),
-        ]);
-        const nextCategories = Array.isArray(filtersData?.categories)
-          ? filtersData.categories
-          : [];
-        setCategories(nextCategories);
+    let active = true;
 
-        const items = Array.isArray(productsData?.items)
-          ? productsData.items
-          : [];
-        const normalized = items.map((item) => {
-          const images = Array.isArray(item.images)
-            ? item.images
-            : (item.images
-                ? Object.values(item.images).filter(Boolean)
-                : []
-              ).map((url, index) => ({
-                id: `img-${item.id}-${index}`,
-                image_url: url,
-              }));
-          return {
-            ...item,
-            images,
-            oldPrice: item.compare_price,
-          };
-        });
-        setProducts(normalized);
-      } catch (e) {
-        setCategories([]);
-        setProducts([]);
+    const loadProducts = async () => {
+      setLoadingProducts(true);
+      try {
+        const data = await apiFetch("/products?limit=8");
+        const items = Array.isArray(data?.items) ? data.items : [];
+        if (active) setProducts(items.map(normalizeProduct));
+      } catch {
+        if (active) setProducts([]);
       } finally {
-        setLoadingCategories(false);
-        setLoadingProducts(false);
+        if (active) setLoadingProducts(false);
       }
     };
-    loadData();
-  }, []);
 
-  useEffect(() => {
     const loadBlogs = async () => {
-      setLoadingBlogs(true);
       try {
         const data = await apiFetch("/home/blogs");
-        setBlogPosts(normalizeBlogList(data).slice(0, 3));
+        const items = normalizeBlogList(data).slice(0, 3);
+        if (active && items.length) setBlogPosts(items);
       } catch {
-        setBlogPosts([]);
-      } finally {
-        setLoadingBlogs(false);
+        // The designed fallback articles remain visible when the API is unavailable.
       }
     };
 
+    loadProducts();
     loadBlogs();
+
+    return () => {
+      active = false;
+    };
   }, []);
 
   return (
-    <>
-      <main>
-        <HeroSection />
+    <main className="bg-white text-[#20251d]">
+      <HeroSection />
 
-        {/* About Kahwa Section */}
-        <section
-          id="about"
-          className="container mx-auto px-4 py-12 grid gap-8 lg:grid-cols-[1.1fr_1fr] lg:items-stretch"
-        >
-          <div className="relative min-h-[280px] sm:min-h-[340px] md:min-h-[420px] h-full overflow-hidden rounded-3xl">
-            <img
-              src="/products/W5.png"
-              alt="Kahwa assortment"
-              className="h-full w-full object-cover"
-            />
-            <div className="absolute inset-0 bg-gradient-to-tr from-black/70 via-black/30 to-transparent" />
-            <div className="absolute left-6 bottom-6 text-white">
-              <p className="text-xs uppercase tracking-[0.4em] text-white/70">
-                Craft & Heritage
-              </p>
-              <h3 className="mt-2 text-2xl font-semibold">
-                A ritual from Kashmir
-              </h3>
-            </div>
-          </div>
-
-          <div className="relative min-h-[280px] sm:min-h-[340px] md:min-h-[420px] h-full overflow-hidden rounded-3xl border border-black/10 bg-white p-6 md:p-10">
-            <div className="absolute right-6 top-6 h-20 w-20 overflow-hidden rounded-full border border-black/10 bg-white">
-              <img
-                src="/logo/Fevicon%20tkc-2.png"
-                alt="TKC"
-                className="h-full w-full object-contain p-2"
-              />
-            </div>
-            <div className="relative z-10 flex h-full flex-col">
-              <p className="text-xs uppercase tracking-[0.4em] text-[#FFBF00]">
-                About kahwa
-              </p>
-              <h2 className="mt-4 text-2xl md:text-3xl font-semibold text-black">
-                What is Kahwa?
-              </h2>
-              <p className="mt-4 text-sm md:text-base text-black/70">
-                Kahwa is a traditional aromatic tea from the valleys of Kashmir,
-                crafted with fine green tea leaves and slow brewed with spices
-                like saffron, cardamom, cinnamon and cloves. Known for its
-                warmth and calming fragrance, it has been a part of Kashmiri
-                hospitality for centuries, served to energise the body, soothe
-                the senses and bring people together.
-              </p>
-              <p className="mt-4 text-sm md:text-base text-black/70">
-                At The Kahwa Company, we honour this timeless drink while
-                introducing modern, creative flavours that elevate the
-                experience. From classic blends to innovative infusions, our
-                kahwa is crafted to be both comforting and artisanal, something
-                you can enjoy every day in every season.
-              </p>
-              <div className="mt-auto pt-4">
-                <Link
-                  href="/shop"
-                  className="inline-flex items-center gap-2 rounded-full border border-black px-5 py-2 text-xs font-semibold uppercase tracking-[0.25em] text-black"
-                >
-                  Explore blends
-                </Link>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* products section -- 2 */}
-        <section id="shop-by-product" className="bg-white">
-          <div className="container mx-auto px-4 py-16">
-            <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
-              <div>
-                <p className="text-xs uppercase tracking-[0.4em] text-black/60 mb-3">
-                  KAHWA BLENDS
-                </p>
-                <h2 className="text-3xl md:text-4xl font-semibold text-black">
-                  Explore Our Range
-                </h2>
-              </div>
-              <Link
-                href="/shop"
-                className="self-start text-xs font-semibold uppercase tracking-[0.2em] text-black/60 hover:text-black inline-flex items-center gap-2"
-              >
-                View all products <span aria-hidden="true">�</span>
-              </Link>
-            </div>
-
-            <Swiper
-              modules={[Navigation, Pagination]}
-              slidesPerView={1.1}
-              spaceBetween={18}
-              breakpoints={{
-                640: { slidesPerView: 2.1, spaceBetween: 22 },
-                1024: { slidesPerView: 3.2, spaceBetween: 26 },
-                1280: { slidesPerView: 4.6, spaceBetween: 30 },
-              }}
-              className="kahwa-tiles-swiper mt-10 pb-12"
+      <section
+        className="pt-28 sm:pt-36 lg:pt-40"
+        aria-labelledby="blends-title"
+      >
+        <div className="mx-auto w-full max-w-[1216px] px-4 sm:px-6">
+          <div className="mb-8 flex items-end justify-between gap-6">
+            <h2
+              id="blends-title"
+              className="font-(family-name:--font-basker) text-[28px] uppercase leading-none tracking-[0.01em] text-[#252a22] sm:text-[36px]"
             >
-              {loadingProducts && (
-                <SwiperSlide key="tiles-loading">
-                  <div className="rounded-sm border border-black/10 bg-white p-6 text-sm text-black/60">
-                    Loading products...
-                  </div>
-                </SwiperSlide>
-              )}
-              {!loadingProducts && products.length === 0 && (
-                <SwiperSlide key="tiles-empty">
-                  <div className="rounded-sm border border-black/10 bg-white p-6 text-sm text-black/60">
-                    No products available right now.
-                  </div>
-                </SwiperSlide>
-              )}
-              {!loadingProducts &&
-                products.map((product) => (
-                  <SwiperSlide key={`tiles-${product.id}`}>
-                    <ProductCard product={product} />
-                  </SwiperSlide>
-                ))}
-            </Swiper>
+              Must Have Blends
+            </h2>
+            <Link
+              href="/shop"
+              className="mb-0.5 inline-flex items-center gap-1.5 text-xs font-medium text-[#586f34] underline underline-offset-2 sm:text-base"
+            >
+              View all Blends <ArrowRight size={18} strokeWidth={1.5} />
+            </Link>
           </div>
-        </section>
 
-        {/* bulk inquiry */}
-        <section
-          id="bulk-inquiry"
-          className="relative overflow-hidden bg-black bg-center bg-cover"
-          style={{ backgroundImage: "url('/products/W7.png')" }}
-        >
-          <div className="absolute inset-0 bg-gradient-to-br from-black/90 via-black/70 to-black/40" />
-          <div className="container mx-auto px-4 py-16 md:py-24 relative">
-            <div className="grid gap-10 lg:grid-cols-[1.2fr_0.8fr]">
-              <div className="rounded-[28px] border border-white/15 bg-white/5 px-6 py-10 text-white backdrop-blur-md md:px-10">
-                <div className="flex flex-wrap items-center gap-3 text-xs uppercase tracking-[0.45em] text-white/70">
-                  <span className="h-1.5 w-1.5 rounded-full bg-white/70" />
-                  Bulk inquiry
-                </div>
-                <h2 className="mt-5 text-3xl md:text-4xl lg:text-5xl font-semibold text-white">
-                  Stock kahwa for cafes, hotels, or events.
-                </h2>
-                <p className="mt-4 max-w-2xl text-sm md:text-base text-white/70">
-                  Tell us your volume, preferred blends, and delivery timeline.
-                  We will curate a proposal within 24 hours.
-                </p>
-                <div className="mt-8 flex flex-wrap gap-4">
-                  <a
-                    href="mailto:hello@thekahwacompany.com"
-                    className="inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-xs md:text-sm font-semibold uppercase tracking-[0.25em] text-black"
-                  >
-                    Email our team
-                  </a>
-                  <Link
-                    href="/shop"
-                    className="inline-flex items-center gap-2 rounded-full border border-white/60 px-6 py-3 text-xs md:text-sm font-semibold uppercase tracking-[0.25em] text-white hover:border-white"
-                  >
-                    Browse catalog
-                  </Link>
-                </div>
-              </div>
+          <Link
+            href="/shop"
+            aria-label="Discover our must-have Kahwa blends"
+            className="group block aspect-[4.25/1] overflow-hidden rounded-md"
+          >
+            <img
+              src="/bg/banner.png"
+              alt="Exquisite taste, refreshing Kahwa blends"
+              className="block h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.06]"
+            />
+          </Link>
 
-              <div className="grid gap-4 text-white/70">
-                <div className="rounded-2xl border border-white/10 bg-white/5 px-6 py-6">
-                  <p className="text-xs uppercase tracking-[0.4em] text-white/60">
-                    MOQ friendly
-                  </p>
-                  <p className="mt-3 text-sm text-white/70">
-                    Flexible starting quantities for boutique cafes to large
-                    hotel chains.
-                  </p>
-                </div>
-                <div className="rounded-2xl border border-white/10 bg-white/5 px-6 py-6">
-                  <p className="text-xs uppercase tracking-[0.4em] text-white/60">
-                    Custom blends
-                  </p>
-                  <p className="mt-3 text-sm text-white/70">
-                    Tailored spice profiles, packaging, and gifting notes.
-                  </p>
-                </div>
-                <div className="rounded-2xl border border-white/10 bg-white/5 px-6 py-6">
-                  <p className="text-xs uppercase tracking-[0.4em] text-white/60">
-                    24h response
-                  </p>
-                  <p className="mt-3 text-sm text-white/70">
-                    Dedicated concierge replies within one business day.
-                  </p>
-                </div>
+          <div className="homepage-products mt-4 grid grid-flow-col gap-3.5 overflow-x-auto pb-3">
+            {loadingProducts
+              ? Array.from({ length: 4 }).map((_, index) => (
+                  <div
+                    key={`product-loading-${index}`}
+                    className="h-[350px] animate-pulse rounded-sm border border-[#e8ecdf] bg-[#f1f4ec]"
+                    aria-hidden="true"
+                  />
+                ))
+              : null}
+
+            {!loadingProducts && products.length === 0 ? (
+              <div className="col-span-full rounded-sm border border-[#e8ecdf] bg-[#f7f9f3] p-8 text-sm text-[#626a5b]">
+                No products are available right now.
               </div>
-            </div>
+            ) : null}
+
+            {!loadingProducts
+              ? products.map((product) => (
+                  <ProductCard
+                    key={product.id}
+                    product={product}
+                    variant="homepage"
+                  />
+                ))
+              : null}
           </div>
-        </section>
+        </div>
 
-        {/* Category Section */}
-        <section id="categories" className="bg-white text-black">
-          <div className="container mx-auto px-4 py-16">
-            <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-              <div>
-                <p className="text-xs uppercase tracking-[0.4em] text-black/60">
-                  Browse by category
-                </p>
-                <h2 className="mt-3 text-3xl md:text-4xl font-semibold text-black">
-                  Shop by Category
-                </h2>
-              </div>
+        <div className="mt-12 h-48 bg-[#f1f4ec] sm:h-64 lg:h-80" />
+      </section>
+
+      <section
+        className="bg-white py-14 sm:py-18 lg:py-20"
+        aria-labelledby="articles-title"
+      >
+        <div className="mx-auto w-full max-w-[1180px] px-4 sm:px-6">
+          <div className="mb-7 flex items-end justify-between gap-6">
+            <h2
+              id="articles-title"
+              className="font-(family-name:--font-basker) text-2xl uppercase tracking-[0.01em] text-[#30352c] sm:text-3xl"
+            >
+              Latest Articles
+            </h2>
+            <Link
+              href="/blogs"
+              className="mb-1 inline-flex items-center gap-1 text-[11px] font-medium text-[#52633c] underline underline-offset-2 sm:text-xs"
+            >
+              View all Articles <ArrowRight size={14} strokeWidth={1.5} />
+            </Link>
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-3">
+            {blogPosts.slice(0, 3).map((post, index) => (
               <Link
-                href="/shop"
-                className="self-start rounded-full border border-black/60 px-5 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-black hover:border-black"
+                key={post.id || `${post.title}-${index}`}
+                href={post.href || "/blogs"}
+                className="group overflow-hidden rounded-md bg-[#f1f4ec] p-2 transition hover:-translate-y-0.5"
               >
-                View all
+                <div className="aspect-[1.85/1] overflow-hidden rounded">
+                  {post.image ? (
+                    <img
+                      src={post.image}
+                      alt={post.title}
+                      className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.025]"
+                    />
+                  ) : (
+                    <div className="h-full w-full bg-[#e3e8db]" />
+                  )}
+                </div>
+                <div className="px-1 pb-3 pt-3">
+                  <h3 className="text-sm font-semibold leading-snug text-[#23281f] sm:text-[15px]">
+                    {post.title}
+                  </h3>
+                  <p className="mt-1.5 line-clamp-3 text-[10px] leading-relaxed text-[#5e6559] sm:text-[11px]">
+                    {post.excerpt}
+                  </p>
+                </div>
               </Link>
-            </div>
-
-            <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {loadingCategories && (
-                <div className="col-span-full rounded-sm border border-black/10 bg-white p-6 text-sm text-black/60">
-                  Loading categories...
-                </div>
-              )}
-              {!loadingCategories && categories.length === 0 && (
-                <div className="col-span-full rounded-sm border border-black/10 bg-white p-6 text-sm text-black/60">
-                  No categories available right now.
-                </div>
-              )}
-              {!loadingCategories &&
-                categories.slice(0, 6).map((category, index) => {
-                  const fallbackImage =
-                    products[index]?.images?.[0]?.image_url || "";
-                  return (
-                    <Link
-                      key={`${category.id}-${index}`}
-                      href={`/shop?category=${category.slug || category.id}`}
-                      className="group relative overflow-hidden rounded-3xl border border-black/10 bg-white transition hover:-translate-y-1 hover:shadow-2xl"
-                    >
-                      <div
-                        className="h-44 bg-center bg-cover"
-                        style={{
-                          backgroundImage: fallbackImage
-                            ? `url(${fallbackImage})`
-                            : "none",
-                        }}
-                      >
-                        <div className="h-full w-full bg-gradient-to-b from-black/10 via-black/30 to-black/80" />
-                      </div>
-                      <div className="p-6">
-                        <div className="flex items-center justify-between text-xs uppercase tracking-[0.3em] text-black/60">
-                          <span>Category</span>
-                          <span>View</span>
-                        </div>
-                        <h3 className="mt-4 text-2xl font-semibold text-black">
-                          {category.name}
-                        </h3>
-                        <p className="mt-3 text-sm text-black/70 line-clamp-2">
-                          {category.description ||
-                            "Explore the best sellers and seasonal favorites."}
-                        </p>
-                      </div>
-                    </Link>
-                  );
-                })}
-            </div>
+            ))}
           </div>
-        </section>
-
-        {/* Blog section */}
-        <section id="blog" className="bg-white">
-          <div className="container mx-auto px-4 py-16">
-            <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-              <div>
-                <p className="text-xs uppercase tracking-[0.4em] text-black/60">
-                  Stories & Sips
-                </p>
-                <h2 className="mt-3 text-3xl md:text-4xl font-semibold text-black">
-                  From our blog
-                </h2>
-              </div>
-              <Link
-                href="/blogs"
-                className="self-start text-xs font-semibold uppercase tracking-[0.05em] text-black/60 hover:text-black inline-flex items-center gap-2"
-              >
-                View all blogs <ArrowRight size={14} strokeWidth={1.8} />
-              </Link>
-            </div>
-
-            <div className="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {loadingBlogs && (
-                <div className="col-span-full rounded-sm border border-black/10 bg-white p-6 text-sm text-black/60">
-                  Loading stories...
-                </div>
-              )}
-              {!loadingBlogs && blogPosts.length === 0 && (
-                <div className="col-span-full rounded-sm border border-black/10 bg-white p-6 text-sm text-black/60">
-                  No blog posts available right now.
-                </div>
-              )}
-              {!loadingBlogs &&
-                blogPosts.map((post, index) => (
-                  <Link
-                    key={post.id || `${post.title}-${index}`}
-                    href={post.href}
-                    className="group overflow-hidden rounded-3xl border border-black/10 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-2xl"
-                  >
-                    <div className="relative overflow-hidden bg-[#f2f2f2] h-56">
-                      {post.image ? (
-                        <img
-                          src={post.image}
-                          alt={post.title}
-                          className="h-full w-full object-cover transition duration-300 group-hover:scale-[1.05]"
-                        />
-                      ) : null}
-                      <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/70 to-transparent" />
-                      <div className="absolute left-4 bottom-4 text-white">
-                        <span className="inline-flex items-center gap-2 text-xs text-white/85">
-                          <CalendarDays size={14} />
-                          {post.date}
-                        </span>
-                      </div>
-                    </div>
-                    <div className="p-6">
-                      <h3 className="text-lg font-semibold text-black">
-                        {post.title}
-                      </h3>
-                      <p className="mt-3 text-sm text-black/60">
-                        {post.excerpt}
-                      </p>
-                      <div className="mt-5 flex items-center justify-between gap-4 text-xs text-black/50">
-                        <span className="inline-flex items-center gap-1.5">
-                          <Clock size={14} />
-                          {post.read || "Quick read"}
-                        </span>
-                        <span className="text-black/40">Kahwa journal</span>
-                      </div>
-                      <span className="mt-5 inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.03em] text-black transition group-hover:gap-3">
-                        Read article <ArrowRight size={14} strokeWidth={1.8} />
-                      </span>
-                    </div>
-                  </Link>
-                ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Testimonial section */}
-        <section id="testimonials" className="bg-white text-black">
-          <div className="container mx-auto px-4 py-14 md:py-20">
-            <div className="overflow-hidden rounded-[28px] border border-black/10 bg-[#f7f3eb]">
-              <div className="grid lg:grid-cols-[minmax(0,1fr)_360px]">
-                <div className="relative px-5 py-8 sm:px-8 md:px-12 lg:px-14 lg:py-14">
-                  <div className="pointer-events-none absolute right-8 top-8 hidden text-[#FFBF00]/20 md:block">
-                    <Quote size={72} strokeWidth={1.15} />
-                  </div>
-
-                  <div className="relative max-w-3xl">
-                    <p className="text-xs uppercase tracking-[0.4em] text-black/50">
-                      What our customers say
-                    </p>
-                    <div className="mt-4 h-px w-20 bg-[#FFBF00]" />
-
-                    <Swiper
-                      modules={[Navigation, Pagination]}
-                      slidesPerView={1}
-                      navigation
-                      pagination={{ clickable: true }}
-                      className="testimonials-swiper mt-8 pb-16"
-                    >
-                      {testimonials.map((t) => (
-                        <SwiperSlide key={t.name}>
-                          <article>
-                            <div
-                              className="flex gap-1 text-[#FFBF00]"
-                              aria-label={`${t.rating} out of 5 stars`}
-                            >
-                              {Array.from({ length: t.rating }).map((_, i) => (
-                                <Star
-                                  key={i}
-                                  size={17}
-                                  fill="currentColor"
-                                  strokeWidth={1.5}
-                                />
-                              ))}
-                            </div>
-
-                            <p className="mt-6 font-(family-name:--font-basker) text-2xl leading-[1.18] text-black sm:text-3xl lg:text-[38px]">
-                              {t.quote}
-                            </p>
-
-                            <div className="mt-8 flex items-center gap-4 border-t border-black/10 pt-6">
-                              <div className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-black text-xs font-semibold uppercase text-white">
-                                <span className="absolute bottom-1.5 h-px w-6 bg-[#FFBF00]" />
-                                {t.name
-                                  .split(" ")
-                                  .map((part) => part[0])
-                                  .join("")
-                                  .replace(".", "")
-                                  .slice(0, 2)}
-                              </div>
-                              <div>
-                                <p className="font-semibold text-black">
-                                  {t.name}
-                                </p>
-                                <p className="text-sm text-black/50">
-                                  {t.date}
-                                </p>
-                              </div>
-                            </div>
-                          </article>
-                        </SwiperSlide>
-                      ))}
-                    </Swiper>
-                  </div>
-                </div>
-
-                <aside className="relative min-h-[320px] overflow-hidden bg-black px-8 py-8 text-white lg:min-h-full">
-                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_38%,rgba(255,191,0,0.20),transparent_42%)]" />
-                  <div className="relative z-10 flex h-full flex-col">
-                    <div className="flex items-center justify-between text-xs uppercase tracking-[0.28em] text-white/55">
-                      <span>Verified reviews</span>
-                      <span>5.0</span>
-                    </div>
-
-                    <div className="my-8 flex flex-1 items-center justify-center">
-                      <img
-                        src="/products/tin/KLTIN1.png"
-                        alt="Kashmiri Kahwa tin"
-                        className="max-h-[300px] w-full object-contain drop-shadow-[0_24px_50px_rgba(255,191,0,0.18)]"
-                      />
-                    </div>
-
-                    <div className="border-t border-white/15 pt-5">
-                      <p className="text-xs uppercase tracking-[0.32em] text-[#FFBF00]">
-                        Customer notes
-                      </p>
-                      <h2 className="mt-3 text-2xl font-semibold leading-tight text-white">
-                        Sipped, shared, remembered.
-                      </h2>
-                    </div>
-                  </div>
-                </aside>
-              </div>
-            </div>
-          </div>
-        </section>
-      </main>
+        </div>
+      </section>
 
       <style jsx global>{`
-        .kahwa-tiles-swiper .swiper-button-next,
-        .kahwa-tiles-swiper .swiper-button-prev {
-          color: #2f241b;
+        .homepage-products {
+          grid-auto-columns: minmax(220px, 78vw);
+          scrollbar-width: none;
         }
 
-        .kahwa-tiles-swiper .swiper-pagination-bullet {
-          background: #d5c6b4;
-          opacity: 1;
+        .homepage-products::-webkit-scrollbar {
+          display: none;
         }
 
-        .kahwa-tiles-swiper .swiper-pagination-bullet-active {
-          background: #2f241b;
+        @media (min-width: 640px) {
+          .homepage-products {
+            grid-auto-columns: calc((100% - 14px) / 2);
+          }
+        }
+
+        @media (min-width: 768px) {
+          .homepage-products {
+            grid-auto-columns: calc((100% - 28px) / 3);
+          }
+        }
+
+        @media (min-width: 1024px) {
+          .homepage-products {
+            grid-auto-columns: calc((100% - 42px) / 4);
+          }
         }
       `}</style>
-    </>
+    </main>
   );
 }

@@ -32,6 +32,11 @@ export const normalizeBlogPost = (item, index = 0) => {
     status: item?.status,
     metaTitle: item?.meta_title || "",
     metaDescription: item?.meta_description || "",
+    author:
+      item?.author?.name ||
+      item?.author_name ||
+      item?.created_by?.name ||
+      "",
     date: formatBlogDate(item?.published_at || item?.created_at),
     read: getReadTime(content),
   };

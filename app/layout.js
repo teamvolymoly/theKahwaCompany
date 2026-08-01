@@ -5,6 +5,7 @@ import Footer from "@/components/Footer";
 import NewHeader from "@/components/NewHeader";
 import ToastHost from "@/components/ToastHost";
 import SiteLoader from "@/components/SiteLoader";
+import PageTransition from "@/components/PageTransition";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -36,7 +37,7 @@ export default function RootLayout({ children }) {
           <SiteLoader />
           <NewHeader />
           <ToastHost />
-          {children}
+          <PageTransition>{children}</PageTransition>
           <Footer />
         </AuthProvider>
       </body>

@@ -3,36 +3,157 @@
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
-import { ArrowLeft, CalendarDays, Clock, Leaf } from "lucide-react";
 
 import { apiFetch } from "@/utils/api";
 import {
   contentToBlogBlocks,
+  normalizeBlogPagination,
   normalizeBlogPost,
 } from "@/utils/blogs";
+
+const shareLinks = [
+  {
+    label: "Facebook",
+    href: (url, title) =>
+      `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}&quote=${encodeURIComponent(title)}`,
+    path: "M14 9h3V6h-3c-2.2 0-4 1.8-4 4v2H7v3h3v7h3v-7h3l1-3h-4v-2c0-.6.4-1 1-1z",
+  },
+  {
+    label: "X",
+    href: (url, title) =>
+      `https://x.com/intent/post?url=${encodeURIComponent(url)}&text=${encodeURIComponent(title)}`,
+    path: "M18.9 2H22l-6.77 7.74L23.2 22h-6.24l-4.89-6.39L6.48 22H3.36l7.27-8.31L3 2h6.4l4.42 5.84L18.9 2zm-1.1 17.84h1.73L8.46 4.05H6.6L17.8 19.84z",
+  },
+  {
+    label: "WhatsApp",
+    href: (url, title) =>
+      `https://wa.me/?text=${encodeURIComponent(`${title} ${url}`)}`,
+    path: "M12.04 2a9.84 9.84 0 0 0-8.42 14.92L2.1 22l5.2-1.48A9.98 9.98 0 1 0 12.04 2Zm0 17.93a8.08 8.08 0 0 1-4.12-1.13l-.3-.18-3.08.88.9-3-.2-.31a7.9 7.9 0 1 1 6.8 3.74Zm4.42-5.95c-.24-.12-1.43-.7-1.65-.79-.22-.08-.38-.12-.54.12-.16.24-.62.78-.76.94-.14.16-.28.18-.52.06-.24-.12-1.02-.37-1.94-1.2a7.2 7.2 0 0 1-1.34-1.66c-.14-.24-.01-.37.1-.49.11-.1.24-.28.36-.42.12-.14.16-.24.24-.4.08-.16.04-.3-.02-.42-.06-.12-.54-1.3-.74-1.78-.2-.47-.4-.4-.54-.4h-.46c-.16 0-.42.06-.64.3-.22.24-.84.82-.84 2s.86 2.32.98 2.48c.12.16 1.69 2.58 4.1 3.62.57.25 1.02.4 1.37.51.58.19 1.1.16 1.51.1.46-.06 1.43-.59 1.63-1.15.2-.56.2-1.04.14-1.14-.06-.1-.22-.16-.46-.28Z",
+  },
+];
+
+function ArticleCard({ post }) {
+  return (
+    <Link
+      href={post.href}
+      className="group flex min-h-0 flex-col rounded-lg bg-[#f1f4ec] p-4"
+    >
+      <div className="aspect-[1.42/1] overflow-hidden rounded-md bg-[#e3e8df]">
+        {post.image ? (
+          <img
+            src={post.image}
+            alt={post.title}
+            className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.045]"
+          />
+        ) : null}
+      </div>
+      <div className="flex flex-1 flex-col pt-4">
+        <div className="space-y-1 text-[9px] uppercase leading-tight text-[#8a8f86]">
+          {post.date ? <p>{post.date}</p> : null}
+          <p className="normal-case text-[#646961]">
+            Estimated Read Time: {post.read || "Quick read"}
+          </p>
+        </div>
+        <h3 className="mt-4 line-clamp-2 text-[22px] font-semibold leading-[1.08] text-[#252a23]">
+          {post.title}
+        </h3>
+        {post.excerpt ? (
+          <p className="mt-4 line-clamp-3 text-[13px] leading-[1.35] text-[#444940]">
+            {post.excerpt}
+          </p>
+        ) : null}
+        <span className="mt-5 flex h-10 w-full items-center justify-center rounded-md bg-[#4f6139] text-sm font-semibold text-white transition-colors group-hover:bg-[#40502e]">
+          Read More
+        </span>
+      </div>
+    </Link>
+  );
+}
+
+function ArticleBody({ blocks }) {
+  return (
+    <div className="space-y-4 text-[13px] leading-[1.28] text-[#20231f] sm:text-sm sm:leading-[1.35]">
+      {blocks.map((block, index) => {
+        const key = `${block.type}-${index}`;
+
+        if (block.type === "heading") {
+          return (
+            <h2 key={key} className="pt-2 text-sm font-semibold leading-tight text-[#20231f]">
+              {block.text}
+            </h2>
+          );
+        }
+
+        if (block.type === "step") {
+          return (
+            <h3 key={key} className="pt-1 text-sm font-semibold leading-tight text-[#20231f]">
+              {block.text}
+            </h3>
+          );
+        }
+
+        if (block.type === "list") {
+          return (
+            <ul key={key} className="space-y-1 pl-4">
+              {block.items.map((item) => (
+                <li key={item} className="list-disc pl-1">
+                  {item}
+                </li>
+              ))}
+            </ul>
+          );
+        }
+
+        return <p key={key}>{block.text}</p>;
+      })}
+    </div>
+  );
+}
 
 export default function BlogDetailPage() {
   const { slug: blogId } = useParams();
   const [post, setPost] = useState(null);
+  const [related, setRelated] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [shareUrl, setShareUrl] = useState("");
+
+  useEffect(() => {
+    setShareUrl(window.location.href);
+  }, []);
 
   useEffect(() => {
     let active = true;
 
-    const loadPost = async () => {
+    const loadArticle = async () => {
       if (!blogId) return;
       setLoading(true);
+
       try {
-        const data = await apiFetch(`/blog-posts/${blogId}`);
-        if (active) setPost(normalizeBlogPost(data));
+        const [postData, listData] = await Promise.all([
+          apiFetch(`/blog-posts/${blogId}`),
+          apiFetch("/blog-posts?page=1"),
+        ]);
+        if (!active) return;
+
+        const normalizedPost = normalizeBlogPost(postData);
+        const normalizedList = normalizeBlogPagination(listData).posts;
+        setPost(normalizedPost);
+        setRelated(
+          normalizedList
+            .filter((item) => String(item.id) !== String(normalizedPost.id))
+            .slice(0, 3),
+        );
       } catch {
-        if (active) setPost(null);
+        if (active) {
+          setPost(null);
+          setRelated([]);
+        }
       } finally {
         if (active) setLoading(false);
       }
     };
 
-    loadPost();
+    loadArticle();
     return () => {
       active = false;
     };
@@ -43,156 +164,99 @@ export default function BlogDetailPage() {
     [post?.content],
   );
 
-  return (
-    <main className="bg-white pt-24 text-black md:pt-28">
-      <article className="container mx-auto px-4 py-10 md:py-16">
-        <div className="mx-auto max-w-6xl">
-          <Link
-            href="/blogs"
-            className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.16em] text-black/55 transition hover:text-black"
-          >
-            <ArrowLeft size={14} strokeWidth={1.8} />
-            Back to journal
-          </Link>
+  if (loading) {
+    return (
+      <main className="min-h-screen bg-[#fdfefb] pt-[70px]">
+        <div className="h-[490px] animate-pulse bg-[#e9ede5]" />
+        <div className="mx-auto h-[430px] max-w-[1100px] animate-pulse px-6 py-16">
+          <div className="h-full rounded-lg bg-[#f1f4ec]" />
         </div>
+      </main>
+    );
+  }
 
-        {loading && (
-          <div className="mx-auto mt-10 max-w-6xl rounded-sm border border-black/10 p-6 text-sm text-black/60">
-            Loading story...
-          </div>
-        )}
+  if (!post) {
+    return (
+      <main className="min-h-[70vh] bg-[#fdfefb] px-5 pt-40 text-center text-[#344823]">
+        <h1 className="font-(family-name:--font-basker) text-4xl">Article not found</h1>
+        <Link href="/blogs" className="mt-6 inline-block underline underline-offset-4">
+          View all articles
+        </Link>
+      </main>
+    );
+  }
 
-        {!loading && !post && (
-          <div className="mx-auto mt-10 max-w-6xl rounded-sm border border-black/10 p-6 text-sm text-black/60">
-            This blog post could not be found.
-          </div>
-        )}
-
-        {!loading && post && (
-          <>
-            <header className="mx-auto mt-8 grid max-w-6xl gap-8 lg:grid-cols-[minmax(0,1fr)_280px] lg:items-end">
-              <div>
-                <p className="text-xs uppercase tracking-[0.4em] text-[#9b7a13]">
-                  Kahwa journal
-                </p>
-                <h1 className="mt-4 max-w-4xl font-(family-name:--font-basker) text-4xl leading-[1.05] text-black md:text-6xl">
-                  {post.title}
-                </h1>
-                <p className="mt-5 max-w-2xl text-base leading-7 text-black/65 md:text-lg">
-                  {post.excerpt}
-                </p>
-              </div>
-
-              <div className="rounded-2xl border border-black/10 bg-[#f7f3eb] p-5">
-                <div className="flex items-center gap-3 border-b border-black/10 pb-4">
-                  <span className="flex h-10 w-10 items-center justify-center rounded-full bg-black text-[#FFBF00]">
-                    <Leaf size={18} />
-                  </span>
-                  <div>
-                    <p className="text-xs uppercase tracking-[0.22em] text-black/45">
-                      Article
-                    </p>
-                    <p className="font-semibold text-black">Kahwa guide</p>
-                  </div>
-                </div>
-                <div className="mt-4 grid gap-3 text-sm text-black/60">
-                  <span className="inline-flex items-center gap-2">
-                    <CalendarDays size={16} />
-                    {post.date}
-                  </span>
-                  <span className="inline-flex items-center gap-2">
-                    <Clock size={16} />
-                    {post.read || "Quick read"}
-                  </span>
-                </div>
-              </div>
-            </header>
-
+  return (
+    <main className="bg-[#fdfefb] pt-[70px] text-[#20231f]">
+      <article>
+        <header className="grid bg-[#6b803f] lg:h-[490px] lg:grid-cols-2">
+          <div className="h-[340px] overflow-hidden bg-[#ebece7] sm:h-[430px] lg:h-full">
             {post.image ? (
-              <div className="mx-auto mt-10 max-w-6xl overflow-hidden rounded-[28px] bg-[#f2f2f2]">
-                <img
-                  src={post.image}
-                  alt={post.title}
-                  className="aspect-[16/7] w-full object-cover"
-                />
-              </div>
+              <img src={post.image} alt={post.title} className="h-full w-full object-cover" />
             ) : null}
+          </div>
+          <div className="flex min-h-[250px] items-center justify-center px-8 py-14 text-center lg:h-full lg:min-h-0 lg:px-14">
+            <h1 className="max-w-[560px] text-[26px] font-semibold leading-[1.16] text-[#f7f5ee] sm:text-[30px] lg:text-[28px]">
+              {post.title}
+            </h1>
+          </div>
+        </header>
 
-            <div className="mx-auto mt-12 grid max-w-6xl gap-10 lg:grid-cols-[220px_minmax(0,760px)] lg:items-start lg:justify-center">
-              <aside className="hidden border-t border-black/10 pt-5 text-sm text-black/50 lg:block">
-                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-black/45">
-                  In this story
-                </p>
-                <div className="mt-4 space-y-3">
-                  {blocks
-                    .filter((block) => block.type === "heading")
-                    .slice(0, 5)
-                    .map((block, index) => (
-                      <p key={`${block.text}-${index}`}>{block.text}</p>
-                    ))}
-                </div>
-              </aside>
+        <section className="mx-auto grid max-w-[1100px] gap-10 px-5 py-16 sm:px-8 lg:grid-cols-[220px_minmax(0,1fr)] lg:gap-16 lg:py-[74px]">
+          <aside className="text-[#30342d]">
+            <p className="text-lg leading-snug">By {post.author || "The Kahwa Company"}</p>
+            {post.date ? <p className="mt-1 text-lg leading-snug">{post.date}</p> : null}
 
-              <div className="min-w-0">
-                <div className="border-l-2 border-[#FFBF00] pl-5">
-                  <p className="font-(family-name:--font-basker) text-2xl leading-9 text-black md:text-3xl">
-                    {post.excerpt}
-                  </p>
-                </div>
-
-                <div className="mt-10 space-y-6 text-base leading-8 text-black/70">
-                  {blocks.map((block, index) => {
-                    if (block.type === "heading") {
-                      return (
-                        <h2
-                          key={`${block.text}-${index}`}
-                          className="pt-6 text-2xl font-semibold leading-tight text-black md:text-3xl"
-                        >
-                          {block.text}
-                        </h2>
-                      );
-                    }
-
-                    if (block.type === "step") {
-                      return (
-                        <h3
-                          key={`${block.text}-${index}`}
-                          className="pt-4 text-sm font-semibold uppercase tracking-[0.22em] text-[#9b7a13]"
-                        >
-                          {block.text}
-                        </h3>
-                      );
-                    }
-
-                    if (block.type === "list") {
-                      return (
-                        <ul
-                          key={`list-${index}`}
-                          className="grid gap-2 rounded-2xl bg-[#f7f3eb] p-5 text-black/70 sm:grid-cols-2"
-                        >
-                          {block.items.map((item) => (
-                            <li
-                              key={item}
-                              className="flex items-start gap-3"
-                            >
-                              <span className="mt-3 h-1.5 w-1.5 shrink-0 rounded-full bg-[#FFBF00]" />
-                              <span>{item}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      );
-                    }
-
-                    return (
-                      <p key={`${block.text}-${index}`}>{block.text}</p>
-                    );
-                  })}
-                </div>
-              </div>
+            <p className="mt-8 text-[11px] font-semibold uppercase tracking-[0.02em]">
+              Share this article
+            </p>
+            <div className="mt-3 flex gap-2">
+              {shareLinks.map((link) => (
+                <a
+                  key={link.label}
+                  href={link.href(shareUrl || `/blogs/${blogId}`, post.title)}
+                  target="_blank"
+                  rel="noreferrer"
+                  aria-label={`Share on ${link.label}`}
+                  className="flex h-6 w-6 items-center justify-center rounded-full border border-[#687a51] text-[#566b3d] transition hover:bg-[#566b3d] hover:text-white"
+                >
+                  <svg viewBox="0 0 24 24" className="h-4 w-4" fill="currentColor" aria-hidden="true">
+                    <path d={link.path} />
+                  </svg>
+                </a>
+              ))}
             </div>
-          </>
-        )}
+          </aside>
+
+          <div className="min-w-0">
+            {post.excerpt ? (
+              <p className="mb-5 text-[13px] leading-[1.28] text-[#20231f] sm:text-sm">
+                {post.excerpt}
+              </p>
+            ) : null}
+            <ArticleBody blocks={blocks} />
+          </div>
+        </section>
       </article>
+
+      {related.length ? (
+        <section className="mx-auto max-w-[1100px] px-5 pb-[74px] pt-7 sm:px-8 lg:pt-10">
+          <div className="flex items-end justify-between gap-6">
+            <h2 className="font-(family-name:--font-basker) text-[32px] font-normal uppercase leading-none text-[#33372f] sm:text-[38px]">
+              Related Articles
+            </h2>
+            <Link href="/blogs" className="shrink-0 text-xs text-[#566b3d] underline underline-offset-2">
+              View all Articles <span aria-hidden="true">›</span>
+            </Link>
+          </div>
+
+          <div className="mt-10 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {related.map((item) => (
+              <ArticleCard key={item.id} post={item} />
+            ))}
+          </div>
+        </section>
+      ) : null}
     </main>
   );
 }

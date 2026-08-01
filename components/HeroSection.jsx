@@ -213,9 +213,6 @@ export default function HeroSection() {
       state.offset = ((state.offset % total) + total) % total;
 
       const center = containerWidth / 2;
-      const CURVE_DEPTH = Math.min(80, containerWidth * 0.07);
-      const MAX_ROTATE = 25;
-      const MAX_SCALE_LOSS = 0.16;
 
       for (let i = 0; i < count; i++) {
         const card = cards[i];
@@ -226,24 +223,18 @@ export default function HeroSection() {
         if (x < -step) x += total;
         else if (x > total - step) x -= total;
 
-        const mid = x + cardWidth / 2;
-        const dist = (mid - center) / center; // -1 … 1 (rough)
-        const absDist = Math.abs(dist);
+        const cardCenter = x + cardWidth / 2;
+        const distanceInCards = Math.abs(cardCenter - center) / step;
+        const scale = 1 - Math.min(0.16, distanceInCards * 0.08);
 
-        // Smooth parabolic curve: deepest at centre, flat at edges
-        const t = Math.max(0, 1 - absDist * 0.9);
-        const y = -CURVE_DEPTH * t * t;
-        const rotation =
-          dist * MAX_ROTATE * (1 + 0.6 * Math.max(0, 1 - absDist));
-        const scale = 1 - Math.min(MAX_SCALE_LOSS, absDist * 0.1);
-
-        // Single gsap.set call per card per frame — minimal overhead
+        // Keep the row flat while making the centred product the focus.
         gsap.set(card, {
           x,
-          y,
-          rotation,
+          y: 0,
+          rotation: 0,
           scale,
-          transformOrigin: "50% 100%", // rotate from bottom for natural arc
+          zIndex: Math.max(1, 5 - Math.round(distanceInCards)),
+          transformOrigin: "50% 50%",
         });
       }
     };
@@ -340,7 +331,7 @@ export default function HeroSection() {
 
   return (
     <div
-      className="relative w-full min-h-[680px] md:min-h-[820px] lg:min-h-[980px] xl:min-h-[1080px] bg-center bg-cover flex flex-col justify-end items-center gap-4"
+      className="relative isolate w-full min-h-[680px] md:min-h-[820px] lg:min-h-[980px] xl:min-h-[1080px] bg-center bg-cover flex flex-col justify-end items-center gap-4"
       style={{
         backgroundImage: "url('/bg/beautiful-view-mountains-sunny-day.png')",
       }}
@@ -351,8 +342,9 @@ export default function HeroSection() {
           <h2 className="mb-0 md:mb-2">Discover a blend of</h2>
           <h2>botanicals and tradition</h2>
         </div>
-        <p className="font-thin text-base text-sm md:text-md md:text-lg text-black/80">
-          Thoughtfully crafted with nature&apos;s finest ingredients to bring warmth,
+        <p className="font-thin text-base text-sm md:text-md md:text-xl text-black/80">
+          Thoughtfully crafted with nature&apos;s finest ingredients to bring
+          warmth,
           <span className=" md:block mt-0 md:mt-1">
             {" "}
             wellness, and mindful rituals to your everyday life.
