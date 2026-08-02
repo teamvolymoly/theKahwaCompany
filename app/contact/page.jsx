@@ -30,16 +30,16 @@ const contactOptions = [
 ];
 
 const fieldClass =
-  "h-11 w-full rounded-md border border-[#9aa58e] bg-transparent px-5 text-sm text-[#30362b] outline-none transition-colors placeholder:text-[#777d73] focus:border-[#4f6139] focus:ring-1 focus:ring-[#4f6139]";
+  "h-11 w-full rounded-md border border-[#9aa58e] bg-transparent px-5 text-base text-[#30362b] outline-none transition-colors placeholder:text-[#777d73] focus:border-[#4f6139] focus:ring-1 focus:ring-[#4f6139]";
 
 export default function ContactPage() {
   return (
     <main className="bg-[#fdfefb] pt-[70px] text-[#252a23]">
       <section className="mx-auto max-w-[1164px] px-5 pb-[92px] pt-[72px] sm:px-8">
-        <h1 className="font-(family-name:--font-basker) text-[36px] font-normal uppercase leading-none text-[#344823] sm:text-[42px]">
+        <h1 className="font-(family-name:--font-basker) text-4xl font-normal uppercase leading-none text-[#344823]">
           Contact Us
         </h1>
-        <p className="mt-6 max-w-[1040px] text-lg leading-relaxed text-[#333730] sm:text-[20px]">
+        <p className="mt-6 max-w-[1040px] text-base leading-relaxed text-[#333730]">
           If you have questions about your order, need help with brewing, or
           just want to chat we&apos;re here for you!
         </p>
@@ -57,7 +57,7 @@ export default function ContactPage() {
                 <h2 className="mt-5 text-center text-base font-semibold leading-tight text-[#344823] sm:text-xl">
                   {option.title}
                 </h2>
-                <p className="mt-1 text-center text-[11px] leading-tight text-[#30352d] sm:text-sm">
+                <p className="mt-1 text-center text-base leading-tight text-[#30352d]">
                   {option.detail}
                 </p>
               </>
@@ -84,7 +84,7 @@ export default function ContactPage() {
 
         <div className="mt-11 grid items-stretch gap-5 lg:grid-cols-[1.4fr_1fr]">
           <div className="rounded-lg bg-[#f1f4ec] px-6 py-8 sm:px-9 sm:py-10">
-            <h2 className="max-w-[560px] text-[28px] font-semibold leading-[1.2] text-[#2f4819] sm:text-[32px]">
+            <h2 className="max-w-[560px] text-4xl font-semibold leading-[1.2] text-[#2f4819]">
               Drop your query below and we will
               <br className="hidden sm:block" /> get back to you!
             </h2>
@@ -139,13 +139,13 @@ export default function ContactPage() {
                 id="contact-comment"
                 name="comment"
                 rows={5}
-                className="min-h-[124px] resize-y rounded-md border border-[#9aa58e] bg-transparent px-5 py-3 text-sm text-[#30362b] outline-none transition-colors placeholder:text-[#777d73] focus:border-[#4f6139] focus:ring-1 focus:ring-[#4f6139] sm:col-span-2"
+                className="min-h-[124px] resize-y rounded-md border border-[#9aa58e] bg-transparent px-5 py-3 text-base text-[#30362b] outline-none transition-colors placeholder:text-[#777d73] focus:border-[#4f6139] focus:ring-1 focus:ring-[#4f6139] sm:col-span-2"
                 placeholder="Comment"
               />
 
               <button
                 type="submit"
-                className="h-11 cursor-pointer rounded-md bg-[#4f6139] px-6 text-sm font-semibold text-white transition-colors hover:bg-[#40502e] sm:col-span-2"
+                className="h-11 cursor-pointer rounded-md bg-[#4f6139] px-6 text-base font-semibold text-white transition-colors hover:bg-[#40502e] sm:col-span-2"
               >
                 Request a Call Back
               </button>

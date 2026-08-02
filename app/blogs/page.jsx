@@ -55,12 +55,12 @@ function FeaturedArticle({ post }) {
 
       <div className="flex min-h-[310px] flex-col rounded-md bg-white px-6 py-6 sm:px-7 lg:h-[310px] lg:min-h-0 lg:py-5">
         <ArticleMeta post={post} />
-        <h2 className="mt-4 line-clamp-3 text-[24px] font-semibold leading-[1.08] text-[#242822] sm:text-[26px]">
+        <h2 className="mt-4 line-clamp-3 text-sm font-semibold leading-[1.2] text-[#242822]">
           {post.title}
         </h2>
         {post.excerpt ? (
-          <p className="mt-3 line-clamp-3 text-[13px] leading-[1.4] text-[#444940]">
-            {post.excerpt}
+          <p className="mt-3 line-clamp-3 text-xs leading-[1.4] text-[#444940]">
+            {post.excerpt}...
           </p>
         ) : null}
         <div className="mt-4 flex flex-1 items-end">
@@ -91,12 +91,12 @@ function ArticleCard({ post }) {
 
       <div className="flex flex-1 flex-col pt-5">
         <ArticleMeta post={post} />
-        <h2 className="mt-5 line-clamp-2 text-[23px] font-semibold leading-[1.08] text-[#242822] sm:text-[27px]">
+        <h2 className="mt-5 line-clamp-2 text-sm font-semibold leading-[1.2] text-[#242822]">
           {post.title}
         </h2>
         {post.excerpt ? (
-          <p className="mt-5 line-clamp-3 text-sm leading-[1.42] text-[#444940]">
-            {post.excerpt}
+          <p className="mt-5 line-clamp-3 text-xs leading-[1.42] text-[#444940]">
+            {post.excerpt}...
           </p>
         ) : null}
         <div className="mt-6 flex flex-1 items-end">
@@ -179,7 +179,7 @@ export default function BlogsPage() {
     <main className="bg-[#fdfefb] pt-[70px] text-[#20241e]">
       <section className="mx-auto max-w-[1100px] px-5 pb-16 pt-14 sm:px-8 sm:pb-20 sm:pt-[76px] lg:pb-[88px]">
         <h1
-          className="text-[36px] font-normal uppercase leading-none text-[#344823] sm:text-[42px]"
+          className="text-4xl font-normal uppercase leading-none text-[#344823]"
           style={{ fontFamily: "var(--font-basker)" }}
         >
           Articles

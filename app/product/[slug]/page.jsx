@@ -100,7 +100,7 @@ function ProductTabs({ product, selectedVariant }) {
               key={tab.id}
               type="button"
               onClick={() => setActiveTab(tab.id)}
-              className={`relative shrink-0 pb-3 text-base font-semibold sm:text-xl ${
+              className={`relative shrink-0 pb-3 text-[28px] font-semibold ${
                 activeTab === tab.id ? "text-[#3f532b]" : "text-[#999c96]"
               }`}
             >
@@ -112,7 +112,7 @@ function ProductTabs({ product, selectedVariant }) {
           ))}
         </div>
 
-        <div className="min-h-[92px] pt-6 text-sm leading-[1.65] text-[#30342e]">
+        <div className="min-h-[92px] pt-6 text-base leading-[1.65] text-[#30342e]">
           {activeTab === "description" ? (
             <p>{stripMarkup(product.description) || "Description coming soon."}</p>
           ) : null}
@@ -176,15 +176,15 @@ function Queries({ faqs }) {
   return (
     <section className="bg-[#f6f8f2]">
       <div className="mx-auto max-w-[1180px] px-5 py-11 sm:px-8 lg:py-14">
-        <h2 className="text-xl font-semibold text-[#344823] sm:text-2xl">Your Queries</h2>
+        <h2 className="text-[28px] font-semibold text-[#344823]">Your Queries</h2>
         <div className="mt-7 divide-y divide-[#dfe2da]">
           {faqs.map((faq, index) => (
             <details key={index} className="group py-4">
-              <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-sm text-[#252923]">
+              <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-base text-[#252923]">
                 <span>{faq.question}</span>
                 <ChevronDown className="h-4 w-4 transition group-open:rotate-180" />
               </summary>
-              <p className="max-w-4xl pt-3 text-sm leading-6 text-[#62675e]">{faq.answer}</p>
+              <p className="max-w-4xl pt-3 text-base leading-6 text-[#62675e]">{faq.answer}</p>
             </details>
           ))}
         </div>
@@ -206,13 +206,13 @@ function Reviews({ reviews, average, total }) {
   return (
     <section className="bg-white">
       <div className="mx-auto max-w-[1180px] px-5 pb-14 sm:px-8 lg:pb-20">
-        <h2 className="text-xl font-semibold text-[#344823] sm:text-2xl">Customer Reviews</h2>
+        <h2 className="text-[28px] font-semibold text-[#344823]">Customer Reviews</h2>
 
         <div className="mt-7 grid items-center gap-8 border-b border-[#dfe2da] pb-8 lg:grid-cols-[260px_1fr_250px]">
           <div className="lg:border-r lg:border-[#e1e3dd] lg:pr-8">
             <Stars value={average} size={18} />
             <p className="mt-3 text-lg">{Number(average || 0).toFixed(2)} out of 5</p>
-            <p className="text-sm text-[#62675e]">Based on {total} reviews</p>
+            <p className="text-base text-[#62675e]">Based on {total} reviews</p>
           </div>
 
           <div className="space-y-1 lg:px-8">
@@ -239,7 +239,7 @@ function Reviews({ reviews, average, total }) {
         {reviews.length ? (
           <div className="divide-y divide-[#e1e3dd]">
             {reviews.map((review) => (
-              <article key={review.id} className="py-7 text-sm">
+              <article key={review.id} className="py-7 text-base">
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex items-center gap-3">
                     <span className="flex h-10 w-10 items-center justify-center bg-[#f4f5f1]"><UserRound className="h-5 w-5" /></span>
@@ -255,7 +255,7 @@ function Reviews({ reviews, average, total }) {
               </article>
             ))}
           </div>
-        ) : <p className="py-8 text-sm text-[#73776f]">No customer reviews yet. Be the first to review this blend.</p>}
+        ) : <p className="py-8 text-base text-[#73776f]">No customer reviews yet. Be the first to review this blend.</p>}
       </div>
     </section>
   );
@@ -395,15 +395,15 @@ export default function ProductDetail() {
 
           <div className="order-3 lg:pl-16">
             {product.tag_line_1 || product.tag_line ? <p className="inline bg-[#fff1bd] px-1.5 py-1 text-xs text-[#b38700]">{product.tag_line_1 || product.tag_line}</p> : null}
-            <h1 className="mt-4 font-serif text-[31px] uppercase leading-none text-[#3f532b] sm:text-[38px]">{product.name}</h1>
+            <h1 className="mt-4 font-serif text-4xl uppercase leading-none text-[#3f532b]">{product.name}</h1>
             {product.tag_line_2 || product.short_description ? <p className="mt-3 text-xs font-semibold uppercase">{product.tag_line_2 || product.short_description}</p> : null}
 
             <div className="mt-6 flex items-center gap-2 border-b border-[#e0e3dc] pb-5"><Stars value={averageRating} /><span className="text-xs text-[#7b7f77]">({totalReviews})</span></div>
-            {product.description ? <p className="mt-5 line-clamp-3 text-sm leading-[1.45]">{stripMarkup(product.description)}</p> : null}
+            {product.description ? <p className="mt-5 line-clamp-3 text-base leading-[1.45]">{stripMarkup(product.description)}</p> : null}
 
             {variants.length ? (
               <div className="mt-6">
-                <p className="text-sm font-semibold">Net Weight</p>
+                <p className="text-base font-semibold">Net Weight</p>
                 <div className="mt-3 flex flex-wrap gap-3">
                   {variants.map((variant) => {
                     const meta = weightMeta(variant);
@@ -422,7 +422,7 @@ export default function ProductDetail() {
             <div className="mt-7 flex items-center gap-4 text-xl"><span className="font-semibold">₹ {currentPrice}</span>{comparePrice && String(comparePrice) !== String(currentPrice) ? <span className="text-[#73776f] line-through">₹ {comparePrice}</span> : null}</div>
 
             <div className="mt-6 flex items-center justify-between">
-              <p className="text-sm font-semibold">Quantity</p>
+              <p className="text-base font-semibold">Quantity</p>
               <div className="grid h-8 grid-cols-3 border border-[#dfe2da] bg-white text-sm">
                 <button type="button" onClick={() => setQuantity((value) => Math.max(1, value - 1))} className="w-8">−</button>
                 <input aria-label="Quantity" value={quantity} onChange={(event) => setQuantity(Math.max(1, Number(event.target.value.replace(/\D/g, "")) || 1))} className="w-9 border-x border-[#dfe2da] text-center outline-none" />
@@ -442,7 +442,7 @@ export default function ProductDetail() {
       {recommendations.length ? (
         <section className="bg-white">
           <div className="mx-auto max-w-[1180px] px-5 py-12 sm:px-8 lg:py-16">
-            <div className="flex items-center justify-between"><h2 className="font-serif text-2xl uppercase sm:text-3xl">Discover More</h2><Link href="/shop" className="text-xs text-[#52633d] underline">View All ›</Link></div>
+            <div className="flex items-center justify-between"><h2 className="font-serif text-[28px] uppercase">Discover More</h2><Link href="/shop" className="text-xs text-[#52633d] underline">View All ›</Link></div>
             <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">{recommendations.map((item) => <ProductCard key={item.id} product={item} variant="homepage" />)}</div>
           </div>
         </section>

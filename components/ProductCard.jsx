@@ -166,9 +166,7 @@ export default function ProductCard({ product, variant = "default" }) {
 
         <h3
           className={`font-normal uppercase tracking-[0.04em] text-[#1c2230] ${
-            isHomepage
-              ? "mt-2 text-sm sm:text-lg lg:text-xl"
-              : "mt-3 text-lg"
+            isHomepage ? "mt-2 text-xl" : "mt-3 text-xl"
           }`}
           style={{ fontFamily: "var(--font-basker)" }}
         >
@@ -177,9 +175,7 @@ export default function ProductCard({ product, variant = "default" }) {
 
         <div
           className={`flex flex-wrap items-center justify-center text-[#1c2230] ${
-            isHomepage
-              ? "mt-3 gap-2 text-xs sm:text-sm"
-              : "mt-4 gap-3 text-sm"
+            isHomepage ? "mt-3 gap-2 text-base" : "mt-4 gap-3 text-base"
           }`}
         >
           <span className="font-semibold">

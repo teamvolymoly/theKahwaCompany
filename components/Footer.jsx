@@ -79,11 +79,12 @@ const socialLinks = [
 
 export default function Footer() {
   return (
-    <footer>
-      <section
-        className="border-y border-[#dfe5d8] bg-[#f1f4ec]"
-        aria-label="Our product promises"
-      >
+    <footer className="kahwa-footer">
+      <div className="kahwa-footer__content">
+        <section
+          className="border-y border-[#dfe5d8] bg-[#f1f4ec]"
+          aria-label="Our product promises"
+        >
         <div className="mx-auto grid w-full max-w-[1120px] grid-cols-2 gap-x-4 gap-y-8 px-4 py-8 sm:grid-cols-3 sm:px-6 lg:grid-cols-5 lg:py-9">
           {trustItems.map((item) => (
             <div
@@ -95,21 +96,21 @@ export default function Footer() {
                 alt=""
                 className="h-12 w-12 object-contain transition-transform duration-500 ease-out group-hover:-translate-y-1 group-hover:scale-105 sm:h-14 sm:w-14"
               />
-              <p className="mt-2 text-[10px] font-medium text-[#4f5948] sm:text-xs">
+              <p className="mt-2 text-base font-medium text-[#4f5948]">
                 {item.label}
               </p>
             </div>
           ))}
         </div>
-      </section>
+        </section>
 
-      <div className="bg-[#4b6038] text-[#f5f2e9]">
-        <div className="mx-auto w-full max-w-[1180px] px-4 py-12 sm:px-6 lg:py-14">
+        <div className="bg-[#4b6038] text-[#f5f2e9]">
+          <div className="mx-auto w-full max-w-[1180px] px-4 py-12 sm:px-6 lg:py-14">
           <div className="grid gap-10 lg:grid-cols-[1.05fr_1fr] lg:gap-20">
             <div className="grid grid-cols-2 gap-8 sm:grid-cols-3">
               {footerGroups.map((group) => (
                 <div key={group.title}>
-                  <h2 className="font-(family-name:--font-basker) text-sm uppercase tracking-[0.04em] text-[#f0eadc]">
+                  <h2 className="font-(family-name:--font-basker) text-xl uppercase tracking-[0.04em] text-[#f0eadc]">
                     {group.title}
                   </h2>
                   <nav className="mt-4 flex flex-col gap-2.5">
@@ -117,7 +118,7 @@ export default function Footer() {
                       <Link
                         key={link.label}
                         href={link.href}
-                        className="w-fit text-xs text-white/70 transition hover:text-white"
+                        className="w-fit text-base text-white/70 transition hover:text-white"
                       >
                         {link.label}
                       </Link>
@@ -128,10 +129,10 @@ export default function Footer() {
             </div>
 
             <div className="lg:pl-4">
-              <h2 className="font-(family-name:--font-basker) text-base uppercase tracking-[0.03em] text-[#f0eadc]">
+              <h2 className="font-(family-name:--font-basker) text-xl uppercase tracking-[0.03em] text-[#f0eadc]">
                 Join the Kahwa Circle
               </h2>
-              <p className="mt-3 text-xs text-white/70">
+              <p className="mt-3 text-base text-white/70">
                 Stay updated with exclusive blends, stories and offers.
               </p>
               <form className="mt-5 flex max-w-md overflow-hidden rounded-md bg-[#667d45]">
@@ -143,11 +144,11 @@ export default function Footer() {
                   type="email"
                   required
                   placeholder="Email"
-                  className="min-w-0 flex-1 bg-transparent px-4 py-2.5 text-xs text-white outline-none placeholder:text-white/55"
+                  className="min-w-0 flex-1 bg-transparent px-4 py-2.5 text-base text-white outline-none placeholder:text-white/55"
                 />
                 <button
                   type="submit"
-                  className="cursor-pointer bg-[#7f9655] px-5 py-2.5 text-[10px] font-medium text-white transition hover:bg-[#8ca45f]"
+                  className="cursor-pointer bg-[#7f9655] px-5 py-2.5 text-base font-medium text-white transition hover:bg-[#8ca45f]"
                 >
                   Subscribe
                 </button>
@@ -177,14 +178,14 @@ export default function Footer() {
             </div>
           </div>
 
-          <p className="mt-11 max-w-4xl text-[10px] leading-relaxed text-white/55">
+          <p className="mt-11 max-w-4xl text-base leading-relaxed text-white/55">
             The Kahwa Company&apos;s products are crafted for wellness and
             enjoyment, not for medical use. They are not intended to diagnose,
             treat, or cure any condition. Please consult a healthcare
             professional for any medical advice or concerns.
           </p>
 
-          <div className="mt-8 flex flex-col gap-3 text-[10px] text-white/70 sm:flex-row sm:items-center sm:justify-between">
+          <div className="mt-8 flex flex-col gap-3 text-base text-white/70 sm:flex-row sm:items-center sm:justify-between">
             <p>The Kahwa Company © 2026 · All rights reserved</p>
             <p>
               Designed by{" "}
@@ -198,15 +199,17 @@ export default function Footer() {
               </a>
             </p>
           </div>
+          </div>
         </div>
       </div>
 
       <div
         role="img"
         aria-label="Where tradition meets imagination"
-        className="min-h-[clamp(250px,27.8vw,440px)] bg-[#26331d] bg-cover bg-center bg-no-repeat max-md:min-h-[280px]"
-        style={{ backgroundImage: 'url("/bg/Footer Image.png")' }}
-      />
+        className="kahwa-footer__fixed"
+      >
+        <div className="kahwa-footer__fixed-art" />
+      </div>
     </footer>
   );
 }

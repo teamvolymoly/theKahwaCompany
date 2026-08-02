@@ -94,7 +94,52 @@ a[href]:active {
 }
 
 .page-transition {
+  position: relative;
+  z-index: 1;
+  background: #fff;
   animation: page-enter 560ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Seed-style footer reveal: the page scrolls away while the landscape stays pinned. */
+.kahwa-footer {
+  position: relative;
+  margin-bottom: 316px;
+}
+
+.kahwa-footer__content {
+  position: relative;
+  z-index: 2;
+}
+
+.kahwa-footer__fixed {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 0;
+  height: 800px;
+  overflow: hidden;
+  pointer-events: none;
+  background: #26331d;
+}
+
+.kahwa-footer__fixed-art {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 316px;
+  background-image: url("/bg/Footer Image.png");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+@media (max-width: 640px) {
+  .kahwa-footer__fixed-art {
+    background-position: center bottom;
+    background-size: 1156px 220px;
+  }
 }
 
 @keyframes page-enter {

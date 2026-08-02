@@ -122,7 +122,7 @@ function ProductDetails({ product, featured = false, onAdd }) {
     <div className="min-w-0">
       <h2
         className={`font-normal uppercase leading-[1.08] text-[#3f532b] ${
-          featured ? "text-[30px] sm:text-[36px]" : "text-[23px] sm:text-[27px]"
+          featured ? "text-xl" : "text-xl"
         }`}
         style={{ fontFamily: "var(--font-basker)" }}
       >
@@ -134,13 +134,13 @@ function ProductDetails({ product, featured = false, onAdd }) {
       {description ? (
         <p
           className={`mt-5 max-w-[580px] leading-[1.35] text-[#252823] ${
-            featured ? "text-[15px] sm:text-base" : "line-clamp-3 text-sm"
+            featured ? "text-base" : "line-clamp-3 text-base"
           }`}
         >
           {description}
         </p>
       ) : null}
-      <div className="mt-5 flex items-center gap-4 text-lg text-[#20231e]">
+      <div className="mt-5 flex items-center gap-4 text-base text-[#20231e]">
         <span>₹ {currentPrice}</span>
         {previousPrice && String(previousPrice) !== String(currentPrice) ? (
           <span className="text-[#6f716c] line-through">₹ {previousPrice}</span>
@@ -290,7 +290,7 @@ export default function ShopClient() {
         />
         <div className="absolute inset-0 bg-[#f8ead7]/10" />
         <h1
-          className="relative z-10 mx-auto max-w-[1100px] px-8 text-center text-[24px] font-normal uppercase leading-[1.12] text-[#292b27] sm:text-[31px] lg:text-[36px]"
+          className="relative z-10 mx-auto max-w-[1100px] px-8 text-center text-4xl font-normal uppercase leading-[1.12] text-[#292b27]"
           style={{ fontFamily: "var(--font-basker)" }}
         >
           <span className="sm:block">A Collection of Authentic Kahwa </span>

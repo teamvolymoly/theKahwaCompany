@@ -54,12 +54,12 @@ function ArticleCard({ post }) {
             Estimated Read Time: {post.read || "Quick read"}
           </p>
         </div>
-        <h3 className="mt-4 line-clamp-2 text-[22px] font-semibold leading-[1.08] text-[#252a23]">
+        <h3 className="mt-4 line-clamp-2 text-sm font-semibold leading-[1.2] text-[#252a23]">
           {post.title}
         </h3>
         {post.excerpt ? (
-          <p className="mt-4 line-clamp-3 text-[13px] leading-[1.35] text-[#444940]">
-            {post.excerpt}
+          <p className="mt-4 line-clamp-3 text-xs leading-[1.35] text-[#444940]">
+            {post.excerpt}...
           </p>
         ) : null}
         <span className="mt-5 flex h-10 w-full items-center justify-center rounded-md bg-[#4f6139] text-sm font-semibold text-white transition-colors group-hover:bg-[#40502e]">
@@ -72,7 +72,7 @@ function ArticleCard({ post }) {
 
 function ArticleBody({ blocks }) {
   return (
-    <div className="space-y-4 text-[13px] leading-[1.28] text-[#20231f] sm:text-sm sm:leading-[1.35]">
+    <div className="space-y-4 text-base leading-[1.45] text-[#20231f]">
       {blocks.map((block, index) => {
         const key = `${block.type}-${index}`;
 
@@ -196,7 +196,7 @@ export default function BlogDetailPage() {
             ) : null}
           </div>
           <div className="flex min-h-[250px] items-center justify-center px-8 py-14 text-center lg:h-full lg:min-h-0 lg:px-14">
-            <h1 className="max-w-[560px] text-[26px] font-semibold leading-[1.16] text-[#f7f5ee] sm:text-[30px] lg:text-[28px]">
+            <h1 className="max-w-[560px] text-4xl font-semibold leading-[1.16] text-[#f7f5ee]">
               {post.title}
             </h1>
           </div>
@@ -230,7 +230,7 @@ export default function BlogDetailPage() {
 
           <div className="min-w-0">
             {post.excerpt ? (
-              <p className="mb-5 text-[13px] leading-[1.28] text-[#20231f] sm:text-sm">
+              <p className="mb-5 text-base leading-[1.45] text-[#20231f]">
                 {post.excerpt}
               </p>
             ) : null}
@@ -242,7 +242,7 @@ export default function BlogDetailPage() {
       {related.length ? (
         <section className="mx-auto max-w-[1100px] px-5 pb-[74px] pt-7 sm:px-8 lg:pt-10">
           <div className="flex items-end justify-between gap-6">
-            <h2 className="font-(family-name:--font-basker) text-[32px] font-normal uppercase leading-none text-[#33372f] sm:text-[38px]">
+            <h2 className="font-(family-name:--font-basker) text-4xl font-normal uppercase leading-none text-[#33372f]">
               Related Articles
             </h2>
             <Link href="/blogs" className="shrink-0 text-xs text-[#566b3d] underline underline-offset-2">

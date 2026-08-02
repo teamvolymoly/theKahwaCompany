@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
@@ -104,7 +104,7 @@ export default function Home() {
           <div className="mb-8 flex items-end justify-between gap-6">
             <h2
               id="blends-title"
-              className="font-(family-name:--font-basker) text-[28px] uppercase leading-none tracking-[0.01em] text-[#252a22] sm:text-[36px]"
+              className="font-(family-name:--font-basker) text-4xl uppercase leading-none tracking-[0.01em] text-[#252a22]"
             >
               Must Have Blends
             </h2>
@@ -168,7 +168,7 @@ export default function Home() {
           <div className="mb-7 flex items-end justify-between gap-6">
             <h2
               id="articles-title"
-              className="font-(family-name:--font-basker) text-2xl uppercase tracking-[0.01em] text-[#30352c] sm:text-3xl"
+              className="font-(family-name:--font-basker) text-4xl uppercase tracking-[0.01em] text-[#30352c]"
             >
               Latest Articles
             </h2>
@@ -199,11 +199,11 @@ export default function Home() {
                   )}
                 </div>
                 <div className="px-1 pb-3 pt-3">
-                  <h3 className="text-sm font-semibold leading-snug text-[#23281f] sm:text-[15px]">
+                  <h3 className="text-sm font-semibold leading-snug text-[#23281f]">
                     {post.title}
                   </h3>
-                  <p className="mt-1.5 line-clamp-3 text-[10px] leading-relaxed text-[#5e6559] sm:text-[11px]">
-                    {post.excerpt}
+                  <p className="mt-1.5 line-clamp-3 text-xs leading-relaxed">
+                    {post.excerpt}...
                   </p>
                 </div>
               </Link>

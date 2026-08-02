@@ -201,7 +201,7 @@ export default function CartPage() {
     <main className="min-h-[650px] overflow-x-hidden bg-[#fdfefb] pt-[70px] text-[#1f241c]">
       <section className="mx-auto max-w-[1230px] px-5 pb-[86px] pt-16 sm:px-8 sm:pt-[86px]">
         <h1
-          className="text-[38px] font-normal uppercase leading-none text-[#344823] sm:text-[46px]"
+          className="text-4xl font-normal uppercase leading-none text-[#344823]"
           style={{ fontFamily: "var(--font-basker)" }}
         >
           Cart
@@ -220,7 +220,7 @@ export default function CartPage() {
               </div>
             ) : (
               <>
-                <div className="hidden grid-cols-[minmax(0,1fr)_90px_150px_38px_92px] items-center gap-4 px-1 pb-4 text-sm uppercase lg:grid">
+                <div className="hidden grid-cols-[minmax(0,1fr)_90px_150px_38px_92px] items-center gap-4 px-1 pb-4 text-base uppercase lg:grid">
                   <span className="pl-[110px]">Product</span>
                   <span>Price</span>
                   <span>Quantity</span>
@@ -243,18 +243,18 @@ export default function CartPage() {
                           )}
                         </div>
                         <div className="min-w-0 pr-8 lg:pr-0">
-                          <h2 className="font-serif text-lg uppercase leading-tight sm:text-xl">{item.product_name}</h2>
+                          <h2 className="font-serif text-xl uppercase leading-tight">{item.product_name}</h2>
                           {item.variant_name ? <p className="mt-2 text-sm">{item.variant_name}</p> : null}
                         </div>
                       </div>
 
                       <div className="flex items-center justify-between text-base lg:block">
-                        <span className="text-xs uppercase text-[#73786f] lg:hidden">Price</span>
+                        <span className="text-base uppercase text-[#73786f] lg:hidden">Price</span>
                         <span>₹{item.price}</span>
                       </div>
 
                       <div className="flex items-center justify-between lg:block">
-                        <span className="text-xs uppercase text-[#73786f] lg:hidden">Quantity</span>
+                        <span className="text-base uppercase text-[#73786f] lg:hidden">Quantity</span>
                         <div className="grid h-9 w-[122px] grid-cols-3 overflow-hidden rounded border border-[#d6dad2] bg-white text-base">
                           <button type="button" onClick={() => updateQty(item, -1)} disabled={actionLoading || item.quantity <= 1} className="cursor-pointer transition hover:bg-[#edf0e9] disabled:cursor-not-allowed disabled:opacity-40" aria-label={`Decrease ${item.product_name} quantity`}>−</button>
                           <span className="flex items-center justify-center border-x border-[#d6dad2]">{item.quantity}</span>
@@ -267,7 +267,7 @@ export default function CartPage() {
                       </button>
 
                       <div className="flex items-center justify-between text-base lg:block">
-                        <span className="text-xs uppercase text-[#73786f] lg:hidden">Subtotal</span>
+                        <span className="text-base uppercase text-[#73786f] lg:hidden">Subtotal</span>
                         <span>₹{item.subtotal ?? item.price * item.quantity}</span>
                       </div>
                     </article>
@@ -278,11 +278,11 @@ export default function CartPage() {
           </section>
 
           <aside className="rounded-lg bg-[#f3f6ef] px-6 py-7 sm:px-8">
-            <h2 className="text-[28px] font-semibold leading-none text-[#344823] sm:text-[32px]">Cart totals</h2>
+            <h2 className="text-[28px] font-semibold leading-none text-[#344823]">Cart totals</h2>
 
             {error ? <p className="mt-5 rounded bg-[#f8e8e4] px-4 py-3 text-sm text-[#8b352b]">{error}</p> : null}
 
-            <div className="mt-7 rounded bg-[#e5e9df] px-4 py-3 text-sm text-[#454a42]">
+            <div className="mt-7 rounded bg-[#e5e9df] px-4 py-3 text-xs text-[#454a42]">
               {freeShippingThreshold > 0 && subtotal >= freeShippingThreshold
                 ? "You got FREE delivery."
                 : freeShippingThreshold > 0
@@ -315,7 +315,7 @@ export default function CartPage() {
               <div className="flex justify-between"><dt>Subtotal</dt><dd>₹{subtotal}</dd></div>
               <div className="flex justify-between"><dt>Shipping</dt><dd>{shipping === 0 ? "Free" : `₹${shipping}`}</dd></div>
               {discount > 0 ? <div className="flex justify-between text-[#52633d]"><dt>Discount</dt><dd>− ₹{discount}</dd></div> : null}
-              <div className="flex justify-between pt-1 text-xl"><dt>Total</dt><dd>₹{total}</dd></div>
+              <div className="flex justify-between pt-1 text-[22px]"><dt>Total</dt><dd>₹{total}</dd></div>
             </dl>
 
             {items.length ? (
