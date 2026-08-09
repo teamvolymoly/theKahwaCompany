@@ -238,26 +238,26 @@ export default function NewHeader() {
                 />
               </svg>
             </button>
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-black/60">
+            <p className="text-md font-semibold uppercase tracking-[0.2em] text-black/60">
               Welcome offer
             </p>
             <h3 className="mt-3 text-2xl font-semibold text-gray-900">
               Get first dibs on new Kahwa drops
             </h3>
-            <p className="mt-2 text-sm text-gray-600">
+            <p className="mt-2 text-md text-gray-600">
               Join our newsletter or WhatsApp list for early access and launch
               offers.
             </p>
             <div className="mt-5 flex flex-col gap-3 sm:flex-row">
               <button
                 type="button"
-                className="inline-flex flex-1 items-center justify-center rounded-full border border-black px-4 py-2 text-sm font-semibold text-black hover:bg-black hover:text-white"
+                className="inline-flex flex-1 items-center justify-center rounded-full border border-black px-4 py-2 text-md font-semibold text-black hover:bg-black hover:text-white"
               >
                 Join Newsletter
               </button>
               <button
                 type="button"
-                className="inline-flex flex-1 items-center justify-center rounded-full bg-black px-4 py-2 text-sm font-semibold text-white hover:bg-black/80"
+                className="inline-flex flex-1 items-center justify-center rounded-full bg-black px-4 py-2 text-md font-semibold text-white hover:bg-black/80"
               >
                 WhatsApp Updates
               </button>
@@ -281,7 +281,7 @@ export default function NewHeader() {
             />
           )}
           <div
-            className="relative z-10 container mx-auto px-4 lg:px-8"
+            className="site-container relative z-10"
             ref={mobileMenuRef}
           >
             <div className="relative flex items-center justify-between py-4 lg:py-4">
@@ -362,7 +362,7 @@ export default function NewHeader() {
     rounded-sm border border-black/10 bg-white shadow-2xl bg-white"
                     >
                       <form onSubmit={submitSearch} className="p-4">
-                        <label className="text-xs uppercase tracking-[0.12em] text-black/50">
+                        <label className="text-md uppercase tracking-[0.12em] text-black/50">
                           Search products
                         </label>
                         <div className="mt-2 flex items-center gap-2 border-b border-black/20 pb-2">
@@ -372,11 +372,11 @@ export default function NewHeader() {
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                             placeholder="Search kahwa..."
-                            className="min-w-0 flex-1 bg-transparent text-sm text-black outline-none placeholder:text-black/40"
+                            className="min-w-0 flex-1 bg-transparent text-md text-black outline-none placeholder:text-black/40"
                           />
                           <button
                             type="submit"
-                            className="shrink-0 rounded-full bg-black px-4 py-2 text-xs font-semibold uppercase tracking-[0.08em] text-white disabled:opacity-40"
+                            className="shrink-0 rounded-full bg-black px-4 py-2 text-md font-semibold uppercase tracking-[0.08em] text-white disabled:opacity-40"
                             disabled={!searchQuery.trim()}
                           >
                             Search
@@ -386,19 +386,19 @@ export default function NewHeader() {
 
                       <div className="max-h-[380px] overflow-y-auto px-2 pb-2">
                         {searchQuery.trim().length < 2 ? (
-                          <p className="px-2 py-4 text-sm text-black/50">
+                          <p className="px-2 py-4 text-md text-black/50">
                             Type at least 2 characters to search.
                           </p>
                         ) : searchLoading ? (
-                          <p className="px-2 py-4 text-sm text-black/50">
+                          <p className="px-2 py-4 text-md text-black/50">
                             Searching products...
                           </p>
                         ) : searchError ? (
-                          <p className="px-2 py-4 text-sm text-red-600">
+                          <p className="px-2 py-4 text-md text-red-600">
                             {searchError}
                           </p>
                         ) : searchResults.length === 0 ? (
-                          <p className="px-2 py-4 text-sm text-black/50">
+                          <p className="px-2 py-4 text-md text-black/50">
                             No products found.
                           </p>
                         ) : (
@@ -420,10 +420,10 @@ export default function NewHeader() {
                                   ) : null}
                                 </div>
                                 <div className="min-w-0 flex-1">
-                                  <p className="truncate text-sm font-semibold text-black">
+                                  <p className="truncate text-md font-semibold text-black">
                                     {product.name}
                                   </p>
-                                  <p className="truncate text-xs text-black/55">
+                                  <p className="truncate text-md text-black/55">
                                     {product.variant_name || "View product"}
                                   </p>
                                 </div>
@@ -437,7 +437,7 @@ export default function NewHeader() {
                         <button
                           type="button"
                           onClick={submitSearch}
-                          className="w-full border-t border-black/10 px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.08em] text-black hover:bg-black/5"
+                          className="w-full border-t border-black/10 px-4 py-3 text-left text-md font-semibold uppercase tracking-[0.08em] text-black hover:bg-black/5"
                         >
                           View all {searchPagination.total_items} results
                         </button>
@@ -481,7 +481,7 @@ export default function NewHeader() {
                           : "invisible opacity-0"
                       }`}
                     >
-                      <div className="py-2 text-sm text-gray-700">
+                      <div className="py-2 text-md text-gray-700">
                         <Link
                           href="/user/profile"
                           className="block px-4 py-2 hover:bg-gray-50"
@@ -531,7 +531,7 @@ export default function NewHeader() {
               }`}
             >
               <div className="border-t border-gray-800 py-4">
-                <nav className="flex flex-col gap-4 text-sm font-medium">
+                <nav className="flex flex-col gap-4 text-md font-medium">
                   <Link
                     href="/"
                     className="hover:text-gray-700"
@@ -562,7 +562,7 @@ export default function NewHeader() {
                       )}
                       {headerCategories.map((category) => (
                         <div key={category.slug} className="space-y-2">
-                          <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+                          <p className="text-md font-semibold uppercase tracking-wide text-gray-500">
                             {category.name}
                           </p>
                           <Link
@@ -676,10 +676,10 @@ export default function NewHeader() {
             style={{ position: "relative", zIndex: 20 }}
           >
             <div className=" border border-gray-200 bg-white shadow-xl">
-              <div className="container mx-auto px-4 px-10 py-8">
+              <div className="site-container py-8">
                 <div className=" flex flex-col gap-10 lg:flex-row">
                   <div className="flex-1 max-h-[360px] overflow-y-auto pr-4">
-                    <div className="grid grid-cols-2 gap-8 text-sm">
+                    <div className="grid grid-cols-2 gap-8 text-md">
                       {headerCategories.length === 0 && (
                         <div>
                           <p className="mb-4 text-base font-semibold text-gray-900">

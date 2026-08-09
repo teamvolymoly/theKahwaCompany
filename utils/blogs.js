@@ -17,18 +17,25 @@ export const getReadTime = (content = "") => {
 
 export const normalizeBlogPost = (item, index = 0) => {
   const content = item?.content || "";
+  const excerpt = item?.excerpt || "";
   const id = item?.id || `fallback-blog-${index}`;
   const slug = item?.slug || id;
+  const image =
+    item?.featured_image_url ||
+    item?.featured_image_path ||
+    item?.image_url ||
+    item?.image ||
+    "";
 
   return {
     id,
     title: item?.title || "",
     slug,
     href: `/blogs/${id}`,
-    excerpt: item?.excerpt || "",
+    excerpt,
     content,
-    image: item?.featured_image_url || "",
-    imagePath: item?.featured_image_path || "",
+    image,
+    imagePath: image,
     status: item?.status,
     metaTitle: item?.meta_title || "",
     metaDescription: item?.meta_description || "",
@@ -38,7 +45,7 @@ export const normalizeBlogPost = (item, index = 0) => {
       item?.created_by?.name ||
       "",
     date: formatBlogDate(item?.published_at || item?.created_at),
-    read: getReadTime(content),
+    read: getReadTime(content || excerpt),
   };
 };
 

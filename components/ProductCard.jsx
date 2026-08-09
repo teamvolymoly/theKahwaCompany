@@ -46,7 +46,10 @@ export default function ProductCard({ product, variant = "default" }) {
       const targetVariantId = Number(variantId);
       const alreadyInCart = cartItems.some((item) => {
         const itemVariantId = Number(item?.variant_id || item?.variant?.id);
-        if (Number.isFinite(itemVariantId) && Number.isFinite(targetVariantId)) {
+        if (
+          Number.isFinite(itemVariantId) &&
+          Number.isFinite(targetVariantId)
+        ) {
           return itemVariantId === targetVariantId;
         }
         return (
@@ -91,10 +94,8 @@ export default function ProductCard({ product, variant = "default" }) {
 
   return (
     <article
-      className={`group flex h-full min-w-0 flex-col overflow-hidden rounded-sm ${
-        isHomepage
-          ? "rounded-lg bg-[#f7f9f3]"
-          : "bg-[#fafafa] pb-6"
+      className={`group flex h-full min-w-0 flex-col overflow-visible rounded-sm ${
+        isHomepage ? "rounded-lg bg-[#f7f9f3]" : "bg-[#fafafa] pb-6"
       }`}
     >
       <div
@@ -104,7 +105,7 @@ export default function ProductCard({ product, variant = "default" }) {
       >
         <Link
           href={`/product/${slugOrId}`}
-          className="relative block overflow-hidden rounded-sm"
+          className="group/image relative block overflow-hidden rounded-sm"
         >
           <div
             className={`relative mx-auto flex items-center justify-center ${
@@ -116,14 +117,14 @@ export default function ProductCard({ product, variant = "default" }) {
             <img
               src={primaryImage}
               alt={product.name}
-              className={`w-auto object-contain object-center transition duration-300 group-hover:opacity-0 ${
+              className={`w-auto object-contain object-center transition duration-300 group-hover/image:opacity-0 ${
                 isHomepage ? "max-h-full" : "h-full"
               }`}
             />
             <img
               src={secondaryImage}
               alt={`${product.name} alternate`}
-              className={`absolute inset-0 mx-auto w-auto object-contain object-center opacity-0 transition duration-300 group-hover:opacity-100 ${
+              className={`absolute inset-0 mx-auto w-auto object-contain object-center opacity-0 transition duration-300 group-hover/image:opacity-100 ${
                 isHomepage ? "max-h-full" : "h-full"
               }`}
             />
@@ -158,7 +159,7 @@ export default function ProductCard({ product, variant = "default" }) {
             </svg>
           ))}
           {isHomepage ? (
-            <span className="ml-1 text-xs text-[#777d70]">
+            <span className="ml-1 text-md text-[#777d70]">
               ({product.review_count || 16})
             </span>
           ) : null}
@@ -190,7 +191,7 @@ export default function ProductCard({ product, variant = "default" }) {
             <span
               className={`bg-[#fff1c3] font-semibold text-[#a78000] ${
                 isHomepage
-                  ? "px-2 py-0.5 text-[10px] sm:text-xs"
+                  ? "px-2 py-0.5 text-[10px] sm:text-md"
                   : "px-2 py-0.5 text-[10px] uppercase tracking-[0.08em]"
               }`}
             >
@@ -202,12 +203,11 @@ export default function ProductCard({ product, variant = "default" }) {
 
       <button
         onClick={handleAddToCart}
-        className={`w-full cursor-pointer font-medium uppercase text-white transition ${
+        className={`w-full cursor-pointer rounded-none bg-[#52653b] font-serif font-thin uppercase text-white transition hover:bg-[#6B7F42] ${
           isHomepage
-            ? "bg-[#4e6039] py-3 text-sm tracking-[0.02em] hover:bg-[#40502f] sm:py-3.5 sm:text-base"
-            : "bg-gradient-to-r from-[#7a8177] to-[#6a716a] py-3 text-xs tracking-[0.12em] hover:from-[#5f665e] hover:to-[#525a53]"
+            ? "py-3 text-md tracking-[0.02em] sm:py-3.5 sm:text-base"
+            : "py-3 text-md tracking-[0.12em]"
         }`}
-        style={isHomepage ? { fontFamily: "var(--font-basker)" } : undefined}
       >
         Add To Cart
       </button>

@@ -123,10 +123,10 @@ export default function OrdersPage() {
 
   return (
     <main className="min-h-screen bg-white text-black mt-14">
-      <section className="container max-w-7xl mx-auto px-6 md:px-12 py-14">
+      <section className="site-container py-14">
         <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
           <div>
-            <p className="text-xs uppercase tracking-[0.094em] text-black/60">
+            <p className="text-md uppercase tracking-[0.094em] text-black/60">
               My account
             </p>
             <h1
@@ -138,7 +138,7 @@ export default function OrdersPage() {
           </div>
           <Link
             href="/shop"
-            className="self-start text-xs font-semibold uppercase tracking-[0.2em] text-black/60 hover:text-black inline-flex items-center gap-2"
+            className="self-start text-md font-semibold uppercase tracking-[0.2em] text-black/60 hover:text-black inline-flex items-center gap-2"
           >
             Continue shopping <span aria-hidden="true">&rsaquo;</span>
           </Link>
@@ -148,7 +148,7 @@ export default function OrdersPage() {
           <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-[200px_220px_220px_1fr] lg:gap-4">
               <div>
-                <label className="text-xs uppercase tracking-[0.12em] text-black/50">
+                <label className="text-md uppercase tracking-[0.12em] text-black/50">
                   Status
                 </label>
                 <select
@@ -157,7 +157,7 @@ export default function OrdersPage() {
                     setStatus(e.target.value);
                     setPage(1);
                   }}
-                  className="mt-2 w-full rounded-sm border border-black/20 px-3 py-2 text-sm outline-none focus:border-black"
+                  className="mt-2 w-full rounded-sm border border-black/20 px-3 py-2 text-md outline-none focus:border-black"
                 >
                   {STATUS_OPTIONS.map((option) => (
                     <option key={option} value={option}>
@@ -167,7 +167,7 @@ export default function OrdersPage() {
                 </select>
               </div>
               <div>
-                <label className="text-xs uppercase tracking-[0.12em] text-black/50">
+                <label className="text-md uppercase tracking-[0.12em] text-black/50">
                   From
                 </label>
                 <input
@@ -177,11 +177,11 @@ export default function OrdersPage() {
                     setDateFrom(e.target.value);
                     setPage(1);
                   }}
-                  className="mt-2 w-full rounded-sm border border-black/20 px-3 py-2 text-sm outline-none focus:border-black"
+                  className="mt-2 w-full rounded-sm border border-black/20 px-3 py-2 text-md outline-none focus:border-black"
                 />
               </div>
               <div>
-                <label className="text-xs uppercase tracking-[0.12em] text-black/50">
+                <label className="text-md uppercase tracking-[0.12em] text-black/50">
                   To
                 </label>
                 <input
@@ -191,11 +191,11 @@ export default function OrdersPage() {
                     setDateTo(e.target.value);
                     setPage(1);
                   }}
-                  className="mt-2 w-full rounded-sm border border-black/20 px-3 py-2 text-sm outline-none focus:border-black"
+                  className="mt-2 w-full rounded-sm border border-black/20 px-3 py-2 text-md outline-none focus:border-black"
                 />
               </div>
               <div>
-                <label className="text-xs uppercase tracking-[0.12em] text-black/50">
+                <label className="text-md uppercase tracking-[0.12em] text-black/50">
                   Search
                 </label>
                 <input
@@ -206,14 +206,14 @@ export default function OrdersPage() {
                     setPage(1);
                   }}
                   placeholder="Search order ID or product..."
-                  className="mt-2 w-full rounded-sm border border-black/20 px-3 py-2 text-sm outline-none focus:border-black"
+                  className="mt-2 w-full rounded-sm border border-black/20 px-3 py-2 text-md outline-none focus:border-black"
                 />
               </div>
             </div>
             <button
               type="button"
               onClick={resetFilters}
-              className="rounded-sm border border-black/40 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-black hover:border-black"
+              className="rounded-sm border border-black/40 px-4 py-2 text-md font-semibold uppercase tracking-[0.2em] text-black hover:border-black"
             >
               Reset filters
             </button>
@@ -222,24 +222,24 @@ export default function OrdersPage() {
 
         <div className="mt-8 rounded-sm border border-black/10 bg-white p-6 shadow-sm">
           <div className="flex items-center justify-between">
-            <p className="text-xs uppercase tracking-[0.12em] text-black/60">
+            <p className="text-md uppercase tracking-[0.12em] text-black/60">
               All orders
             </p>
-            <p className="text-xs text-black/50">
+            <p className="text-md text-black/50">
               {pagination.total_items} orders
             </p>
           </div>
 
           {error && (
-            <div className="mt-4 rounded-sm border border-red-200 bg-red-50 px-4 py-3 text-xs uppercase tracking-[0.08em] text-red-700">
+            <div className="mt-4 rounded-sm border border-red-200 bg-red-50 px-4 py-3 text-md uppercase tracking-[0.08em] text-red-700">
               {error}
             </div>
           )}
 
           {loadingOrders ? (
-            <p className="mt-6 text-sm text-black/60">Loading orders...</p>
+            <p className="mt-6 text-md text-black/60">Loading orders...</p>
           ) : visibleOrders.length === 0 ? (
-            <p className="mt-6 text-sm text-black/60">
+            <p className="mt-6 text-md text-black/60">
               No orders found for these filters.
             </p>
           ) : (
@@ -251,29 +251,31 @@ export default function OrdersPage() {
                   className="rounded-sm border border-black/10 bg-gray-50 p-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between hover:border-black/40 transition cursor-pointer"
                 >
                   <div className="min-w-0">
-                    <p className="text-sm font-semibold">
+                    <p className="text-md font-semibold">
                       {order.id || order.order_id}
                     </p>
-                    <p className="text-xs text-black/50">
+                    <p className="text-md text-black/50">
                       {order.date || order.created_at}
                     </p>
-                    <p className="mt-1 text-xs text-black/60">
+                    <p className="mt-1 text-md text-black/60">
                       {order.product_name || "Order item"}
-                      {order.product_variant ? ` - ${order.product_variant}` : ""}
+                      {order.product_variant
+                        ? ` - ${order.product_variant}`
+                        : ""}
                       {order.items_count
                         ? ` (${order.items_count} item${order.items_count > 1 ? "s" : ""})`
                         : ""}
                     </p>
                   </div>
-                  <div className="text-sm text-black/60 md:text-center">
+                  <div className="text-md text-black/60 md:text-center">
                     <p>{order.status || "Processing"}</p>
                     {order.payment_status && (
-                      <p className="text-xs text-black/45">
+                      <p className="text-md text-black/45">
                         Payment: {order.payment_status}
                       </p>
                     )}
                   </div>
-                  <div className="text-sm font-semibold">
+                  <div className="text-md font-semibold">
                     {formatMoney(order.total || order.amount, order.currency)}
                   </div>
                 </Link>
@@ -282,12 +284,12 @@ export default function OrdersPage() {
           )}
 
           {pagination.total_pages > 1 && (
-            <div className="mt-8 flex items-center justify-between text-sm text-black/60">
+            <div className="mt-8 flex items-center justify-between text-md text-black/60">
               <button
                 type="button"
                 onClick={() => setPage((prev) => Math.max(1, prev - 1))}
                 disabled={page <= 1}
-                className="rounded-sm border border-black/10 px-4 py-2 text-xs uppercase tracking-[0.08em] disabled:cursor-not-allowed disabled:opacity-50"
+                className="rounded-sm border border-black/10 px-4 py-2 text-md uppercase tracking-[0.08em] disabled:cursor-not-allowed disabled:opacity-50"
               >
                 Previous
               </button>
@@ -300,7 +302,7 @@ export default function OrdersPage() {
                   setPage((prev) => Math.min(pagination.total_pages, prev + 1))
                 }
                 disabled={page >= pagination.total_pages}
-                className="rounded-sm border border-black/10 px-4 py-2 text-xs uppercase tracking-[0.08em] disabled:cursor-not-allowed disabled:opacity-50"
+                className="rounded-sm border border-black/10 px-4 py-2 text-md uppercase tracking-[0.08em] disabled:cursor-not-allowed disabled:opacity-50"
               >
                 Next
               </button>

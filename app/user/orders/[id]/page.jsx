@@ -86,8 +86,8 @@ const normalizeOrderDetail = (payload, orderId) => {
 
 const DetailItem = ({ label, value }) => (
   <div>
-    <p className="text-xs uppercase tracking-[0.08em] text-black/50">{label}</p>
-    <p className="mt-1 text-sm font-semibold text-black">{value || "-"}</p>
+    <p className="text-md uppercase tracking-[0.08em] text-black/50">{label}</p>
+    <p className="mt-1 text-md font-semibold text-black">{value || "-"}</p>
   </div>
 );
 
@@ -112,28 +112,28 @@ const ReviewModal = ({
         <button
           type="button"
           onClick={onClose}
-          className="absolute right-4 top-4 rounded-full border border-black/20 px-3 py-1 text-xs uppercase tracking-[0.08em] text-black/70 hover:border-black"
+          className="absolute right-4 top-4 rounded-full border border-black/20 px-3 py-1 text-md uppercase tracking-[0.08em] text-black/70 hover:border-black"
         >
           Close
         </button>
-        <p className="text-xs uppercase tracking-[0.12em] text-black/50">
+        <p className="text-md uppercase tracking-[0.12em] text-black/50">
           Product review
         </p>
         <h2 className="mt-2 pr-16 text-xl font-semibold text-black">
           {item.product_name}
         </h2>
-        <p className="mt-1 text-sm text-black/55">{item.variant_name}</p>
+        <p className="mt-1 text-md text-black/55">{item.variant_name}</p>
 
         <form onSubmit={onSubmit} className="mt-6 grid gap-4">
           <div>
-            <label className="text-xs uppercase tracking-[0.12em] text-black/50">
+            <label className="text-md uppercase tracking-[0.12em] text-black/50">
               Rating
             </label>
             <select
               name="rating"
               value={form.rating}
               onChange={onChange}
-              className="mt-2 w-full rounded-sm border border-black/20 px-3 py-2 text-sm outline-none focus:border-black"
+              className="mt-2 w-full rounded-sm border border-black/20 px-3 py-2 text-md outline-none focus:border-black"
             >
               {[5, 4, 3, 2, 1].map((rating) => (
                 <option key={rating} value={rating}>
@@ -143,7 +143,7 @@ const ReviewModal = ({
             </select>
           </div>
           <div>
-            <label className="text-xs uppercase tracking-[0.12em] text-black/50">
+            <label className="text-md uppercase tracking-[0.12em] text-black/50">
               Title
             </label>
             <input
@@ -151,11 +151,11 @@ const ReviewModal = ({
               value={form.title}
               onChange={onChange}
               placeholder="Loved it"
-              className="mt-2 w-full rounded-sm border border-black/20 px-3 py-2 text-sm outline-none focus:border-black"
+              className="mt-2 w-full rounded-sm border border-black/20 px-3 py-2 text-md outline-none focus:border-black"
             />
           </div>
           <div>
-            <label className="text-xs uppercase tracking-[0.12em] text-black/50">
+            <label className="text-md uppercase tracking-[0.12em] text-black/50">
               Comment
             </label>
             <textarea
@@ -165,11 +165,11 @@ const ReviewModal = ({
               required
               rows={5}
               placeholder="Tell us what you thought."
-              className="mt-2 w-full rounded-sm border border-black/20 px-3 py-2 text-sm outline-none focus:border-black"
+              className="mt-2 w-full rounded-sm border border-black/20 px-3 py-2 text-md outline-none focus:border-black"
             />
           </div>
           <div>
-            <label className="text-xs uppercase tracking-[0.12em] text-black/50">
+            <label className="text-md uppercase tracking-[0.12em] text-black/50">
               Images optional
             </label>
             <input
@@ -178,21 +178,20 @@ const ReviewModal = ({
               accept="image/*"
               multiple
               onChange={onChange}
-              className="mt-2 w-full rounded-sm border border-black/20 px-3 py-2 text-sm file:mr-4 file:rounded-full file:border-0 file:bg-black file:px-4 file:py-2 file:text-xs file:font-semibold file:uppercase file:tracking-[0.08em] file:text-white"
+              className="mt-2 w-full rounded-sm border border-black/20 px-3 py-2 text-md file:mr-4 file:rounded-full file:border-0 file:bg-black file:px-4 file:py-2 file:text-md file:font-semibold file:uppercase file:tracking-[0.08em] file:text-white"
             />
             {form.images?.length > 0 && (
-              <p className="mt-2 text-xs text-black/50">
-                {form.images.length} image{form.images.length > 1 ? "s" : ""} selected
+              <p className="mt-2 text-md text-black/50">
+                {form.images.length} image{form.images.length > 1 ? "s" : ""}{" "}
+                selected
               </p>
             )}
           </div>
-          {message && (
-            <p className="text-sm text-black/60">{message}</p>
-          )}
+          {message && <p className="text-md text-black/60">{message}</p>}
           <button
             type="submit"
             disabled={loading}
-            className="rounded-full bg-black px-6 py-3 text-xs font-semibold uppercase tracking-[0.08em] text-white disabled:opacity-60"
+            className="rounded-full bg-black px-6 py-3 text-md font-semibold uppercase tracking-[0.08em] text-white disabled:opacity-60"
           >
             {loading ? "Saving..." : "Submit review"}
           </button>
@@ -474,8 +473,8 @@ export default function OrderDetailPage() {
   if (loadingOrder) {
     return (
       <main className="min-h-screen bg-white text-black mt-14">
-        <section className="container max-w-5xl mx-auto px-6 md:px-12 py-14">
-          <p className="text-sm text-black/60">Loading order details...</p>
+        <section className="site-container py-14">
+          <p className="text-md text-black/60">Loading order details...</p>
         </section>
       </main>
     );
@@ -484,11 +483,11 @@ export default function OrderDetailPage() {
   if (error || !order) {
     return (
       <main className="min-h-screen bg-white text-black mt-14">
-        <section className="container max-w-5xl mx-auto px-6 md:px-12 py-14">
-          <p className="text-sm text-red-600">{error || "Order not found."}</p>
+        <section className="site-container py-14">
+          <p className="text-md text-red-600">{error || "Order not found."}</p>
           <Link
             href="/user/orders"
-            className="mt-6 inline-flex rounded-sm border border-black/60 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-black hover:border-black"
+            className="mt-6 inline-flex rounded-sm border border-black/60 px-4 py-2 text-md font-semibold uppercase tracking-[0.2em] text-black hover:border-black"
           >
             Back to orders
           </Link>
@@ -499,10 +498,10 @@ export default function OrderDetailPage() {
 
   return (
     <main className="min-h-screen bg-white text-black mt-14">
-      <section className="container max-w-5xl mx-auto px-6 md:px-12 py-14">
+      <section className="site-container py-14">
         <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
           <div>
-            <p className="text-xs uppercase tracking-[0.094em] text-black/60">
+            <p className="text-md uppercase tracking-[0.094em] text-black/60">
               My account
             </p>
             <h1
@@ -511,13 +510,13 @@ export default function OrderDetailPage() {
             >
               Order {order.id}
             </h1>
-            <p className="mt-2 text-sm text-black/50">
+            <p className="mt-2 text-md text-black/50">
               {order.placed_on} - {order.status}
             </p>
           </div>
           <Link
             href="/user/orders"
-            className="self-start rounded-sm border border-black/60 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-black hover:border-black"
+            className="self-start rounded-sm border border-black/60 px-4 py-2 text-md font-semibold uppercase tracking-[0.2em] text-black hover:border-black"
           >
             Back to orders
           </Link>
@@ -525,7 +524,7 @@ export default function OrderDetailPage() {
 
         <div className="mt-10 grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
           <div className="rounded-sm border border-black/10 bg-white p-6 shadow-sm">
-            <p className="text-xs uppercase tracking-[0.08em] text-black/50">
+            <p className="text-md uppercase tracking-[0.08em] text-black/50">
               Order details
             </p>
             <div className="mt-4 grid gap-4 sm:grid-cols-2">
@@ -543,7 +542,7 @@ export default function OrderDetailPage() {
             </div>
 
             <div className="mt-6 rounded-sm border border-black/10 bg-gray-50 p-4">
-              <p className="text-xs uppercase tracking-[0.08em] text-black/50">
+              <p className="text-md uppercase tracking-[0.08em] text-black/50">
                 Customer
               </p>
               <div className="mt-3 grid gap-3 sm:grid-cols-2">
@@ -554,10 +553,10 @@ export default function OrderDetailPage() {
             </div>
 
             <div className="mt-6 rounded-sm border border-black/10 bg-gray-50 p-4">
-              <p className="text-xs uppercase tracking-[0.08em] text-black/50">
+              <p className="text-md uppercase tracking-[0.08em] text-black/50">
                 Shipping address
               </p>
-              <div className="mt-3 text-sm text-black/70">
+              <div className="mt-3 text-md text-black/70">
                 <p className="font-semibold text-black">
                   {order.shipping_address.label || "-"}
                 </p>
@@ -576,10 +575,10 @@ export default function OrderDetailPage() {
             <div className="mt-6 rounded-sm border border-black/10 bg-white p-4">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>
-                  <p className="text-xs uppercase tracking-[0.08em] text-black/50">
+                  <p className="text-md uppercase tracking-[0.08em] text-black/50">
                     Invoice
                   </p>
-                  <p className="mt-1 text-sm font-semibold text-black">
+                  <p className="mt-1 text-md font-semibold text-black">
                     {order.invoice.number}
                   </p>
                 </div>
@@ -587,20 +586,20 @@ export default function OrderDetailPage() {
                   <button
                     type="button"
                     onClick={() => setInvoiceOpen(true)}
-                    className="rounded-full border border-black px-5 py-2 text-xs font-semibold uppercase tracking-[0.08em] text-black hover:bg-black hover:text-white"
+                    className="rounded-full border border-black px-5 py-2 text-md font-semibold uppercase tracking-[0.08em] text-black hover:bg-black hover:text-white"
                   >
                     View
                   </button>
                   <button
                     type="button"
                     onClick={handleDownloadInvoice}
-                    className="rounded-full border border-black px-5 py-2 text-xs font-semibold uppercase tracking-[0.08em] text-black hover:bg-black hover:text-white"
+                    className="rounded-full border border-black px-5 py-2 text-md font-semibold uppercase tracking-[0.08em] text-black hover:bg-black hover:text-white"
                   >
                     Download
                   </button>
                 </div>
               </div>
-              <div className="mt-4 grid gap-3 text-sm text-black/70">
+              <div className="mt-4 grid gap-3 text-md text-black/70">
                 <div className="flex items-center justify-between">
                   <span>Issued on</span>
                   <span>{order.invoice.issued_on || "-"}</span>
@@ -630,7 +629,7 @@ export default function OrderDetailPage() {
           </div>
 
           <div className="rounded-sm border border-black/10 bg-gray-50 p-6 h-fit">
-            <p className="text-xs uppercase tracking-[0.08em] text-black/50">
+            <p className="text-md uppercase tracking-[0.08em] text-black/50">
               Items in this order
             </p>
             <div className="mt-4 space-y-4">
@@ -656,39 +655,39 @@ export default function OrderDetailPage() {
                       ) : null}
                     </div>
                     <div className="flex-1">
-                      <p className="text-sm font-semibold text-black">
+                      <p className="text-md font-semibold text-black">
                         {item.product_name}
                       </p>
-                      <p className="text-xs text-black/60">
+                      <p className="text-md text-black/60">
                         {item.variant_name}
                       </p>
-                      <p className="text-xs text-black/60">
+                      <p className="text-md text-black/60">
                         Qty: {item.quantity}
                       </p>
-                      <p className="text-xs text-black/50">
+                      <p className="text-md text-black/50">
                         Unit: {formatMoney(item.price, order.currency)}
                       </p>
                       {canReview && (
                         <button
                           type="button"
                           onClick={() => openReviewModal(item)}
-                          className="mt-3 rounded-full border border-black px-4 py-2 text-xs font-semibold uppercase tracking-[0.08em] text-black hover:bg-black hover:text-white"
+                          className="mt-3 rounded-full border border-black px-4 py-2 text-md font-semibold uppercase tracking-[0.08em] text-black hover:bg-black hover:text-white"
                         >
                           Give review
                         </button>
                       )}
                       {!canReview && existingReview && (
-                        <p className="mt-2 text-xs font-semibold uppercase tracking-[0.08em] text-black/55">
+                        <p className="mt-2 text-md font-semibold uppercase tracking-[0.08em] text-black/55">
                           Already reviewed
                         </p>
                       )}
                       {!canReview && !existingReview && eligibility.reason && (
-                        <p className="mt-2 text-xs text-black/45">
+                        <p className="mt-2 text-md text-black/45">
                           {eligibility.reason}
                         </p>
                       )}
                     </div>
-                    <p className="text-sm font-semibold text-black">
+                    <p className="text-md font-semibold text-black">
                       {formatMoney(item.line_total, order.currency)}
                     </p>
                   </div>
@@ -698,13 +697,13 @@ export default function OrderDetailPage() {
             <div className="mt-6 flex flex-wrap gap-4">
               <Link
                 href="/user/orders"
-                className="rounded-full border border-black px-6 py-3 text-xs font-semibold uppercase tracking-[0.08em] text-black"
+                className="rounded-full border border-black px-6 py-3 text-md font-semibold uppercase tracking-[0.08em] text-black"
               >
                 View orders
               </Link>
               <Link
                 href="/shop"
-                className="rounded-full bg-black px-6 py-3 text-xs font-semibold uppercase tracking-[0.08em] text-white"
+                className="rounded-full bg-black px-6 py-3 text-md font-semibold uppercase tracking-[0.08em] text-white"
               >
                 Continue shopping
               </Link>
@@ -723,7 +722,7 @@ export default function OrderDetailPage() {
             <button
               type="button"
               onClick={() => setInvoiceOpen(false)}
-              className="absolute right-4 top-4 rounded-full border border-black/20 px-3 py-1 text-xs uppercase tracking-[0.08em] text-black/70 hover:border-black"
+              className="absolute right-4 top-4 rounded-full border border-black/20 px-3 py-1 text-md uppercase tracking-[0.08em] text-black/70 hover:border-black"
             >
               Close
             </button>
@@ -734,36 +733,36 @@ export default function OrderDetailPage() {
                 className="h-10 w-auto object-contain"
               />
               <div className="text-right">
-                <p className="text-sm font-semibold">Invoice</p>
-                <p className="text-xs text-black/60">{order.invoice.number}</p>
+                <p className="text-md font-semibold">Invoice</p>
+                <p className="text-md text-black/60">{order.invoice.number}</p>
               </div>
             </div>
-            <div className="mt-4 grid gap-4 sm:grid-cols-2 text-sm text-black/70">
+            <div className="mt-4 grid gap-4 sm:grid-cols-2 text-md text-black/70">
               <div>
-                <p className="text-xs uppercase tracking-[0.08em] text-black/50">
+                <p className="text-md uppercase tracking-[0.08em] text-black/50">
                   Seller
                 </p>
                 <p className="mt-1 font-semibold text-black">
                   {order.invoice.seller}
                 </p>
-                <p className="text-xs text-black/60">
+                <p className="text-md text-black/60">
                   Issued on {order.invoice.issued_on || "-"}
                 </p>
               </div>
               <div>
-                <p className="text-xs uppercase tracking-[0.08em] text-black/50">
+                <p className="text-md uppercase tracking-[0.08em] text-black/50">
                   Bill to
                 </p>
                 <p className="mt-1 font-semibold text-black">
                   {order.customer.name || "-"}
                 </p>
                 <p>{order.customer.email || "-"}</p>
-                <p className="text-xs text-black/60">
+                <p className="text-md text-black/60">
                   {order.customer.phone || "-"}
                 </p>
               </div>
             </div>
-            <div className="mt-4 grid gap-2 text-sm text-black/70">
+            <div className="mt-4 grid gap-2 text-md text-black/70">
               {order.items.map((item, index) => (
                 <div
                   key={`invoice-${item.id || index}`}
@@ -776,7 +775,7 @@ export default function OrderDetailPage() {
                 </div>
               ))}
             </div>
-            <div className="mt-4 grid gap-2 text-sm text-black/70">
+            <div className="mt-4 grid gap-2 text-md text-black/70">
               <div className="flex items-center justify-between">
                 <span>Subtotal</span>
                 <span>{formatMoney(order.subtotal, order.currency)}</span>
@@ -798,7 +797,7 @@ export default function OrderDetailPage() {
                 <span>{formatMoney(order.total, order.currency)}</span>
               </div>
             </div>
-            <div className="mt-4 rounded-sm border border-black/10 bg-black/5 p-3 text-xs text-black/60">
+            <div className="mt-4 rounded-sm border border-black/10 bg-black/5 p-3 text-md text-black/60">
               Order status: {order.status} | Payment:{" "}
               {order.payment_status || "-"} | Delivered:{" "}
               {order.delivered_date || "-"}

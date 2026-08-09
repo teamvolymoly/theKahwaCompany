@@ -20,7 +20,7 @@ export default function NotFound() {
           </h1>
           <Link
             href="/"
-            className="mx-auto mt-9 flex h-12 w-full max-w-[245px] items-center justify-center rounded-lg bg-[#4f6139] text-base font-semibold text-white transition-colors hover:bg-[#40502e] md:mx-0"
+            className="mx-auto mt-9 flex h-12 w-full max-w-[245px] items-center justify-center rounded-lg bg-[#52653b] text-base font-semibold text-white transition-colors hover:bg-[#6B7F42] md:mx-0"
           >
             Back to Home
           </Link>

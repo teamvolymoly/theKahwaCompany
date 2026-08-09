@@ -42,13 +42,17 @@ const productPrice = (product) =>
 const oldPrice = (product) => product?.compare_price ?? product?.oldPrice;
 
 function Rating({ product }) {
-  const hasRating = product?.rating !== null && product?.rating !== undefined;
   const rawRating = Number(product?.rating);
-  const rating = hasRating && Number.isFinite(rawRating) && rawRating > 0 ? rawRating : 5;
+  const rating =
+    Number.isFinite(rawRating) ? Math.max(0, Math.min(5, rawRating)) : 0;
   const fullStars = Math.max(0, Math.min(5, Math.round(rating)));
+  const reviewCount = product?.review_count ?? product?.total_reviews;
 
   return (
-    <div className="flex items-center gap-[2px]" aria-label={`${rating} out of 5 stars`}>
+    <div
+      className="flex items-center gap-[2px]"
+      aria-label={`${rating} out of 5 stars`}
+    >
       {Array.from({ length: 5 }).map((_, index) => (
         <svg
           key={`${product.id}-star-${index}`}
@@ -62,19 +66,22 @@ function Rating({ product }) {
           <path d="m12 2.8 2.8 5.68 6.27.91-4.54 4.42 1.07 6.24L12 17.11l-5.6 2.94 1.07-6.24-4.54-4.42 6.27-.91L12 2.8Z" />
         </svg>
       ))}
-      <span className="ml-1 text-sm text-[#8a8d83]">
-        ({product?.review_count || 16})
-      </span>
+      {reviewCount !== null && reviewCount !== undefined ? (
+        <span className="ml-1 text-md text-[#8a8d83]">({reviewCount})</span>
+      ) : null}
     </div>
   );
 }
 
 function ProductImage({ product, className = "" }) {
-  const primary = product?.images?.[0]?.image_url || product?.image || FALLBACK_IMAGE;
+  const primary =
+    product?.images?.[0]?.image_url || product?.image || FALLBACK_IMAGE;
   const secondary = product?.images?.[1]?.image_url || primary;
 
   return (
-    <div className={`group/image relative flex items-center justify-center ${className}`}>
+    <div
+      className={`group/image relative flex items-center justify-center ${className}`}
+    >
       <img
         src={primary}
         alt={product.name}
@@ -91,21 +98,23 @@ function ProductImage({ product, className = "" }) {
 
 function ProductActions({ product, onAdd, compact = false }) {
   const slugOrId = product.slug || product.id;
+  const isAvailable = product.in_stock !== false && product.status !== false;
 
   return (
     <div className={`grid grid-cols-2 gap-3 ${compact ? "mt-5" : "mt-7"}`}>
       <Link
         href={`/product/${slugOrId}`}
-        className="flex min-h-10 items-center justify-center border border-[#71805d] px-3 text-center font-serif text-sm uppercase text-[#52633d] transition hover:bg-[#e8ecdf]"
+        className="flex min-h-10 items-center justify-center border border-[#71805d] px-3 text-center font-serif text-md uppercase text-[#52633d] transition hover:bg-[#e8ecdf]"
       >
         Learn More
       </Link>
       <button
         type="button"
         onClick={() => onAdd(product)}
-        className="min-h-10 cursor-pointer bg-[#52653b] px-3 font-serif text-sm uppercase text-white transition hover:bg-[#40512d]"
+        disabled={!isAvailable}
+        className="min-h-10 cursor-pointer rounded-none bg-[#52653b] px-3 font-serif text-md uppercase text-white transition hover:bg-[#6B7F42] disabled:cursor-not-allowed disabled:opacity-50"
       >
-        Add To Cart
+        {isAvailable ? "Add To Cart" : "Out of Stock"}
       </button>
     </div>
   );
@@ -170,6 +179,12 @@ export default function ShopClient() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [products, setProducts] = useState([]);
+  const [pagination, setPagination] = useState({
+    page: 1,
+    limit: 12,
+    total_items: 0,
+    total_pages: 1,
+  });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -203,7 +218,18 @@ export default function ShopClient() {
           oldPrice: product.compare_price,
         }));
 
-        if (active) setProducts(normalized);
+        if (active) {
+          setProducts(normalized);
+          setPagination({
+            page: Number(data?.pagination?.page) || 1,
+            limit: Number(data?.pagination?.limit) || 12,
+            total_items: Number(data?.pagination?.total_items) || 0,
+            total_pages: Math.max(
+              1,
+              Number(data?.pagination?.total_pages) || 1,
+            ),
+          });
+        }
       } catch (requestError) {
         if (active) {
           setProducts([]);
@@ -220,8 +246,16 @@ export default function ShopClient() {
     };
   }, [queryString]);
 
+  const goToPage = (page) => {
+    const nextPage = Math.max(1, Math.min(pagination.total_pages, page));
+    const params = new URLSearchParams(queryString);
+    params.set("page", String(nextPage));
+    router.push(`/shop?${params.toString()}`);
+  };
+
   const { featuredProduct, remainingProducts } = useMemo(() => {
-    if (!products.length) return { featuredProduct: null, remainingProducts: [] };
+    if (!products.length)
+      return { featuredProduct: null, remainingProducts: [] };
 
     const featuredIndex = products.findIndex((product) =>
       /kashmiri/i.test(product.name || ""),
@@ -282,7 +316,7 @@ export default function ShopClient() {
 
   return (
     <main className="bg-white pt-[70px] text-[#1f251c]">
-      <section className="relative flex h-[clamp(230px,22.222vw,320px)] items-center justify-center overflow-hidden">
+      <section className="relative flex h-[80svh] min-h-[360px] max-h-[720px] items-center justify-center overflow-hidden">
         <img
           src="/bg/Rectangle 4245.png"
           alt=""
@@ -298,8 +332,8 @@ export default function ShopClient() {
         </h1>
       </section>
 
-      <section className="px-5 py-14 sm:px-8 sm:py-[62px]">
-        <div className="mx-auto max-w-[1230px]">
+      <section className="py-14 sm:py-[62px]">
+        <div className="site-container">
           {loading ? <LoadingState /> : null}
 
           {!loading && error ? (
@@ -326,11 +360,13 @@ export default function ShopClient() {
               <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_296px]">
                 <article className="relative grid min-h-[439px] items-center overflow-hidden rounded-lg bg-[#f3f6ee] px-6 py-10 sm:grid-cols-[235px_minmax(0,1fr)] sm:px-9 lg:grid-cols-[280px_minmax(0,1fr)] lg:px-12">
                   {featuredProduct.badge ? (
-                    <span className="absolute right-4 top-4 bg-[#ffefb9] px-2 py-1 text-sm text-[#a97e00]">
+                    <span className="absolute right-4 top-4 bg-[#ffefb9] px-2 py-1 text-md text-[#a97e00]">
                       {featuredProduct.badge}
                     </span>
                   ) : null}
-                  <Link href={`/product/${featuredProduct.slug || featuredProduct.id}`}>
+                  <Link
+                    href={`/product/${featuredProduct.slug || featuredProduct.id}`}
+                  >
                     <ProductImage
                       product={featuredProduct}
                       className="mx-auto h-[285px] w-[190px] sm:h-[340px] sm:w-[220px]"
@@ -366,11 +402,41 @@ export default function ShopClient() {
                         />
                       </Link>
                       <div className="mt-6 sm:mt-0 sm:pl-5">
-                        <ProductDetails product={product} onAdd={handleAddToCart} />
+                        <ProductDetails
+                          product={product}
+                          onAdd={handleAddToCart}
+                        />
                       </div>
                     </article>
                   ))}
                 </div>
+              ) : null}
+
+              {pagination.total_pages > 1 ? (
+                <nav
+                  className="mt-12 flex items-center justify-center gap-5"
+                  aria-label="Products pagination"
+                >
+                  <button
+                    type="button"
+                    onClick={() => goToPage(pagination.page - 1)}
+                    disabled={pagination.page <= 1}
+                    className="border border-[#71805d] px-5 py-2 text-[#52633d] transition hover:bg-[#e8ecdf] disabled:cursor-not-allowed disabled:opacity-40"
+                  >
+                    Previous
+                  </button>
+                  <span className="text-base text-[#52633d]">
+                    Page {pagination.page} of {pagination.total_pages}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => goToPage(pagination.page + 1)}
+                    disabled={pagination.page >= pagination.total_pages}
+                    className="border border-[#71805d] px-5 py-2 text-[#52633d] transition hover:bg-[#e8ecdf] disabled:cursor-not-allowed disabled:opacity-40"
+                  >
+                    Next
+                  </button>
+                </nav>
               ) : null}
             </>
           ) : null}

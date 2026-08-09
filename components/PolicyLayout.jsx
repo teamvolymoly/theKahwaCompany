@@ -1,7 +1,7 @@
 export default function PolicyLayout({ title, children }) {
   return (
     <main className="bg-[#fdfefb] pt-[70px] text-[#252a23]">
-      <section className="mx-auto max-w-[1164px] px-5 pb-20 pt-[72px] sm:px-8">
+      <section className="site-container pb-20 pt-[72px]">
         <h1 className="font-(family-name:--font-basker) text-4xl font-normal uppercase leading-none text-[#344823]">
           {title}
         </h1>

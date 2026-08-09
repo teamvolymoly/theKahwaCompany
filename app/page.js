@@ -100,7 +100,7 @@ export default function Home() {
         className="pt-28 sm:pt-36 lg:pt-40"
         aria-labelledby="blends-title"
       >
-        <div className="mx-auto w-full max-w-[1216px] px-4 sm:px-6">
+        <div className="site-container">
           <div className="mb-8 flex items-end justify-between gap-6">
             <h2
               id="blends-title"
@@ -110,22 +110,43 @@ export default function Home() {
             </h2>
             <Link
               href="/shop"
-              className="mb-0.5 inline-flex items-center gap-1.5 text-xs font-medium text-[#586f34] underline underline-offset-2 sm:text-base"
+              className="text-cta mb-0.5 inline-flex items-center gap-1.5 text-md font-medium text-[#586f34] sm:text-base"
             >
-              View all Blends <ArrowRight size={18} strokeWidth={1.5} />
+              View all Blends
+              <img
+                data-cta-arrow
+                src="/icons/VectorRight.svg"
+                alt=""
+                className="h-3.5 w-2 object-contain"
+              />
             </Link>
           </div>
 
           <Link
             href="/shop"
             aria-label="Discover our must-have Kahwa blends"
-            className="group block aspect-[4.25/1] overflow-hidden rounded-md"
+            className="group relative block h-[220px] overflow-hidden rounded-md sm:h-auto sm:aspect-[4.25/1]"
           >
             <img
               src="/bg/banner.png"
-              alt="Exquisite taste, refreshing Kahwa blends"
+              alt=""
               className="block h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.06]"
             />
+            <div className="absolute inset-0 flex items-center px-5 sm:px-8 lg:px-12">
+              <div className="max-w-[430px] text-[#393735]">
+                <h3 className="text-2xl font-bold leading-[1.08] sm:text-3xl lg:text-[32px]">
+                  Exquisite Taste,
+                  <span className="block">Refreshing Blends.</span>
+                </h3>
+                <p className="mt-2 text-base text-[#6f6965]">
+                  Traditional Kahwa Blends You Must Try.
+                </p>
+                <span className="text-cta mt-4 inline-flex items-center gap-2 text-base font-semibold">
+                  Discover More
+                  <ArrowRight data-cta-arrow size={19} strokeWidth={1.7} />
+                </span>
+              </div>
+            </div>
           </Link>
 
           <div className="homepage-products mt-4 grid grid-flow-col gap-3.5 overflow-x-auto pb-3">
@@ -140,7 +161,7 @@ export default function Home() {
               : null}
 
             {!loadingProducts && products.length === 0 ? (
-              <div className="col-span-full rounded-sm border border-[#e8ecdf] bg-[#f7f9f3] p-8 text-sm text-[#626a5b]">
+              <div className="col-span-full rounded-sm border border-[#e8ecdf] bg-[#f7f9f3] p-8 text-md text-[#626a5b]">
                 No products are available right now.
               </div>
             ) : null}
@@ -164,7 +185,7 @@ export default function Home() {
         className="bg-white py-14 sm:py-18 lg:py-20"
         aria-labelledby="articles-title"
       >
-        <div className="mx-auto w-full max-w-[1180px] px-4 sm:px-6">
+        <div className="site-container">
           <div className="mb-7 flex items-end justify-between gap-6">
             <h2
               id="articles-title"
@@ -174,9 +195,15 @@ export default function Home() {
             </h2>
             <Link
               href="/blogs"
-              className="mb-1 inline-flex items-center gap-1 text-[11px] font-medium text-[#52633c] underline underline-offset-2 sm:text-xs"
+              className="text-cta mb-1 inline-flex items-center gap-1 text-[11px] font-medium text-[#52633c] sm:text-md"
             >
-              View all Articles <ArrowRight size={14} strokeWidth={1.5} />
+              View all Articles
+              <img
+                data-cta-arrow
+                src="/icons/VectorRight.svg"
+                alt=""
+                className="h-3.5 w-2 object-contain"
+              />
             </Link>
           </div>
 
@@ -199,11 +226,16 @@ export default function Home() {
                   )}
                 </div>
                 <div className="px-1 pb-3 pt-3">
-                  <h3 className="text-sm font-semibold leading-snug text-[#23281f]">
+                  <h3 className="text-lg font-semibold leading-snug text-[#23281f]">
                     {post.title}
                   </h3>
-                  <p className="mt-1.5 line-clamp-3 text-xs leading-relaxed">
-                    {post.excerpt}...
+                  <p className="mt-1.5 text-sm">
+                    {String(post.excerpt || "").length > 130
+                      ? `${String(post.excerpt).slice(0, 127).trim()}...`
+                      : post.excerpt}{" "}
+                    <span className="text-cta text-cta--self inline-block text-base font-medium text-[#52633c]">
+                      Read More
+                    </span>
                   </p>
                 </div>
               </Link>

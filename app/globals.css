@@ -56,8 +56,86 @@ html {
 
 body {
   overflow-x: clip;
+  min-width: 0;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+}
+
+/* Shared horizontal alignment for the header and every page section. */
+.site-container {
+  width: 100%;
+  margin-inline: auto;
+  padding-inline: 1rem;
+}
+
+/* Shared animated treatment for text-style calls to action. */
+.text-cta {
+  position: relative;
+  width: fit-content;
+  text-decoration: none !important;
+}
+
+.text-cta::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  bottom: -3px;
+  left: 0;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: right center;
+  transition: transform 260ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.text-cta:hover::after,
+.text-cta:focus-visible::after,
+.group:hover .text-cta:not(.text-cta--self)::after {
+  transform: scaleX(1);
+  transform-origin: left center;
+}
+
+.text-cta [data-cta-arrow] {
+  transition: transform 260ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.text-cta:hover [data-cta-arrow],
+.text-cta:focus-visible [data-cta-arrow],
+.group:hover .text-cta:not(.text-cta--self) [data-cta-arrow] {
+  transform: translateX(4px);
+}
+
+@media (min-width: 768px) {
+  .site-container {
+    max-width: 768px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .site-container {
+    max-width: 1024px;
+    padding-inline: 2rem;
+  }
+}
+
+@media (min-width: 1280px) {
+  .site-container {
+    max-width: 1280px;
+  }
+}
+
+/* Keep all readable website copy at the agreed 16px minimum. */
+small,
+[class~="text-xs"],
+[class~="text-sm"],
+[class~="text-[9px]"],
+[class~="text-[10px]"],
+[class~="text-[11px]"],
+[class~="text-[12px]"],
+[class~="text-[13px]"],
+[class~="text-[14px]"],
+[class~="text-[15px]"] {
+  font-size: 1rem !important;
 }
 
 ::selection {
@@ -79,8 +157,21 @@ summary {
 
 button:not(:disabled),
 summary,
-a[href] {
+a[href],
+[role="button"]:not([aria-disabled="true"]),
+[role="link"],
+label[for],
+select,
+input[type="button"],
+input[type="submit"],
+input[type="reset"] {
+  cursor: pointer;
   -webkit-tap-highlight-color: transparent;
+}
+
+button:disabled,
+[role="button"][aria-disabled="true"] {
+  cursor: not-allowed;
 }
 
 button:not(:disabled):active,
@@ -135,11 +226,26 @@ a[href]:active {
   background-size: cover;
 }
 
+/* Scrollable product tabs without a visible browser scrollbar. */
+.product-tabs__list {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  background-image: linear-gradient(#d8dbd3, #d8dbd3);
+  background-position: left bottom;
+  background-repeat: no-repeat;
+  background-size: 100% 2px;
+}
+
+.product-tabs__list::-webkit-scrollbar {
+  display: none;
+}
+
 @media (max-width: 640px) {
   .kahwa-footer__fixed-art {
     background-position: center bottom;
     background-size: 1156px 220px;
   }
+
 }
 
 @keyframes page-enter {
@@ -220,7 +326,7 @@ a[href]:active {
 }
 .testimonials-swiper .swiper-button-next::after,
 .testimonials-swiper .swiper-button-prev::after {
-  font-size: 13px;
+  font-size: 16px;
   font-weight: 700;
 }
 .testimonials-swiper .swiper-pagination {

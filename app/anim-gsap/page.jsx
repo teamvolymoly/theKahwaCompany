@@ -252,7 +252,7 @@ export default function AnimGsapPage() {
                 draggable={false} /* prevent ghost drag image */
               />
             </div>
-            <p className="mt-2 mb-1 text-sm font-medium tracking-wide opacity-80">
+            <p className="mt-2 mb-1 text-md font-medium tracking-wide opacity-80">
               {item.text}
             </p>
             <Link href="#" className="mt-1 mb-4 cursor-pointer">

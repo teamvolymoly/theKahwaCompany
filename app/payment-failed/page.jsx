@@ -103,7 +103,10 @@ export default function PaymentFailedPage() {
       setDetailsError("");
       try {
         const payload = await apiFetch(`/payments/failed/${paymentAttemptId}`);
-        const details = normalizeFailedPaymentDetails(payload, paymentAttemptId);
+        const details = normalizeFailedPaymentDetails(
+          payload,
+          paymentAttemptId,
+        );
         setOrder(details.order);
         setItems(details.items);
       } catch (err) {
@@ -118,8 +121,8 @@ export default function PaymentFailedPage() {
 
   return (
     <main className="min-h-screen bg-white text-black mt-12">
-      <section className="max-w-5xl mx-auto px-6 py-16">
-        <p className="text-xs uppercase tracking-[0.4em] text-black/60">
+      <section className="site-container py-16">
+        <p className="text-md uppercase tracking-[0.4em] text-black/60">
           Payment failed
         </p>
         <h1
@@ -128,30 +131,30 @@ export default function PaymentFailedPage() {
         >
           We couldn&apos;t process your payment
         </h1>
-        <p className="mt-4 text-sm text-black/60">
+        <p className="mt-4 text-md text-black/60">
           Please try again or use a different payment method.
         </p>
         {loadingDetails && (
-          <p className="mt-4 text-sm text-black/60">Loading order details...</p>
+          <p className="mt-4 text-md text-black/60">Loading order details...</p>
         )}
         {detailsError && (
-          <p className="mt-4 text-sm text-red-600">{detailsError}</p>
+          <p className="mt-4 text-md text-red-600">{detailsError}</p>
         )}
         <div className="mt-10 grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
           <div className="rounded-sm border border-black/10 bg-white p-6 shadow-sm">
-            <p className="text-xs uppercase tracking-[0.2em] text-black/50">
+            <p className="text-md uppercase tracking-[0.2em] text-black/50">
               Payment attempt
             </p>
-            <div className="mt-4 grid gap-4 sm:grid-cols-2 text-sm text-black/70">
+            <div className="mt-4 grid gap-4 sm:grid-cols-2 text-md text-black/70">
               <div>
-                <p className="text-xs uppercase tracking-[0.2em] text-black/50">
+                <p className="text-md uppercase tracking-[0.2em] text-black/50">
                   Attempt ID
                 </p>
                 <p className="mt-1 font-semibold text-black">{order.id}</p>
               </div>
               {order.razorpayOrderId && (
                 <div>
-                  <p className="text-xs uppercase tracking-[0.2em] text-black/50">
+                  <p className="text-md uppercase tracking-[0.2em] text-black/50">
                     Razorpay order
                   </p>
                   <p className="mt-1 font-semibold text-black">
@@ -160,7 +163,7 @@ export default function PaymentFailedPage() {
                 </div>
               )}
               <div>
-                <p className="text-xs uppercase tracking-[0.2em] text-black/50">
+                <p className="text-md uppercase tracking-[0.2em] text-black/50">
                   Attempted on
                 </p>
                 <p className="mt-1 font-semibold text-black">
@@ -168,7 +171,7 @@ export default function PaymentFailedPage() {
                 </p>
               </div>
               <div>
-                <p className="text-xs uppercase tracking-[0.2em] text-black/50">
+                <p className="text-md uppercase tracking-[0.2em] text-black/50">
                   Payment
                 </p>
                 <p className="mt-1 font-semibold text-black">
@@ -176,37 +179,37 @@ export default function PaymentFailedPage() {
                 </p>
               </div>
               <div>
-                <p className="text-xs uppercase tracking-[0.2em] text-black/50">
+                <p className="text-md uppercase tracking-[0.2em] text-black/50">
                   Amount
                 </p>
                 <p className="mt-1 font-semibold text-black">{order.total}</p>
               </div>
               <div>
-                <p className="text-xs uppercase tracking-[0.2em] text-black/50">
+                <p className="text-md uppercase tracking-[0.2em] text-black/50">
                   Email
                 </p>
                 <p className="mt-1">{order.email}</p>
               </div>
               <div>
-                <p className="text-xs uppercase tracking-[0.2em] text-black/50">
+                <p className="text-md uppercase tracking-[0.2em] text-black/50">
                   Phone
                 </p>
                 <p className="mt-1">{order.phone}</p>
               </div>
             </div>
-            <div className="mt-6 rounded-sm border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+            <div className="mt-6 rounded-sm border border-red-200 bg-red-50 p-4 text-md text-red-700">
               {order.failureReason}
             </div>
             <div className="mt-6 flex flex-wrap gap-4">
               <Link
                 href="/checkout"
-                className="rounded-full bg-black px-6 py-3 text-xs font-semibold uppercase tracking-[0.3em] text-white"
+                className="rounded-full bg-black px-6 py-3 text-md font-semibold uppercase tracking-[0.3em] text-white"
               >
                 Retry payment
               </Link>
               <Link
                 href="/cart"
-                className="rounded-full border border-black px-6 py-3 text-xs font-semibold uppercase tracking-[0.3em] text-black"
+                className="rounded-full border border-black px-6 py-3 text-md font-semibold uppercase tracking-[0.3em] text-black"
               >
                 Back to cart
               </Link>
@@ -214,7 +217,7 @@ export default function PaymentFailedPage() {
           </div>
 
           <div className="rounded-sm border border-black/10 bg-gray-50 p-6 shadow-sm">
-            <p className="text-xs uppercase tracking-[0.2em] text-black/50">
+            <p className="text-md uppercase tracking-[0.2em] text-black/50">
               Items in this payment attempt
             </p>
             <div className="mt-4 space-y-4">
@@ -231,19 +234,19 @@ export default function PaymentFailedPage() {
                     />
                   </div>
                   <div className="flex-1">
-                    <p className="text-sm font-semibold text-black">
+                    <p className="text-md font-semibold text-black">
                       {item.name}
                     </p>
-                    <p className="text-xs text-black/60">{item.variant}</p>
-                    <p className="text-xs text-black/60">Qty: {item.qty}</p>
+                    <p className="text-md text-black/60">{item.variant}</p>
+                    <p className="text-md text-black/60">Qty: {item.qty}</p>
                   </div>
-                  <p className="text-sm font-semibold text-black">
+                  <p className="text-md font-semibold text-black">
                     {item.price}
                   </p>
                 </div>
               ))}
             </div>
-            <p className="mt-6 text-xs text-black/50">
+            <p className="mt-6 text-md text-black/50">
               Your cart is still available. Retry payment when you are ready.
             </p>
           </div>

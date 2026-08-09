@@ -342,7 +342,7 @@ export default function AccountClient() {
 
   return (
     <main className="min-h-screen bg-white text-black mt-14">
-      <section className="mx-auto w-full max-w-6xl px-6 py-12 lg:py-16">
+      <section className="site-container py-12 lg:py-16">
         <div className="text-center">
           <h1
             className="text-4xl uppercase text-[#4e5a50]"
@@ -357,7 +357,7 @@ export default function AccountClient() {
             <h2 className="text-2xl font-semibold text-[#4e5a50]">Login</h2>
             <form onSubmit={onLoginSubmit} className="mt-6 space-y-5">
               <div>
-                <label className="text-sm font-thin text-black">
+                <label className="text-md font-thin text-black">
                   Email address <span className="text-red-400">*</span>
                 </label>
                 <input
@@ -366,18 +366,18 @@ export default function AccountClient() {
                   value={loginForm.email}
                   onChange={onLoginChange}
                   required
-                  className="mt-2 w-full rounded-sm border border-black/15 px-4 py-3 text-sm outline-none focus:border-[#4e5a50]"
+                  className="mt-2 w-full rounded-sm border border-black/15 px-4 py-3 text-md outline-none focus:border-[#4e5a50]"
                   placeholder="Enter your email address..."
                 />
                 {loginErrors.email && (
-                  <p className="mt-2 text-xs text-red-600">
+                  <p className="mt-2 text-md text-red-600">
                     {loginErrors.email}
                   </p>
                 )}
               </div>
 
               <div>
-                <label className="text-sm font-thin text-black">
+                <label className="text-md font-thin text-black">
                   Password <span className="text-red-400">*</span>
                 </label>
                 <div className="relative mt-2">
@@ -387,7 +387,7 @@ export default function AccountClient() {
                     value={loginForm.password}
                     onChange={onLoginChange}
                     required
-                    className="w-full rounded-sm border border-black/15 px-4 py-3 pr-12 text-sm outline-none focus:border-[#4e5a50]"
+                    className="w-full rounded-sm border border-black/15 px-4 py-3 pr-12 text-md outline-none focus:border-[#4e5a50]"
                     placeholder="Enter your password..."
                   />
                   <button
@@ -406,13 +406,13 @@ export default function AccountClient() {
                   </button>
                 </div>
                 {loginErrors.password && (
-                  <p className="mt-2 text-xs text-red-600">
+                  <p className="mt-2 text-md text-red-600">
                     {loginErrors.password}
                   </p>
                 )}
               </div>
 
-              <div className="flex flex-wrap items-center justify-between gap-4 text-sm text-black/70">
+              <div className="flex flex-wrap items-center justify-between gap-4 text-md text-black/70">
                 <label className="flex items-center gap-2">
                   <input
                     type="checkbox"
@@ -424,19 +424,19 @@ export default function AccountClient() {
                 </label>
                 <a
                   href="/auth/forgot-password"
-                  className="text-sm text-black/60 underline-offset-4 hover:underline"
+                  className="text-cta text-md text-black/60"
                 >
                   Lost your password?
                 </a>
               </div>
 
               {loginError && (
-                <p className="rounded-sm border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                <p className="rounded-sm border border-red-200 bg-red-50 px-4 py-3 text-md text-red-700">
                   {loginError}
                 </p>
               )}
               {loginSuccess && (
-                <p className="rounded-sm border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">
+                <p className="rounded-sm border border-green-200 bg-green-50 px-4 py-3 text-md text-green-700">
                   {loginSuccess}
                 </p>
               )}
@@ -444,7 +444,7 @@ export default function AccountClient() {
               <button
                 type="submit"
                 disabled={authLoading}
-                className="w-full rounded-sm bg-gradient-to-r from-[#7a8177] to-[#6a716a] py-3 text-xs font-semibold uppercase tracking-[0.12em] text-white transition hover:from-[#5f665e] hover:to-[#525a53]"
+                className="w-full rounded-sm bg-gradient-to-r from-[#7a8177] to-[#6a716a] py-3 text-md font-semibold uppercase tracking-[0.12em] text-white transition hover:from-[#5f665e] hover:to-[#525a53]"
               >
                 {authLoading ? "Signing in..." : "Login"}
               </button>
@@ -455,7 +455,7 @@ export default function AccountClient() {
             <h2 className="text-2xl font-semibold text-[#4e5a50]">Register</h2>
             <form onSubmit={onRegisterSubmit} className="mt-6 space-y-5">
               <div>
-                <label className="text-sm font-thin text-black">
+                <label className="text-md font-thin text-black">
                   Name <span className="text-red-400">*</span>
                 </label>
                 <input
@@ -463,18 +463,18 @@ export default function AccountClient() {
                   value={registerForm.name}
                   onChange={onRegisterChange}
                   required
-                  className="mt-2 w-full rounded-sm border border-black/15 px-4 py-3 text-sm outline-none focus:border-[#4e5a50]"
+                  className="mt-2 w-full rounded-sm border border-black/15 px-4 py-3 text-md outline-none focus:border-[#4e5a50]"
                   placeholder="Enter your name..."
                 />
                 {registerErrors.name && (
-                  <p className="mt-2 text-xs text-red-600">
+                  <p className="mt-2 text-md text-red-600">
                     {registerErrors.name}
                   </p>
                 )}
               </div>
 
               <div>
-                <label className="text-sm font-thin text-black">
+                <label className="text-md font-thin text-black">
                   Email address <span className="text-red-400">*</span>
                 </label>
                 <input
@@ -483,26 +483,26 @@ export default function AccountClient() {
                   value={registerForm.email}
                   onChange={onRegisterChange}
                   required
-                  className="mt-2 w-full rounded-sm border border-black/15 px-4 py-3 text-sm outline-none focus:border-[#4e5a50]"
+                  className="mt-2 w-full rounded-sm border border-black/15 px-4 py-3 text-md outline-none focus:border-[#4e5a50]"
                   placeholder="Enter your email..."
                 />
                 {registerErrors.email && (
-                  <p className="mt-2 text-xs text-red-600">
+                  <p className="mt-2 text-md text-red-600">
                     {registerErrors.email}
                   </p>
                 )}
               </div>
 
               <div>
-                <label className="text-sm font-thin text-black">
+                <label className="text-md font-thin text-black">
                   Phone <span className="text-red-400">*</span>
                 </label>
-                <div className="mt-1 text-xs text-black/50">
+                <div className="mt-1 text-md text-black/50">
                   {registerForm.phone.length}/15 digits
                 </div>
                 <div className="mt-2 flex gap-2">
                   <div className="relative w-26">
-                    <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center gap-2 px-3 text-sm text-[#4e5a50]">
+                    <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center gap-2 px-3 text-md text-[#4e5a50]">
                       {selectedFlagSrc ? (
                         <img
                           src={selectedFlagSrc}
@@ -512,7 +512,7 @@ export default function AccountClient() {
                           alt={selectedCountry?.label || "Country"}
                         />
                       ) : (
-                        <span className="text-xs text-black/60">--</span>
+                        <span className="text-md text-black/60">--</span>
                       )}
                       <span>{selectedCountry?.code}</span>
                     </div>
@@ -537,7 +537,7 @@ export default function AccountClient() {
                       name="country_code"
                       value={`${registerForm.country_iso}|${registerForm.country_code}`}
                       onChange={onRegisterChange}
-                      className="w-full rounded-sm border border-black/15 bg-white px-3 py-3 pl-9 pr-8 text-sm outline-none focus:border-[#4e5a50]"
+                      className="w-full rounded-sm border border-black/15 bg-white px-3 py-3 pl-9 pr-8 text-md outline-none focus:border-[#4e5a50]"
                       style={{
                         color: "transparent",
                         WebkitTextFillColor: "transparent",
@@ -562,19 +562,19 @@ export default function AccountClient() {
                     value={registerForm.phone}
                     onChange={onRegisterChange}
                     required
-                    className="flex-1 rounded-sm border border-black/15 px-4 py-3 text-sm outline-none focus:border-[#4e5a50]"
+                    className="flex-1 rounded-sm border border-black/15 px-4 py-3 text-md outline-none focus:border-[#4e5a50]"
                     placeholder="Enter your phone number..."
                   />
                 </div>
                 {registerErrors.phone && (
-                  <p className="mt-2 text-xs text-red-600">
+                  <p className="mt-2 text-md text-red-600">
                     {registerErrors.phone}
                   </p>
                 )}
               </div>
 
               <div>
-                <label className="text-sm font-thin text-black">
+                <label className="text-md font-thin text-black">
                   Password <span className="text-red-400">*</span>
                 </label>
                 <div className="relative mt-2">
@@ -584,7 +584,7 @@ export default function AccountClient() {
                     value={registerForm.password}
                     onChange={onRegisterChange}
                     required
-                    className="w-full rounded-sm border border-black/15 px-4 py-3 pr-12 text-sm outline-none focus:border-[#4e5a50]"
+                    className="w-full rounded-sm border border-black/15 px-4 py-3 pr-12 text-md outline-none focus:border-[#4e5a50]"
                     placeholder="Enter your password..."
                   />
                   <button
@@ -603,14 +603,14 @@ export default function AccountClient() {
                   </button>
                 </div>
                 {registerErrors.password && (
-                  <p className="mt-2 text-xs text-red-600">
+                  <p className="mt-2 text-md text-red-600">
                     {registerErrors.password}
                   </p>
                 )}
               </div>
 
               <div>
-                <label className="text-sm font-thin text-black">
+                <label className="text-md font-thin text-black">
                   Confirm password <span className="text-red-400">*</span>
                 </label>
                 <div className="relative mt-2">
@@ -620,7 +620,7 @@ export default function AccountClient() {
                     value={registerForm.password_confirmation}
                     onChange={onRegisterChange}
                     required
-                    className="w-full rounded-sm border border-black/15 px-4 py-3 pr-12 text-sm outline-none focus:border-[#4e5a50]"
+                    className="w-full rounded-sm border border-black/15 px-4 py-3 pr-12 text-md outline-none focus:border-[#4e5a50]"
                     placeholder="Enter your password..."
                   />
                   <button
@@ -643,13 +643,13 @@ export default function AccountClient() {
                   </button>
                 </div>
                 {registerErrors.password_confirmation && (
-                  <p className="mt-2 text-xs text-red-600">
+                  <p className="mt-2 text-md text-red-600">
                     {registerErrors.password_confirmation}
                   </p>
                 )}
               </div>
 
-              <div className="flex flex-wrap items-center justify-between gap-4 text-sm text-black/70">
+              <div className="flex flex-wrap items-center justify-between gap-4 text-md text-black/70">
                 <label className="flex items-center gap-2">
                   <input
                     type="checkbox"
@@ -661,7 +661,7 @@ export default function AccountClient() {
                 </label>
               </div>
 
-              <p className="text-sm text-black/70">
+              <p className="text-md text-black/70">
                 Your personal data will be used to support your experience
                 throughout this website, to manage access to your account, and
                 for other purposes described in our{" "}
@@ -672,12 +672,12 @@ export default function AccountClient() {
               </p>
 
               {registerError && (
-                <p className="rounded-sm border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                <p className="rounded-sm border border-red-200 bg-red-50 px-4 py-3 text-md text-red-700">
                   {registerError}
                 </p>
               )}
               {registerSuccess && (
-                <p className="rounded-sm border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">
+                <p className="rounded-sm border border-green-200 bg-green-50 px-4 py-3 text-md text-green-700">
                   {registerSuccess}
                 </p>
               )}
@@ -685,7 +685,7 @@ export default function AccountClient() {
               <button
                 type="submit"
                 disabled={registerLoading}
-                className="w-full rounded-sm bg-gradient-to-r from-[#7a8177] to-[#6a716a] py-3 text-xs font-semibold uppercase tracking-[0.12em] text-white transition hover:from-[#5f665e] hover:to-[#525a53]"
+                className="w-full rounded-sm bg-gradient-to-r from-[#7a8177] to-[#6a716a] py-3 text-md font-semibold uppercase tracking-[0.12em] text-white transition hover:from-[#5f665e] hover:to-[#525a53]"
               >
                 {registerLoading ? "Registering..." : "Register"}
               </button>

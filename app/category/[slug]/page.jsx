@@ -66,7 +66,7 @@ export default function CategoryPage() {
   return (
     <>
       <main className="bg-white text-black mt-12">
-        <div className="container mx-auto px-4 py-12">
+        <div className="site-container py-12">
           <h1 className="text-4xl md:text-5xl font-semibold mb-4">
             {category?.name}
           </h1>
@@ -77,7 +77,7 @@ export default function CategoryPage() {
               <Link
                 href={`/category/${s.slug || s.id}`}
                 key={s.id}
-                className="bg-black/5 px-6 py-2 rounded-full text-sm text-black/70"
+                className="bg-black/5 px-6 py-2 rounded-full text-md text-black/70"
               >
                 {s.name}
               </Link>

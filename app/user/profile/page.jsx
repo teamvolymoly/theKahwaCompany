@@ -234,10 +234,10 @@ export default function ProfilePage() {
   return (
     <>
       <main className="min-h-screen bg-white text-black mt-10 sm:mt-12">
-        <section className="container max-w-7xl mx-auto px-4 sm:px-6 md:px-12 py-10 sm:py-14">
+        <section className="site-container py-10 sm:py-14">
           <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
             <div>
-              <p className="text-xs uppercase tracking-[0.094em] text-black/60">
+              <p className="text-md uppercase tracking-[0.094em] text-black/60">
                 My account
               </p>
               <h1
@@ -250,7 +250,7 @@ export default function ProfilePage() {
             <button
               type="button"
               onClick={() => setProfileEditing((prev) => !prev)}
-              className="self-start rounded-sm border border-black/60 px-5 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-black hover:border-black cursor-pointer"
+              className="self-start rounded-sm border border-black/60 px-5 py-2 text-md font-semibold uppercase tracking-[0.2em] text-black hover:border-black cursor-pointer"
             >
               {profileEditing ? "Close edit" : "Edit profile"}
             </button>
@@ -269,10 +269,10 @@ export default function ProfilePage() {
                   <h2 className="text-lg sm:text-xl font-semibold">
                     {profileLoading ? "Loading..." : profile.name || "—"}
                   </h2>
-                  <p className="text-sm text-black/60">
+                  <p className="text-md text-black/60">
                     {profileLoading ? " " : profile.email || "—"}
                   </p>
-                  <p className="text-sm text-black/60">
+                  <p className="text-md text-black/60">
                     {profileLoading ? " " : profile.phone || "—"}
                   </p>
                 </div>
@@ -280,25 +280,25 @@ export default function ProfilePage() {
 
               <div className="mt-6 grid gap-4 sm:grid-cols-2">
                 <div className="rounded-sm border border-black/10 bg-gray-50 p-4">
-                  <p className="text-xs uppercase tracking-[0.3em] text-black/50">
+                  <p className="text-md uppercase tracking-[0.3em] text-black/50">
                     Member since
                   </p>
-                  <p className="mt-2 text-sm">{profile.memberSince || "—"}</p>
+                  <p className="mt-2 text-md">{profile.memberSince || "—"}</p>
                 </div>
                 {/* <div className="rounded-sm border border-black/10 bg-gray-50 p-4">
-                  <p className="text-xs uppercase tracking-[0.3em] text-black/50">
+                  <p className="text-md uppercase tracking-[0.3em] text-black/50">
                     Email address
                   </p>
-                  <p className="mt-2 text-sm">{profile.email}</p>
+                  <p className="mt-2 text-md">{profile.email}</p>
                 </div> */}
               </div>
             </div>
 
             <div className="rounded-sm border border-black/10 bg-white p-6 sm:p-8 shadow-sm">
-              <p className="text-xs uppercase tracking-[0.093em] text-black/50">
+              <p className="text-md uppercase tracking-[0.093em] text-black/50">
                 Account quick links
               </p>
-              <div className="mt-4 grid gap-3 text-sm text-black/70">
+              <div className="mt-4 grid gap-3 text-md text-black/70">
                 <Link
                   href="/user/orders"
                   className="rounded-sm border border-black/10 bg-gray-50 px-4 py-3 text-left hover:border-black/30 cursor-pointer"
@@ -318,12 +318,12 @@ export default function ProfilePage() {
 
           {profileEditing && (
             <div className="mt-6 rounded-sm border border-black/10 bg-white p-6 sm:p-8 shadow-sm">
-              <p className="text-xs uppercase tracking-[0.2em] text-black/50">
+              <p className="text-md uppercase tracking-[0.2em] text-black/50">
                 Edit profile
               </p>
               <div className="mt-4 grid gap-4 sm:grid-cols-3">
                 <div>
-                  <label className="text-xs uppercase tracking-[0.12em] text-black/50">
+                  <label className="text-md uppercase tracking-[0.12em] text-black/50">
                     Name
                   </label>
                   <input
@@ -331,11 +331,11 @@ export default function ProfilePage() {
                     name="name"
                     value={profileForm.name}
                     onChange={handleProfileChange}
-                    className="mt-2 w-full rounded-sm border border-black/20 px-3 py-2 text-sm outline-none focus:border-black"
+                    className="mt-2 w-full rounded-sm border border-black/20 px-3 py-2 text-md outline-none focus:border-black"
                   />
                 </div>
                 <div>
-                  <label className="text-xs uppercase tracking-[0.12em] text-black/50">
+                  <label className="text-md uppercase tracking-[0.12em] text-black/50">
                     Email
                   </label>
                   <input
@@ -343,11 +343,11 @@ export default function ProfilePage() {
                     name="email"
                     value={profileForm.email}
                     onChange={handleProfileChange}
-                    className="mt-2 w-full rounded-sm border border-black/20 px-3 py-2 text-sm outline-none focus:border-black"
+                    className="mt-2 w-full rounded-sm border border-black/20 px-3 py-2 text-md outline-none focus:border-black"
                   />
                 </div>
                 <div>
-                  <label className="text-xs uppercase tracking-[0.12em] text-black/50">
+                  <label className="text-md uppercase tracking-[0.12em] text-black/50">
                     Phone
                   </label>
                   <input
@@ -355,26 +355,26 @@ export default function ProfilePage() {
                     name="phone"
                     value={profileForm.phone}
                     onChange={handleProfileChange}
-                    className="mt-2 w-full rounded-sm border border-black/20 px-3 py-2 text-sm outline-none focus:border-black"
+                    className="mt-2 w-full rounded-sm border border-black/20 px-3 py-2 text-md outline-none focus:border-black"
                   />
                 </div>
               </div>
               {profileError && (
-                <p className="mt-3 text-xs text-red-600">{profileError}</p>
+                <p className="mt-3 text-md text-red-600">{profileError}</p>
               )}
               <div className="mt-4 flex flex-wrap gap-3">
                 <button
                   type="button"
                   onClick={handleProfileSave}
                   disabled={profileSaving}
-                  className="rounded-sm border border-black/60 bg-black px-5 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-white hover:bg-black/90 cursor-pointer"
+                  className="rounded-sm border border-black/60 bg-black px-5 py-2 text-md font-semibold uppercase tracking-[0.2em] text-white hover:bg-black/90 cursor-pointer"
                 >
                   {profileSaving ? "Saving..." : "Save changes"}
                 </button>
                 <button
                   type="button"
                   onClick={() => setProfileEditing(false)}
-                  className="rounded-sm border border-black/30 px-5 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-black hover:border-black cursor-pointer"
+                  className="rounded-sm border border-black/30 px-5 py-2 text-md font-semibold uppercase tracking-[0.2em] text-black hover:border-black cursor-pointer"
                 >
                   Cancel
                 </button>
@@ -385,7 +385,7 @@ export default function ProfilePage() {
           <div className="mt-8 sm:mt-10 rounded-sm border border-black/10 bg-white p-6 sm:p-8 shadow-sm">
             <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
               <div>
-                <p className="text-xs uppercase tracking-[0.093em] text-black/50">
+                <p className="text-md uppercase tracking-[0.093em] text-black/50">
                   Saved addresses
                 </p>
                 <h2 className="mt-2 text-lg sm:text-xl font-semibold">
@@ -395,7 +395,7 @@ export default function ProfilePage() {
               <button
                 type="button"
                 onClick={openAddAddress}
-                className="self-start rounded-sm border border-black/60 px-5 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-black hover:border-black cursor-pointer"
+                className="self-start rounded-sm border border-black/60 px-5 py-2 text-md font-semibold uppercase tracking-[0.2em] text-black hover:border-black cursor-pointer"
               >
                 Add new address
               </button>
@@ -405,12 +405,12 @@ export default function ProfilePage() {
                 onSubmit={handleSaveAddress}
                 className="mt-6 rounded-sm border border-black/10 bg-white p-5"
               >
-                <p className="text-xs uppercase tracking-[0.2em] text-black/50">
+                <p className="text-md uppercase tracking-[0.2em] text-black/50">
                   {addressForm.id ? "Edit address" : "Add address"}
                 </p>
                 <div className="mt-4 grid gap-4 sm:grid-cols-2">
                   <div>
-                    <label className="text-xs uppercase tracking-[0.12em] text-black/50">
+                    <label className="text-md uppercase tracking-[0.12em] text-black/50">
                       Label
                     </label>
                     <input
@@ -418,13 +418,13 @@ export default function ProfilePage() {
                       name="label"
                       value={addressForm.label}
                       onChange={handleAddressChange}
-                      className="mt-2 w-full rounded-sm border border-black/20 px-3 py-2 text-sm outline-none focus:border-black"
+                      className="mt-2 w-full rounded-sm border border-black/20 px-3 py-2 text-md outline-none focus:border-black"
                       placeholder="Home / Office"
                       required
                     />
                   </div>
                   <div>
-                    <label className="text-xs uppercase tracking-[0.12em] text-black/50">
+                    <label className="text-md uppercase tracking-[0.12em] text-black/50">
                       Country
                     </label>
                     <input
@@ -432,11 +432,11 @@ export default function ProfilePage() {
                       name="country"
                       value={addressForm.country}
                       onChange={handleAddressChange}
-                      className="mt-2 w-full rounded-sm border border-black/20 px-3 py-2 text-sm outline-none focus:border-black"
+                      className="mt-2 w-full rounded-sm border border-black/20 px-3 py-2 text-md outline-none focus:border-black"
                     />
                   </div>
                   <div className="sm:col-span-2">
-                    <label className="text-xs uppercase tracking-[0.12em] text-black/50">
+                    <label className="text-md uppercase tracking-[0.12em] text-black/50">
                       Address line 1
                     </label>
                     <input
@@ -444,12 +444,12 @@ export default function ProfilePage() {
                       name="address_line1"
                       value={addressForm.address_line1}
                       onChange={handleAddressChange}
-                      className="mt-2 w-full rounded-sm border border-black/20 px-3 py-2 text-sm outline-none focus:border-black"
+                      className="mt-2 w-full rounded-sm border border-black/20 px-3 py-2 text-md outline-none focus:border-black"
                       required
                     />
                   </div>
                   <div className="sm:col-span-2">
-                    <label className="text-xs uppercase tracking-[0.12em] text-black/50">
+                    <label className="text-md uppercase tracking-[0.12em] text-black/50">
                       Address line 2
                     </label>
                     <input
@@ -457,11 +457,11 @@ export default function ProfilePage() {
                       name="address_line2"
                       value={addressForm.address_line2}
                       onChange={handleAddressChange}
-                      className="mt-2 w-full rounded-sm border border-black/20 px-3 py-2 text-sm outline-none focus:border-black"
+                      className="mt-2 w-full rounded-sm border border-black/20 px-3 py-2 text-md outline-none focus:border-black"
                     />
                   </div>
                   <div>
-                    <label className="text-xs uppercase tracking-[0.12em] text-black/50">
+                    <label className="text-md uppercase tracking-[0.12em] text-black/50">
                       City
                     </label>
                     <input
@@ -469,12 +469,12 @@ export default function ProfilePage() {
                       name="city"
                       value={addressForm.city}
                       onChange={handleAddressChange}
-                      className="mt-2 w-full rounded-sm border border-black/20 px-3 py-2 text-sm outline-none focus:border-black"
+                      className="mt-2 w-full rounded-sm border border-black/20 px-3 py-2 text-md outline-none focus:border-black"
                       required
                     />
                   </div>
                   <div>
-                    <label className="text-xs uppercase tracking-[0.12em] text-black/50">
+                    <label className="text-md uppercase tracking-[0.12em] text-black/50">
                       State
                     </label>
                     <input
@@ -482,12 +482,12 @@ export default function ProfilePage() {
                       name="state"
                       value={addressForm.state}
                       onChange={handleAddressChange}
-                      className="mt-2 w-full rounded-sm border border-black/20 px-3 py-2 text-sm outline-none focus:border-black"
+                      className="mt-2 w-full rounded-sm border border-black/20 px-3 py-2 text-md outline-none focus:border-black"
                       required
                     />
                   </div>
                   <div>
-                    <label className="text-xs uppercase tracking-[0.12em] text-black/50">
+                    <label className="text-md uppercase tracking-[0.12em] text-black/50">
                       Pincode
                     </label>
                     <input
@@ -495,11 +495,11 @@ export default function ProfilePage() {
                       name="pincode"
                       value={addressForm.pincode}
                       onChange={handleAddressChange}
-                      className="mt-2 w-full rounded-sm border border-black/20 px-3 py-2 text-sm outline-none focus:border-black"
+                      className="mt-2 w-full rounded-sm border border-black/20 px-3 py-2 text-md outline-none focus:border-black"
                       required
                     />
                   </div>
-                  <label className="flex items-center gap-2 text-xs uppercase tracking-[0.12em] text-black/60 sm:col-span-2">
+                  <label className="flex items-center gap-2 text-md uppercase tracking-[0.12em] text-black/60 sm:col-span-2">
                     <input
                       type="checkbox"
                       name="is_default"
@@ -511,20 +511,20 @@ export default function ProfilePage() {
                   </label>
                 </div>
                 {addressError && (
-                  <p className="mt-3 text-xs text-red-600">{addressError}</p>
+                  <p className="mt-3 text-md text-red-600">{addressError}</p>
                 )}
                 <div className="mt-4 flex flex-wrap gap-3">
                   <button
                     type="submit"
                     disabled={addressSaving}
-                    className="rounded-sm border border-black/60 bg-black px-5 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-white hover:bg-black/90 cursor-pointer"
+                    className="rounded-sm border border-black/60 bg-black px-5 py-2 text-md font-semibold uppercase tracking-[0.2em] text-white hover:bg-black/90 cursor-pointer"
                   >
                     {addressSaving ? "Saving..." : "Save address"}
                   </button>
                   <button
                     type="button"
                     onClick={() => setAddressFormOpen(false)}
-                    className="rounded-sm border border-black/30 px-5 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-black hover:border-black cursor-pointer"
+                    className="rounded-sm border border-black/30 px-5 py-2 text-md font-semibold uppercase tracking-[0.2em] text-black hover:border-black cursor-pointer"
                   >
                     Cancel
                   </button>
@@ -533,7 +533,7 @@ export default function ProfilePage() {
             )}
             <div className="mt-6 grid gap-4 sm:grid-cols-2">
               {addressLoading && (
-                <div className="text-sm text-black/60">
+                <div className="text-md text-black/60">
                   Loading addresses...
                 </div>
               )}
@@ -542,7 +542,7 @@ export default function ProfilePage() {
                   key={address.id}
                   className="rounded-sm border border-black/10 bg-gray-50 p-5"
                 >
-                  <p className="text-xs uppercase tracking-[0.093em] text-black/70">
+                  <p className="text-md uppercase tracking-[0.093em] text-black/70">
                     {address.label || "Address"}
                   </p>
                   {address.is_default && (
@@ -550,13 +550,13 @@ export default function ProfilePage() {
                       Default
                     </span>
                   )}
-                  <p className="mt-2 text-sm">{address.address_line1}</p>
-                  <p className="text-sm">{address.address_line2}</p>
-                  <p className="text-sm">
+                  <p className="mt-2 text-md">{address.address_line1}</p>
+                  <p className="text-md">{address.address_line2}</p>
+                  <p className="text-md">
                     {address.city}, {address.state} {address.pincode}
                   </p>
-                  <p className="text-sm">{address.country}</p>
-                  <div className="mt-4 flex flex-wrap gap-2 text-xs uppercase tracking-[0.2em] text-black/60">
+                  <p className="text-md">{address.country}</p>
+                  <div className="mt-4 flex flex-wrap gap-2 text-md uppercase tracking-[0.2em] text-black/60">
                     <button
                       type="button"
                       onClick={() => openEditAddress(address)}

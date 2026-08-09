@@ -55,7 +55,7 @@ export default function AboutPage() {
         </h1>
       </section>
 
-      <section className="px-5 pb-16 pt-12 sm:px-8 sm:pb-20 sm:pt-16 lg:pb-[82px]">
+      <section className="site-container pb-16 pt-12 sm:pb-20 sm:pt-16 lg:pb-[82px]">
         <div className="mx-auto max-w-[700px] text-center">
           {storySections.map((section, index) => (
             <div key={section.title}>

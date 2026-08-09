@@ -51,7 +51,8 @@ const normalizePaymentDetails = (payload, orderId) => {
   const payment = data.payment || {};
   const customer = data.customer || {};
   const totals = data.totals || data.summary || data.bill || order;
-  const address = data.address || data.delivery_address || data.shipping_address || {};
+  const address =
+    data.address || data.delivery_address || data.shipping_address || {};
   const products = data.items || data.products || data.order_items || [];
   const invoice = data.invoice || {};
   const expectedDelivery = order.expected_delivery || {};
@@ -66,7 +67,11 @@ const normalizePaymentDetails = (payload, orderId) => {
     order: {
       id: order.order_id || order.id || orderId || DEFAULT_ORDER.id,
       placedOn:
-        order.placed_on || order.placed_at || order.created_at || order.date || "",
+        order.placed_on ||
+        order.placed_at ||
+        order.created_at ||
+        order.date ||
+        "",
       paymentMethod: payment.method || order.payment_method || "Razorpay",
       total: formatMoney(total),
       email: customer.email || order.email || data.email || "",
@@ -96,7 +101,9 @@ const normalizePaymentDetails = (payload, orderId) => {
       name: item.product_name || item.name || "",
       variant: item.variant_name || item.variant || "",
       qty: item.quantity || item.qty || 0,
-      price: formatMoney(item.line_total ?? item.price * (item.quantity || item.qty || 1)),
+      price: formatMoney(
+        item.line_total ?? item.price * (item.quantity || item.qty || 1),
+      ),
       image: item.image || item.product_image || "",
     })),
     bill: {
@@ -304,8 +311,8 @@ export default function PaymentSuccessPage() {
 
   return (
     <main className="min-h-screen bg-white text-black mt-12">
-      <section className="max-w-5xl mx-auto px-6 py-16">
-        <p className="text-xs uppercase tracking-[0.4em] text-black/60">
+      <section className="site-container py-16">
+        <p className="text-md uppercase tracking-[0.4em] text-black/60">
           Payment complete
         </p>
         <h1
@@ -314,29 +321,29 @@ export default function PaymentSuccessPage() {
         >
           Thank you for your order
         </h1>
-        <p className="mt-4 text-sm text-black/60">
+        <p className="mt-4 text-md text-black/60">
           Your payment was successful. A confirmation email has been sent.
         </p>
         {loadingDetails && (
-          <p className="mt-4 text-sm text-black/60">Loading order details...</p>
+          <p className="mt-4 text-md text-black/60">Loading order details...</p>
         )}
         {detailsError && (
-          <p className="mt-4 text-sm text-red-600">{detailsError}</p>
+          <p className="mt-4 text-md text-red-600">{detailsError}</p>
         )}
         <div className="mt-10 grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
           <div className="rounded-sm border border-black/10 bg-white p-6 shadow-sm">
-            <p className="text-xs uppercase tracking-[0.08em] text-black/50">
+            <p className="text-md uppercase tracking-[0.08em] text-black/50">
               Order confirmation
             </p>
-            <div className="mt-4 grid gap-4 sm:grid-cols-2 text-sm text-black/70">
+            <div className="mt-4 grid gap-4 sm:grid-cols-2 text-md text-black/70">
               <div>
-                <p className="text-xs uppercase tracking-[0.08em] text-black/50">
+                <p className="text-md uppercase tracking-[0.08em] text-black/50">
                   Order ID
                 </p>
                 <p className="mt-1 font-semibold text-black">{order.id}</p>
               </div>
               <div>
-                <p className="text-xs uppercase tracking-[0.08em] text-black/50">
+                <p className="text-md uppercase tracking-[0.08em] text-black/50">
                   Placed on
                 </p>
                 <p className="mt-1 font-semibold text-black">
@@ -344,7 +351,7 @@ export default function PaymentSuccessPage() {
                 </p>
               </div>
               <div>
-                <p className="text-xs uppercase tracking-[0.08em] text-black/50">
+                <p className="text-md uppercase tracking-[0.08em] text-black/50">
                   Payment
                 </p>
                 <p className="mt-1 font-semibold text-black">
@@ -352,19 +359,19 @@ export default function PaymentSuccessPage() {
                 </p>
               </div>
               <div>
-                <p className="text-xs uppercase tracking-[0.08em] text-black/50">
+                <p className="text-md uppercase tracking-[0.08em] text-black/50">
                   Total paid
                 </p>
                 <p className="mt-1 font-semibold text-black">{order.total}</p>
               </div>
               <div>
-                <p className="text-xs uppercase tracking-[0.08em] text-black/50">
+                <p className="text-md uppercase tracking-[0.08em] text-black/50">
                   Email
                 </p>
                 <p className="mt-1">{order.email}</p>
               </div>
               <div>
-                <p className="text-xs uppercase tracking-[0.08em] text-black/50">
+                <p className="text-md uppercase tracking-[0.08em] text-black/50">
                   Phone
                 </p>
                 <p className="mt-1">{order.phone}</p>
@@ -372,13 +379,13 @@ export default function PaymentSuccessPage() {
             </div>
 
             <div className="mt-6 rounded-sm border border-black/10 bg-gray-50 p-4">
-              <p className="text-xs uppercase tracking-[0.08em] text-black/50">
+              <p className="text-md uppercase tracking-[0.08em] text-black/50">
                 Expected delivery
               </p>
-              <p className="mt-2 text-sm text-black/70">
+              <p className="mt-2 text-md text-black/70">
                 {delivery.estimate} • {delivery.window}
               </p>
-              <div className="mt-3 text-sm text-black/70">
+              <div className="mt-3 text-md text-black/70">
                 <p className="font-semibold text-black">
                   {delivery.address.label}
                 </p>
@@ -395,10 +402,10 @@ export default function PaymentSuccessPage() {
             <div className="mt-6 rounded-sm border border-black/10 bg-white p-4">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>
-                  <p className="text-xs uppercase tracking-[0.08em] text-black/50">
+                  <p className="text-md uppercase tracking-[0.08em] text-black/50">
                     Invoice
                   </p>
-                  <p className="mt-1 text-sm font-semibold text-black">
+                  <p className="mt-1 text-md font-semibold text-black">
                     {bill.invoiceId}
                   </p>
                 </div>
@@ -406,20 +413,20 @@ export default function PaymentSuccessPage() {
                   <button
                     type="button"
                     onClick={() => setInvoiceOpen(true)}
-                    className="rounded-full border border-black px-5 py-2 text-xs font-semibold uppercase tracking-[0.08em] text-black hover:bg-black hover:text-white"
+                    className="rounded-full border border-black px-5 py-2 text-md font-semibold uppercase tracking-[0.08em] text-black hover:bg-black hover:text-white"
                   >
                     View
                   </button>
                   <button
                     type="button"
                     onClick={handleDownloadInvoice}
-                    className="rounded-full border border-black px-5 py-2 text-xs font-semibold uppercase tracking-[0.08em] text-black hover:bg-black hover:text-white"
+                    className="rounded-full border border-black px-5 py-2 text-md font-semibold uppercase tracking-[0.08em] text-black hover:bg-black hover:text-white"
                   >
                     Download
                   </button>
                 </div>
               </div>
-              <div className="mt-4 grid gap-3 text-sm text-black/70">
+              <div className="mt-4 grid gap-3 text-md text-black/70">
                 <div className="flex items-center justify-between">
                   <span>Issued on</span>
                   <span>{bill.issuedOn}</span>
@@ -437,14 +444,16 @@ export default function PaymentSuccessPage() {
                   <span>{bill.taxes}</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span>Discount{bill.couponCode ? ` (${bill.couponCode})` : ""}</span>
+                  <span>
+                    Discount{bill.couponCode ? ` (${bill.couponCode})` : ""}
+                  </span>
                   <span>{bill.discount}</span>
                 </div>
                 <div className="flex items-center justify-between border-t border-black/10 pt-3 font-semibold text-black">
                   <span>Total</span>
                   <span>{bill.total}</span>
                 </div>
-                <div className="text-xs text-black/50">
+                <div className="text-md text-black/50">
                   {bill.seller} • {bill.gst}
                 </div>
               </div>
@@ -452,7 +461,7 @@ export default function PaymentSuccessPage() {
           </div>
 
           <div className="rounded-sm border border-black/10 bg-gray-50 p-6 h-fit">
-            <p className="text-xs uppercase tracking-[0.08em] text-black/50">
+            <p className="text-md uppercase tracking-[0.08em] text-black/50">
               Items in your order
             </p>
             <div className="mt-4 space-y-4">
@@ -469,13 +478,13 @@ export default function PaymentSuccessPage() {
                     />
                   </div>
                   <div className="flex-1">
-                    <p className="text-sm font-semibold text-black">
+                    <p className="text-md font-semibold text-black">
                       {item.name}
                     </p>
-                    <p className="text-xs text-black/60">{item.variant}</p>
-                    <p className="text-xs text-black/60">Qty: {item.qty}</p>
+                    <p className="text-md text-black/60">{item.variant}</p>
+                    <p className="text-md text-black/60">Qty: {item.qty}</p>
                   </div>
-                  <p className="text-sm font-semibold text-black">
+                  <p className="text-md font-semibold text-black">
                     {item.price}
                   </p>
                 </div>
@@ -484,13 +493,13 @@ export default function PaymentSuccessPage() {
             <div className="mt-6 flex flex-wrap gap-4">
               <Link
                 href="/user/orders"
-                className="rounded-full border border-black px-6 py-3 text-xs font-semibold uppercase tracking-[0.08em] text-black"
+                className="rounded-full border border-black px-6 py-3 text-md font-semibold uppercase tracking-[0.08em] text-black"
               >
                 View orders
               </Link>
               <Link
                 href="/shop"
-                className="rounded-full bg-black px-6 py-3 text-xs font-semibold uppercase tracking-[0.08em] text-white"
+                className="rounded-full bg-black px-6 py-3 text-md font-semibold uppercase tracking-[0.08em] text-white"
               >
                 Continue shopping
               </Link>
@@ -508,7 +517,7 @@ export default function PaymentSuccessPage() {
             <button
               type="button"
               onClick={() => setInvoiceOpen(false)}
-              className="absolute right-4 top-4 rounded-full border border-black/20 px-3 py-1 text-xs uppercase tracking-[0.08em] text-black/70 hover:border-black"
+              className="absolute right-4 top-4 rounded-full border border-black/20 px-3 py-1 text-md uppercase tracking-[0.08em] text-black/70 hover:border-black"
             >
               Close
             </button>
@@ -519,27 +528,27 @@ export default function PaymentSuccessPage() {
                 className="h-10 w-auto object-contain"
               />
               <div className="text-right">
-                <p className="text-sm font-semibold">Invoice</p>
-                <p className="text-xs text-black/60">{bill.invoiceId}</p>
+                <p className="text-md font-semibold">Invoice</p>
+                <p className="text-md text-black/60">{bill.invoiceId}</p>
               </div>
             </div>
-            <div className="mt-4 grid gap-4 sm:grid-cols-2 text-sm text-black/70">
+            <div className="mt-4 grid gap-4 sm:grid-cols-2 text-md text-black/70">
               <div>
-                <p className="text-xs uppercase tracking-[0.08em] text-black/50">
+                <p className="text-md uppercase tracking-[0.08em] text-black/50">
                   Seller
                 </p>
                 <p className="mt-1 font-semibold text-black">{bill.seller}</p>
-                <p className="text-xs text-black/60">{bill.gst}</p>
+                <p className="text-md text-black/60">{bill.gst}</p>
               </div>
               <div>
-                <p className="text-xs uppercase tracking-[0.08em] text-black/50">
+                <p className="text-md uppercase tracking-[0.08em] text-black/50">
                   Bill to
                 </p>
                 <p className="mt-1">{order.email}</p>
-                <p className="text-xs text-black/60">{order.phone}</p>
+                <p className="text-md text-black/60">{order.phone}</p>
               </div>
             </div>
-            <div className="mt-4 grid gap-2 text-sm text-black/70">
+            <div className="mt-4 grid gap-2 text-md text-black/70">
               {items.map((item) => (
                 <div
                   key={`invoice-${item.id}`}
@@ -552,7 +561,7 @@ export default function PaymentSuccessPage() {
                 </div>
               ))}
             </div>
-            <div className="mt-4 grid gap-2 text-sm text-black/70">
+            <div className="mt-4 grid gap-2 text-md text-black/70">
               <div className="flex items-center justify-between">
                 <span>Subtotal</span>
                 <span>{bill.subtotal}</span>
@@ -566,7 +575,9 @@ export default function PaymentSuccessPage() {
                 <span>{bill.taxes}</span>
               </div>
               <div className="flex items-center justify-between">
-                <span>Discount{bill.couponCode ? ` (${bill.couponCode})` : ""}</span>
+                <span>
+                  Discount{bill.couponCode ? ` (${bill.couponCode})` : ""}
+                </span>
                 <span>{bill.discount}</span>
               </div>
               <div className="flex items-center justify-between border-t border-black/10 pt-2 font-semibold text-black">
@@ -574,7 +585,7 @@ export default function PaymentSuccessPage() {
                 <span>{bill.total}</span>
               </div>
             </div>
-            <div className="mt-4 rounded-sm border border-black/10 bg-black/5 p-3 text-xs text-black/60">
+            <div className="mt-4 rounded-sm border border-black/10 bg-black/5 p-3 text-md text-black/60">
               Expected delivery: {delivery.estimate} • {delivery.window}
             </div>
           </div>

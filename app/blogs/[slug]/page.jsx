@@ -54,15 +54,15 @@ function ArticleCard({ post }) {
             Estimated Read Time: {post.read || "Quick read"}
           </p>
         </div>
-        <h3 className="mt-4 line-clamp-2 text-sm font-semibold leading-[1.2] text-[#252a23]">
+        <h3 className="mt-4 line-clamp-2 text-md font-semibold leading-[1.2] text-[#252a23]">
           {post.title}
         </h3>
         {post.excerpt ? (
-          <p className="mt-4 line-clamp-3 text-xs leading-[1.35] text-[#444940]">
+          <p className="mt-4 line-clamp-3 text-md leading-[1.35] text-[#444940]">
             {post.excerpt}...
           </p>
         ) : null}
-        <span className="mt-5 flex h-10 w-full items-center justify-center rounded-md bg-[#4f6139] text-sm font-semibold text-white transition-colors group-hover:bg-[#40502e]">
+        <span className="mt-5 flex h-10 w-full items-center justify-center rounded-md bg-[#52653b] text-md font-semibold text-white transition-colors group-hover:bg-[#6B7F42]">
           Read More
         </span>
       </div>
@@ -78,7 +78,10 @@ function ArticleBody({ blocks }) {
 
         if (block.type === "heading") {
           return (
-            <h2 key={key} className="pt-2 text-sm font-semibold leading-tight text-[#20231f]">
+            <h2
+              key={key}
+              className="pt-2 text-md font-semibold leading-tight text-[#20231f]"
+            >
               {block.text}
             </h2>
           );
@@ -86,7 +89,10 @@ function ArticleBody({ blocks }) {
 
         if (block.type === "step") {
           return (
-            <h3 key={key} className="pt-1 text-sm font-semibold leading-tight text-[#20231f]">
+            <h3
+              key={key}
+              className="pt-1 text-md font-semibold leading-tight text-[#20231f]"
+            >
               {block.text}
             </h3>
           );
@@ -130,7 +136,7 @@ export default function BlogDetailPage() {
 
       try {
         const [postData, listData] = await Promise.all([
-          apiFetch(`/blog-posts/${blogId}`),
+          apiFetch(`/blog-posts/${encodeURIComponent(blogId)}`),
           apiFetch("/blog-posts?page=1"),
         ]);
         if (!active) return;
@@ -164,11 +170,41 @@ export default function BlogDetailPage() {
     [post?.content],
   );
 
+  useEffect(() => {
+    if (!post) return undefined;
+
+    const previousTitle = document.title;
+    const title = post.metaTitle || post.title;
+    if (title) document.title = title;
+
+    let descriptionMeta = document.querySelector('meta[name="description"]');
+    const previousDescription = descriptionMeta?.getAttribute("content") || "";
+    const createdDescriptionMeta = !descriptionMeta;
+
+    if (!descriptionMeta) {
+      descriptionMeta = document.createElement("meta");
+      descriptionMeta.setAttribute("name", "description");
+      document.head.appendChild(descriptionMeta);
+    }
+
+    const description = post.metaDescription || post.excerpt;
+    if (description) descriptionMeta.setAttribute("content", description);
+
+    return () => {
+      document.title = previousTitle;
+      if (createdDescriptionMeta) {
+        descriptionMeta?.remove();
+      } else if (descriptionMeta) {
+        descriptionMeta.setAttribute("content", previousDescription);
+      }
+    };
+  }, [post]);
+
   if (loading) {
     return (
       <main className="min-h-screen bg-[#fdfefb] pt-[70px]">
         <div className="h-[490px] animate-pulse bg-[#e9ede5]" />
-        <div className="mx-auto h-[430px] max-w-[1100px] animate-pulse px-6 py-16">
+        <div className="site-container h-[430px] animate-pulse py-16">
           <div className="h-full rounded-lg bg-[#f1f4ec]" />
         </div>
       </main>
@@ -178,8 +214,13 @@ export default function BlogDetailPage() {
   if (!post) {
     return (
       <main className="min-h-[70vh] bg-[#fdfefb] px-5 pt-40 text-center text-[#344823]">
-        <h1 className="font-(family-name:--font-basker) text-4xl">Article not found</h1>
-        <Link href="/blogs" className="mt-6 inline-block underline underline-offset-4">
+        <h1 className="font-(family-name:--font-basker) text-4xl">
+          Article not found
+        </h1>
+        <Link
+          href="/blogs"
+          className="text-cta mt-6 inline-block"
+        >
           View all articles
         </Link>
       </main>
@@ -192,22 +233,30 @@ export default function BlogDetailPage() {
         <header className="grid bg-[#6b803f] lg:h-[490px] lg:grid-cols-2">
           <div className="h-[340px] overflow-hidden bg-[#ebece7] sm:h-[430px] lg:h-full">
             {post.image ? (
-              <img src={post.image} alt={post.title} className="h-full w-full object-cover" />
+              <img
+                src={post.image}
+                alt={post.title}
+                className="h-full w-full object-cover"
+              />
             ) : null}
           </div>
           <div className="flex min-h-[250px] items-center justify-center px-8 py-14 text-center lg:h-full lg:min-h-0 lg:px-14">
-            <h1 className="max-w-[560px] text-4xl font-semibold leading-[1.16] text-[#f7f5ee]">
+            <h1 className="max-w-[560px] text-2xl font-semibold leading-[1.16] text-[#f7f5ee]">
               {post.title}
             </h1>
           </div>
         </header>
 
-        <section className="mx-auto grid max-w-[1100px] gap-10 px-5 py-16 sm:px-8 lg:grid-cols-[220px_minmax(0,1fr)] lg:gap-16 lg:py-[74px]">
-          <aside className="text-[#30342d]">
-            <p className="text-lg leading-snug">By {post.author || "The Kahwa Company"}</p>
-            {post.date ? <p className="mt-1 text-lg leading-snug">{post.date}</p> : null}
+        <section className="site-container grid gap-10 py-16 lg:grid-cols-[260px_minmax(0,1fr)] lg:gap-12 lg:py-[74px]">
+          <aside className="text-[#30342d] h-fit bg-[#f1f4ec] rounded-lg px-6 py-8 sm:px-7 sm:py-10 lg:px-4 lg:py-8">
+            <p className="text-[18px] leading-snug">
+              By {post.author || "The Kahwa Company"}
+            </p>
+            {post.date ? (
+              <p className="mt-1 text-[14px] leading-snug">{post.date}</p>
+            ) : null}
 
-            <p className="mt-8 text-[11px] font-semibold uppercase tracking-[0.02em]">
+            <p className="mt-8 text-[12px] font-semibold uppercase tracking-[0.02em]">
               Share this article
             </p>
             <div className="mt-3 flex gap-2">
@@ -220,7 +269,12 @@ export default function BlogDetailPage() {
                   aria-label={`Share on ${link.label}`}
                   className="flex h-6 w-6 items-center justify-center rounded-full border border-[#687a51] text-[#566b3d] transition hover:bg-[#566b3d] hover:text-white"
                 >
-                  <svg viewBox="0 0 24 24" className="h-4 w-4" fill="currentColor" aria-hidden="true">
+                  <svg
+                    viewBox="0 0 24 24"
+                    className="h-4 w-4"
+                    fill="currentColor"
+                    aria-hidden="true"
+                  >
                     <path d={link.path} />
                   </svg>
                 </a>
@@ -240,13 +294,19 @@ export default function BlogDetailPage() {
       </article>
 
       {related.length ? (
-        <section className="mx-auto max-w-[1100px] px-5 pb-[74px] pt-7 sm:px-8 lg:pt-10">
+        <section className="site-container pb-[74px] pt-7 lg:pt-10">
           <div className="flex items-end justify-between gap-6">
             <h2 className="font-(family-name:--font-basker) text-4xl font-normal uppercase leading-none text-[#33372f]">
               Related Articles
             </h2>
-            <Link href="/blogs" className="shrink-0 text-xs text-[#566b3d] underline underline-offset-2">
-              View all Articles <span aria-hidden="true">›</span>
+            <Link
+              href="/blogs"
+              className="text-cta shrink-0 text-md text-[#566b3d]"
+            >
+              View all Articles {" "}
+              <span data-cta-arrow className="inline-block" aria-hidden="true">
+                ›
+              </span>
             </Link>
           </div>
 

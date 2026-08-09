@@ -331,21 +331,21 @@ export default function HeroSection() {
 
   return (
     <div
-      className="relative isolate w-full min-h-[680px] md:min-h-[820px] lg:min-h-[980px] xl:min-h-[1080px] bg-center bg-cover flex flex-col justify-end items-center gap-4"
+      className="relative isolate flex min-h-[760px] w-full flex-col items-center justify-start bg-cover bg-center sm:min-h-[900px] md:min-h-[1000px] lg:min-h-[1120px] xl:min-h-[1240px]"
       style={{
         backgroundImage: "url('/bg/beautiful-view-mountains-sunny-day.png')",
       }}
     >
       {/* Hero text */}
-      <div className="relative z-10 text-center mt-20 sm:mt-24 lg:mt-28 flex flex-col gap-4 max-w-3xl px-4">
-        <div className="font-(family-name:--font-basker) mt-6 mb-4 text-4xl uppercase text-[#1c2230] drop-shadow-sm">
-          <h2 className="mb-0 md:mb-2">Discover a blend of</h2>
+      <div className="relative z-10 mt-24 flex max-w-4xl flex-col px-4 text-center sm:mt-28 md:mt-32 lg:mt-[150px]">
+        <div className="font-(family-name:--font-basker) text-3xl uppercase leading-[1.18] text-[#1c2230] drop-shadow-sm sm:text-4xl lg:text-[40px]">
+          <h2>Discover a blend of</h2>
           <h2>botanicals and tradition</h2>
         </div>
-        <p className="text-base font-thin text-black/80">
+        <p className="mt-5 text-lg font-thin leading-[1.35] text-black/80 sm:mt-6 sm:text-xl">
           Thoughtfully crafted with nature&apos;s finest ingredients to bring
           warmth,
-          <span className=" md:block mt-0 md:mt-1">
+          <span className="mt-0 md:block">
             {" "}
             wellness, and mindful rituals to your everyday life.
           </span>
@@ -358,7 +358,7 @@ export default function HeroSection() {
           className="
             relative w-full overflow-hidden select-none touch-pan-y
             bg-gradient-to-t from-white via-white/70 to-transparent
-            h-[420px] sm:h-[520px] md:h-[640px] lg:h-[820px] xl:h-[980px] max-h-[1080px]
+            mt-8 h-[440px] sm:h-[560px] md:h-[680px] lg:h-[800px] xl:h-[900px] max-h-[980px]
           "
           aria-label="Product carousel"
           tabIndex={0}
@@ -375,7 +375,8 @@ export default function HeroSection() {
               }}
               className="
                 absolute left-0
-                top-1/2 -translate-y-1/2
+                top-[42%] -translate-y-1/2
+                md:top-[38%] lg:top-[36%] xl:top-[34%]
                 flex flex-col items-center justify-end
                 /* aspect ratio driven by CSS ? no JS height */
                 aspect-[3/4]
@@ -397,11 +398,11 @@ export default function HeroSection() {
           ))}
         </section>
       ) : (
-        <div className="h-[420px] sm:h-[520px] md:h-[640px] lg:h-[820px] xl:h-[980px] w-full flex items-center justify-center text-sm text-black/60">
+        <div className="mt-8 flex h-[440px] w-full items-center justify-center text-md text-black/60 sm:h-[560px] md:h-[680px] lg:h-[800px] xl:h-[900px]">
           Loading hero...
         </div>
       )}
-      <div className="relative z-10 mb-10 -mt-8 md:absolute md:bottom-10 md:mb-0 md:mt-0 lg:bottom-20 xl:bottom-30">
+      <div className="relative z-10 mb-12 -mt-10 md:absolute md:bottom-[104px] md:mb-0 md:mt-0 lg:bottom-[144px] xl:bottom-[144px]">
         <Link href="/shop" className="cursor-pointer">
           <ShopNowButton className="cursor-pointer" />
         </Link>

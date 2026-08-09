@@ -30,7 +30,7 @@ export default function ToastHost() {
       {toasts.map((toast) => (
         <div
           key={toast.id}
-          className={`rounded-sm border px-4 py-3 text-sm shadow-lg transition ${
+          className={`rounded-sm border px-4 py-3 text-md shadow-lg transition ${
             toast.type === "error"
               ? "border-red-200 bg-red-50 text-red-700"
               : "border-black/10 bg-white text-black"

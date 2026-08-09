@@ -17,6 +17,7 @@ export const normalizeProductReview = (review = {}) => ({
     review.name ||
     review.customer_name ||
     review.user_name ||
+    review.user?.name ||
     review.customer?.name ||
     "Customer",
   rating: Number(review.rating ?? 0) || 0,
@@ -75,9 +76,11 @@ export const extractProductReviews = (payload) => {
           : [];
 
   const summary = payload?.summary || payload?.data?.summary || payload || {};
+  const pagination = payload?.pagination || payload?.data?.pagination || {};
   return {
     items: items.map(normalizeProductReview),
     summary,
+    pagination,
   };
 };
 
