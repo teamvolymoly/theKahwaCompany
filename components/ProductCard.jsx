@@ -9,8 +9,13 @@ export default function ProductCard({ product, variant = "default" }) {
   const router = useRouter();
   const isHomepage = variant === "homepage";
   const slugOrId = product.slug || product.id;
-  const rating = Number.isFinite(product.rating) ? product.rating : 4;
+  const rawRating = Number(product.rating);
+  const rating = Number.isFinite(rawRating) ? rawRating : 0;
+  const ratingCount = Number(
+    product.rating_count ?? product.review_count ?? product.total_reviews ?? 0,
+  );
   const fullStars = Math.max(0, Math.min(5, Math.round(rating)));
+  const isAvailable = product.in_stock !== false && product.status !== false;
   const hoverFallbacks = [
     "/products/packets/11.png",
     "/products/packets/12.png",
@@ -33,6 +38,7 @@ export default function ProductCard({ product, variant = "default" }) {
       : primaryImage);
 
   const handleAddToCart = async () => {
+    if (!isAvailable) return;
     try {
       const variantId =
         product.variants?.[0]?.id || product.default_variant_id || null;
@@ -158,9 +164,9 @@ export default function ProductCard({ product, variant = "default" }) {
               />
             </svg>
           ))}
-          {isHomepage ? (
+          {Number.isFinite(ratingCount) ? (
             <span className="ml-1 text-md text-[#777d70]">
-              ({product.review_count || 16})
+              ({ratingCount})
             </span>
           ) : null}
         </div>
@@ -182,7 +188,9 @@ export default function ProductCard({ product, variant = "default" }) {
           <span className="font-semibold">
             {"\u20B9"} {product.variants?.[0]?.price || product.price}
           </span>
-          {product.oldPrice ? (
+          {product.oldPrice != null &&
+          String(product.oldPrice) !==
+            String(product.variants?.[0]?.price ?? product.price) ? (
             <span className="text-[#1c2230]/40 line-through">
               {"\u20B9"} {product.oldPrice}
             </span>
@@ -203,13 +211,14 @@ export default function ProductCard({ product, variant = "default" }) {
 
       <button
         onClick={handleAddToCart}
-        className={`w-full cursor-pointer rounded-none bg-[#52653b] font-serif font-thin uppercase text-white transition hover:bg-[#6B7F42] ${
+        disabled={!isAvailable}
+        className={`mb-4 w-full cursor-pointer rounded-none bg-[#52653b] font-basker font-thin uppercase text-white transition hover:bg-[#6B7F42] ${
           isHomepage
             ? "py-3 text-md tracking-[0.02em] sm:py-3.5 sm:text-base"
             : "py-3 text-md tracking-[0.12em]"
         }`}
       >
-        Add To Cart
+        {isAvailable ? "Add To Cart" : "Out of Stock"}
       </button>
     </article>
   );

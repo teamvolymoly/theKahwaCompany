@@ -220,7 +220,7 @@ export default function CartPage() {
               </p>
             ) : items.length === 0 ? (
               <div className="flex min-h-[320px] flex-col items-center justify-center text-center">
-                <p className="font-serif text-2xl text-[#3f532b]">
+                <p className="font-basker text-2xl text-[#3f532b]">
                   Your cart is empty.
                 </p>
                 <Link
@@ -261,7 +261,7 @@ export default function CartPage() {
                           )}
                         </div>
                         <div className="min-w-0 pr-8 lg:pr-0">
-                          <h2 className="font-serif text-xl uppercase leading-tight">
+                          <h2 className="font-basker text-xl uppercase leading-tight">
                             {item.product_name}
                           </h2>
                           {item.variant_name ? (

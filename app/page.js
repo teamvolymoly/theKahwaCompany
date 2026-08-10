@@ -1,13 +1,16 @@
 ﻿"use client";
 
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import HeroSection from "@/components/HeroSection";
 import ProductCard from "@/components/ProductCard";
 import { apiFetch } from "@/utils/api";
 import { normalizeBlogList } from "@/utils/blogs";
+import {
+  extractProductItems,
+  normalizeProductListItem,
+} from "@/utils/products";
 
 const fallbackArticles = [
   {
@@ -36,23 +39,6 @@ const fallbackArticles = [
   },
 ];
 
-const normalizeProduct = (item) => {
-  const images = Array.isArray(item.images)
-    ? item.images
-    : (item.images ? Object.values(item.images).filter(Boolean) : []).map(
-        (url, index) => ({
-          id: `img-${item.id}-${index}`,
-          image_url: url,
-        }),
-      );
-
-  return {
-    ...item,
-    images,
-    oldPrice: item.compare_price || item.oldPrice,
-  };
-};
-
 export default function Home() {
   const [products, setProducts] = useState([]);
   const [blogPosts, setBlogPosts] = useState(fallbackArticles);
@@ -65,8 +51,8 @@ export default function Home() {
       setLoadingProducts(true);
       try {
         const data = await apiFetch("/products?limit=8");
-        const items = Array.isArray(data?.items) ? data.items : [];
-        if (active) setProducts(items.map(normalizeProduct));
+        const items = extractProductItems(data);
+        if (active) setProducts(items.map(normalizeProductListItem));
       } catch {
         if (active) setProducts([]);
       } finally {
@@ -143,7 +129,12 @@ export default function Home() {
                 </p>
                 <span className="text-cta mt-4 inline-flex items-center gap-2 text-base font-semibold">
                   Discover More
-                  <ArrowRight data-cta-arrow size={19} strokeWidth={1.7} />
+                  <img
+                    data-cta-arrow
+                    src="/icons/VectorRight.svg"
+                    alt=""
+                    className="h-3.5 w-2 object-contain"
+                  />
                 </span>
               </div>
             </div>

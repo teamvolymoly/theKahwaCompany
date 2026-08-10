@@ -6,6 +6,10 @@ import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/app/context/AuthContext";
 import { Squash } from "hamburger-react";
 import { apiFetch } from "@/utils/api";
+import {
+  extractProductItems,
+  normalizeProductListItem,
+} from "@/utils/products";
 
 const toCategoryParam = (value) =>
   value
@@ -188,7 +192,9 @@ export default function NewHeader() {
         const data = await apiFetch(`/products/search?${params.toString()}`);
         if (!active) return;
         const payload = data?.data || data || {};
-        setSearchResults(Array.isArray(payload.items) ? payload.items : []);
+        setSearchResults(
+          extractProductItems(payload).map(normalizeProductListItem),
+        );
         setSearchPagination(payload.pagination || null);
       } catch (e) {
         if (!active) return;
@@ -280,10 +286,7 @@ export default function NewHeader() {
               style={{ zIndex: 1 }}
             />
           )}
-          <div
-            className="site-container relative z-10"
-            ref={mobileMenuRef}
-          >
+          <div className="site-container relative z-10" ref={mobileMenuRef}>
             <div className="relative flex items-center justify-between py-4 lg:py-4">
               <div className="flex items-center gap-3 lg:gap-4">
                 <button
@@ -411,9 +414,13 @@ export default function NewHeader() {
                                 className="flex w-full items-center gap-3 rounded-sm px-2 py-3 text-left hover:bg-black/5"
                               >
                                 <div className="h-14 w-14 shrink-0 rounded-sm bg-gray-50 p-1">
-                                  {product.img ? (
+                                  {product.images?.[0]?.image_url ||
+                                  product.image ? (
                                     <img
-                                      src={product.img}
+                                      src={
+                                        product.images?.[0]?.image_url ||
+                                        product.image
+                                      }
                                       alt={product.name}
                                       className="h-full w-full object-contain"
                                     />
@@ -518,7 +525,7 @@ export default function NewHeader() {
                     className="h-8 w-8 lg:h-9 lg:w-9"
                     alt="Cart"
                   />
-                  <span className="absolute -right-1 -top-1 flex h-5 min-w-[20px] items-center justify-center rounded-full bg-[#FFBF00] px-1 text-[10px] font-semibold text-black">
+                  <span className="absolute -right-0.5 -top-0.5 flex h-5 min-w-[20px] items-center justify-center rounded-full bg-[#FFBF00] px-1 text-[0.75rem] font-normal text-black">
                     {cartCount}
                   </span>
                 </Link>

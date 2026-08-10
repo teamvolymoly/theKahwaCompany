@@ -10,6 +10,10 @@ import {
   dummySubcategories,
 } from "@/utils/dummyData";
 import ProductCard from "@/components/ProductCard";
+import {
+  extractProductItems,
+  normalizeProductListItem,
+} from "@/utils/products";
 
 export default function CategoryPage() {
   const { slug } = useParams();
@@ -36,11 +40,13 @@ export default function CategoryPage() {
             : dummySubcategories,
         );
 
-        const all = await apiFetch("/products");
-        const list = all?.products || all || [];
-        const filtered = Array.isArray(list)
-          ? list.filter((p) => p.category_id === resolvedCategory.id)
-          : [];
+        const categoryParam = resolvedCategory.slug || slug;
+        const all = await apiFetch(
+          `/products?category=${encodeURIComponent(categoryParam)}&limit=100`,
+        );
+        const filtered = extractProductItems(all).map(
+          normalizeProductListItem,
+        );
         setProducts(
           filtered.length
             ? filtered

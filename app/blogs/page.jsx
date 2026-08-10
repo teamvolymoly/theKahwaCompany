@@ -223,7 +223,7 @@ export default function BlogsPage() {
 
         {!loading && !error && posts.length === 0 ? (
           <div className="mt-12 rounded-lg bg-[#f1f4ec] px-6 py-20 text-center">
-            <p className="font-serif text-2xl text-[#3f532b]">
+            <p className="font-basker text-2xl text-[#3f532b]">
               No articles are available right now.
             </p>
           </div>

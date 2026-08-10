@@ -16,6 +16,11 @@ import {
 
 import ProductCard from "@/components/ProductCard";
 import { apiFetch } from "@/utils/api";
+import {
+  extractProductItems,
+  normalizeProductImages,
+  normalizeProductListItem,
+} from "@/utils/products";
 import { extractProductReviews } from "@/utils/reviews";
 
 const FALLBACK_IMAGE = "/products/W1.png";
@@ -25,17 +30,6 @@ const stripMarkup = (value = "") =>
     .replace(/<[^>]*>/g, " ")
     .replace(/\s+/g, " ")
     .trim();
-
-const normalizeImages = (product) => {
-  if (!Array.isArray(product?.images)) return [];
-  return product.images
-    .map((image, index) =>
-      typeof image === "string"
-        ? { id: `${product.id}-${index}`, image_url: image }
-        : image,
-    )
-    .filter((image) => image?.image_url);
-};
 
 const weightMeta = (variant) => {
   const source = `${variant?.weight || ""} ${variant?.variant_name || variant?.name || ""}`;
@@ -166,7 +160,9 @@ function ProductTabs({ product, selectedVariant }) {
               {product.collection ? (
                 <p>
                   <span className="font-semibold">Collection:</span>{" "}
-                  {product.collection}
+                  {Array.isArray(product.collection)
+                    ? product.collection.join(", ")
+                    : product.collection}
                 </p>
               ) : null}
               {selectedVariant?.sku ? (
@@ -620,7 +616,7 @@ export default function ProductDetail() {
         ]);
         if (!detail?.id) throw new Error("Product not found.");
 
-        const normalizedImages = normalizeImages(detail);
+        const normalizedImages = normalizeProductImages(detail);
         const normalizedVariants = Array.isArray(detail.variants)
           ? detail.variants
           : [];
@@ -639,20 +635,14 @@ export default function ProductDetail() {
           : Array.isArray(detail.recommended_products)
             ? detail.recommended_products
             : [];
-        const catalog = Array.isArray(catalogPayload?.items)
-          ? catalogPayload.items
-          : [];
+        const catalog = extractProductItems(catalogPayload);
         const suggested = (
           related.length
             ? related
             : catalog.filter((item) => item.id !== detail.id)
         )
           .slice(0, 4)
-          .map((item) => ({
-            ...item,
-            images: normalizeImages(item),
-            oldPrice: item.compare_price,
-          }));
+          .map(normalizeProductListItem);
 
         if (!active) return;
         setProduct({ ...detail, images: normalizedImages });
@@ -685,6 +675,7 @@ export default function ProductDetail() {
     Number(
       reviewSummary.total_reviews ??
         reviewSummary.count ??
+        product?.rating_count ??
         product?.review_count ??
         reviews.length,
     ) || 0;
@@ -743,7 +734,7 @@ export default function ProductDetail() {
     return (
       <main className="flex min-h-[70vh] items-center justify-center bg-white pt-[90px] text-center">
         <div>
-          <p className="font-serif text-2xl text-[#3f532b]">
+          <p className="font-basker text-2xl text-[#3f532b]">
             {error || "Loading product details…"}
           </p>
         </div>
@@ -820,7 +811,7 @@ export default function ProductDetail() {
                 {product.tag_line_1 || product.tag_line}
               </p>
             ) : null}
-            <h1 className="mt-4 font-serif text-4xl font-normal uppercase leading-none text-[#3f532b]">
+            <h1 className="mt-4 font-basker text-4xl font-normal uppercase leading-none text-[#3f532b]">
               {product.name}
             </h1>
             {product.tag_line_2 || product.short_description ? (
@@ -914,7 +905,7 @@ export default function ProductDetail() {
               type="button"
               onClick={addToCart}
               disabled={!selectedVariant}
-              className="mt-5 h-11 w-full bg-[#52653b] font-serif font-thin text-md uppercase text-white transition hover:bg-[#6B7F42] disabled:opacity-50 cursor-pointer"
+              className="mt-5 h-11 w-full bg-[#52653b] font-basker font-thin text-md uppercase text-white transition hover:bg-[#6B7F42] disabled:opacity-50 cursor-pointer"
             >
               Add to cart
             </button>
@@ -939,7 +930,7 @@ export default function ProductDetail() {
         <section className="bg-white">
           <div className="site-container py-12 lg:py-16">
             <div className="flex items-center justify-between">
-              <h2 className="font-serif text-[28px] uppercase">
+              <h2 className="font-basker text-[28px] uppercase">
                 Discover More
               </h2>
               <Link

@@ -5,30 +5,12 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
 import { apiFetch } from "@/utils/api";
+import {
+  extractProductItems,
+  normalizeProductListItem,
+} from "@/utils/products";
 
 const FALLBACK_IMAGE = "/products/W1.png";
-
-const normalizeImages = (product) => {
-  if (Array.isArray(product.images)) {
-    return product.images
-      .map((image, index) =>
-        typeof image === "string"
-          ? { id: `${product.id}-${index}`, image_url: image }
-          : image,
-      )
-      .filter((image) => image?.image_url);
-  }
-
-  if (!product.images) return [];
-
-  return Object.values(product.images)
-    .filter(Boolean)
-    .map((image, index) => ({
-      id: `${product.id}-${index}`,
-      image_url: typeof image === "string" ? image : image?.image_url,
-    }))
-    .filter((image) => image.image_url);
-};
 
 const stripMarkup = (value = "") =>
   String(value)
@@ -46,7 +28,8 @@ function Rating({ product }) {
   const rating =
     Number.isFinite(rawRating) ? Math.max(0, Math.min(5, rawRating)) : 0;
   const fullStars = Math.max(0, Math.min(5, Math.round(rating)));
-  const reviewCount = product?.review_count ?? product?.total_reviews;
+  const reviewCount =
+    product?.rating_count ?? product?.review_count ?? product?.total_reviews;
 
   return (
     <div
@@ -104,7 +87,7 @@ function ProductActions({ product, onAdd, compact = false }) {
     <div className={`grid grid-cols-2 gap-3 ${compact ? "mt-5" : "mt-7"}`}>
       <Link
         href={`/product/${slugOrId}`}
-        className="flex min-h-10 items-center justify-center border border-[#71805d] px-3 text-center font-serif text-md uppercase text-[#52633d] transition hover:bg-[#e8ecdf]"
+        className="flex min-h-10 items-center justify-center border border-[#71805d] px-3 text-center font-basker text-md uppercase text-[#52633d] transition hover:bg-[#e8ecdf]"
       >
         Learn More
       </Link>
@@ -112,7 +95,7 @@ function ProductActions({ product, onAdd, compact = false }) {
         type="button"
         onClick={() => onAdd(product)}
         disabled={!isAvailable}
-        className="min-h-10 cursor-pointer rounded-none bg-[#52653b] px-3 font-serif text-md uppercase text-white transition hover:bg-[#6B7F42] disabled:cursor-not-allowed disabled:opacity-50"
+        className="min-h-10 cursor-pointer rounded-none bg-[#52653b] px-3 font-basker text-md uppercase text-white transition hover:bg-[#6B7F42] disabled:cursor-not-allowed disabled:opacity-50"
       >
         {isAvailable ? "Add To Cart" : "Out of Stock"}
       </button>
@@ -211,12 +194,9 @@ export default function ShopClient() {
         );
 
         const data = await apiFetch(`/products?${params.toString()}`);
-        const items = Array.isArray(data?.items) ? data.items : [];
-        const normalized = items.map((product) => ({
-          ...product,
-          images: normalizeImages(product),
-          oldPrice: product.compare_price,
-        }));
+        const normalized = extractProductItems(data).map(
+          normalizeProductListItem,
+        );
 
         if (active) {
           setProducts(normalized);
