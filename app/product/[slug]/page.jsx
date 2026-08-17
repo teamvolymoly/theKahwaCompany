@@ -32,7 +32,9 @@ const stripMarkup = (value = "") =>
     .trim();
 
 const weightMeta = (variant) => {
-  const source = `${variant?.weight || ""} ${variant?.variant_name || variant?.name || ""}`;
+  const source = `${variant?.weight || ""} ${
+    variant?.variant_name || variant?.name || ""
+  }`;
   const directWeight = Number(variant?.weight_g);
   let grams =
     Number.isFinite(directWeight) && directWeight > 0 ? directWeight : null;
@@ -95,10 +97,10 @@ function ProductTabs({ product, selectedVariant }) {
   const ingredientsSource = Array.isArray(product.ingredients)
     ? product.ingredients
     : Array.isArray(product.ingredients_list)
-      ? product.ingredients_list
-      : [];
+    ? product.ingredients_list
+    : [];
   const ingredients = ingredientsSource.map((item) =>
-    typeof item === "string" ? { name: item } : item,
+    typeof item === "string" ? { name: item } : item
   );
 
   const tabs = [
@@ -129,7 +131,7 @@ function ProductTabs({ product, selectedVariant }) {
           ))}
         </div>
 
-        <div className="min-h-[92px] pt-6 text-base leading-[1.65] text-[#30342e] sm:text-lg">
+        <div className="min-h-[92px] pt-6 text-base leading-[1.65] text-[#30342e] sm:text-md">
           {activeTab === "description" ? (
             <p>
               {stripMarkup(product.description) || "Description coming soon."}
@@ -268,7 +270,7 @@ function Queries({ faqs }) {
                 aria-controls={`query-answer-${index}`}
                 onClick={() =>
                   setOpenQueryIndex((current) =>
-                    current === index ? null : index,
+                    current === index ? null : index
                   )
                 }
                 className="flex w-full items-center justify-between gap-4 text-left text-base text-[#252923]"
@@ -306,7 +308,7 @@ function Reviews({ reviews, average, total, ratingCounts }) {
       ratingCounts &&
       typeof ratingCounts === "object" &&
       [1, 2, 3, 4, 5].some((star) =>
-        Object.prototype.hasOwnProperty.call(ratingCounts, `${star}_star`),
+        Object.prototype.hasOwnProperty.call(ratingCounts, `${star}_star`)
       );
 
     if (hasSummaryCounts) {
@@ -338,7 +340,7 @@ function Reviews({ reviews, average, total, ratingCounts }) {
                   (current.index - 1 + current.images.length) %
                   current.images.length,
               }
-            : current,
+            : current
         );
       }
       if (event.key === "ArrowRight") {
@@ -348,7 +350,7 @@ function Reviews({ reviews, average, total, ratingCounts }) {
                 ...current,
                 index: (current.index + 1) % current.images.length,
               }
-            : current,
+            : current
         );
       }
     };
@@ -370,7 +372,7 @@ function Reviews({ reviews, average, total, ratingCounts }) {
               (current.index - 1 + current.images.length) %
               current.images.length,
           }
-        : current,
+        : current
     );
   };
 
@@ -381,7 +383,7 @@ function Reviews({ reviews, average, total, ratingCounts }) {
             ...current,
             index: (current.index + 1) % current.images.length,
           }
-        : current,
+        : current
     );
   };
 
@@ -400,186 +402,190 @@ function Reviews({ reviews, average, total, ratingCounts }) {
                 className="relative flex h-full w-full max-w-6xl flex-col items-center justify-center"
                 onClick={(event) => event.stopPropagation()}
               >
-            <button
-              type="button"
-              onClick={() => setGallery(null)}
-              className="absolute right-0 top-0 z-10 flex h-11 w-11 items-center justify-center rounded-full bg-white text-black"
-              aria-label="Close review image gallery"
-            >
-              <X className="h-5 w-5" />
-            </button>
-
-            <div className="flex h-0 min-h-0 w-full flex-1 items-center justify-center px-12 sm:px-16">
-              <img
-                src={gallery.images[gallery.index]}
-                alt={`Customer review image ${gallery.index + 1}`}
-                className="max-h-full max-w-full object-contain"
-              />
-            </div>
-
-            {gallery.images.length > 1 ? (
-              <>
                 <button
                   type="button"
-                  onClick={showPreviousImage}
-                  className="absolute left-0 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white text-black"
-                  aria-label="Previous review image"
+                  onClick={() => setGallery(null)}
+                  className="absolute right-0 top-0 z-10 flex h-11 w-11 items-center justify-center rounded-full bg-white text-black"
+                  aria-label="Close review image gallery"
                 >
-                  <ChevronLeft className="h-6 w-6" />
+                  <X className="h-5 w-5" />
                 </button>
-                <button
-                  type="button"
-                  onClick={showNextImage}
-                  className="absolute right-0 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white text-black"
-                  aria-label="Next review image"
-                >
-                  <ChevronRight className="h-6 w-6" />
-                </button>
-              </>
-            ) : null}
 
-            <p className="mt-4 text-base text-white">
-              {gallery.index + 1} / {gallery.images.length}
-            </p>
-
-            {gallery.images.length > 1 ? (
-              <div className="mt-3 flex max-w-full gap-2 overflow-x-auto pb-1">
-                {gallery.images.map((image, index) => (
-                  <button
-                    key={`${image}-${index}`}
-                    type="button"
-                    onClick={() =>
-                      setGallery((current) =>
-                        current ? { ...current, index } : current,
-                      )
-                    }
-                    className={`h-14 w-14 shrink-0 overflow-hidden border-2 ${
-                      gallery.index === index
-                        ? "border-white"
-                        : "border-transparent opacity-60"
-                    }`}
-                    aria-label={`Show review image ${index + 1}`}
-                  >
-                    <img
-                      src={image}
-                      alt=""
-                      className="h-full w-full object-cover"
-                    />
-                  </button>
-                ))}
-              </div>
-            ) : null}
-              </div>
-            </div>,
-            document.body,
-          )
-        : null}
-
-      <section className="bg-white">
-      <div className="site-container pb-14 lg:pb-20">
-        <h2 className="text-[28px] font-semibold text-[#344823]">
-          Customer Reviews
-        </h2>
-
-        <div className="mt-7 grid items-center gap-8 border-b border-[#dfe2da] pb-8 lg:grid-cols-[260px_1fr_250px]">
-          <div className="lg:border-r lg:border-[#e1e3dd] lg:pr-8">
-            <Stars value={average} size={18} />
-            <p className="mt-3 text-lg">
-              {Number(average || 0).toFixed(2)} out of 5
-            </p>
-            <p className="text-base text-[#62675e]">Based on {total} reviews</p>
-          </div>
-
-          <div className="space-y-1 lg:px-8">
-            {[5, 4, 3, 2, 1].map((star) => {
-              const count = counts[star - 1];
-              const percent = total ? Math.round((count / total) * 100) : 0;
-              return (
-                <div
-                  key={star}
-                  className="grid grid-cols-[92px_1fr_34px] items-center gap-3 text-md"
-                >
-                  <Stars value={star} size={14} />
-                  <div className="h-3 bg-[#dedfda]">
-                    <div
-                      className="h-full bg-[#91a079]"
-                      style={{ width: `${percent}%` }}
-                    />
-                  </div>
-                  <span>{count}</span>
+                <div className="flex h-0 min-h-0 w-full flex-1 items-center justify-center px-12 sm:px-16">
+                  <img
+                    src={gallery.images[gallery.index]}
+                    alt={`Customer review image ${gallery.index + 1}`}
+                    className="max-h-full max-w-full object-contain"
+                  />
                 </div>
-              );
-            })}
-          </div>
 
-          <Link
-            href="/user/orders"
-            className="flex h-11 items-center justify-center border border-[#788863] px-6 text-md text-[#52633d] transition hover:bg-[#f1f4ec]"
-          >
-            Write a review
-          </Link>
-        </div>
-
-        <div className="border-b border-[#e1e3dd] py-4 text-md text-[#4a5540]">
-          Most Recent <ChevronDown className="ml-1 inline h-5 w-5" />
-        </div>
-
-        {reviews.length ? (
-          <div className="divide-y divide-[#e1e3dd]">
-            {reviews.map((review) => (
-              <article key={review.id} className="py-7 text-base">
-                <div className="flex items-start justify-between gap-4">
-                  <div className="flex items-center gap-3">
-                    <span className="flex h-10 w-10 items-center justify-center bg-[#f4f5f1]">
-                      <UserRound className="h-5 w-5" />
-                    </span>
-                    <div>
-                      <Stars value={review.rating} size={14} />
-                      <p className="mt-1 font-medium">
-                        {review.name || "Customer"}
-                      </p>
-                    </div>
-                  </div>
-                  <time className="text-md text-[#8d9089]">
-                    {review.date || ""}
-                  </time>
-                </div>
-                {review.title ? (
-                  <h3 className="mt-4 font-semibold">{review.title}</h3>
+                {gallery.images.length > 1 ? (
+                  <>
+                    <button
+                      type="button"
+                      onClick={showPreviousImage}
+                      className="absolute left-0 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white text-black"
+                      aria-label="Previous review image"
+                    >
+                      <ChevronLeft className="h-6 w-6" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={showNextImage}
+                      className="absolute right-0 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white text-black"
+                      aria-label="Next review image"
+                    >
+                      <ChevronRight className="h-6 w-6" />
+                    </button>
+                  </>
                 ) : null}
-                <p className="mt-2 leading-6 text-[#353934]">{review.review}</p>
-                {review.images?.length ? (
-                  <div className="mt-4 flex gap-3">
-                    {review.images.map((image, index) => (
+
+                <p className="mt-4 text-base text-white">
+                  {gallery.index + 1} / {gallery.images.length}
+                </p>
+
+                {gallery.images.length > 1 ? (
+                  <div className="mt-3 flex max-w-full gap-2 overflow-x-auto pb-1">
+                    {gallery.images.map((image, index) => (
                       <button
-                        key={`${review.id}-${index}`}
+                        key={`${image}-${index}`}
                         type="button"
                         onClick={() =>
-                          setGallery({ images: review.images, index })
+                          setGallery((current) =>
+                            current ? { ...current, index } : current
+                          )
                         }
-                        className="h-20 w-20 overflow-hidden"
-                        aria-label={`Open review image ${index + 1} from ${
-                          review.name || "Customer"
+                        className={`h-14 w-14 shrink-0 overflow-hidden border-2 ${
+                          gallery.index === index
+                            ? "border-white"
+                            : "border-transparent opacity-60"
                         }`}
+                        aria-label={`Show review image ${index + 1}`}
                       >
                         <img
                           src={image}
-                          alt="Customer review"
+                          alt=""
                           className="h-full w-full object-cover"
                         />
                       </button>
                     ))}
                   </div>
                 ) : null}
-              </article>
-            ))}
+              </div>
+            </div>,
+            document.body
+          )
+        : null}
+
+      <section className="bg-white mt-10">
+        <div className="site-container pb-14 lg:pb-20">
+          <h2 className="text-[28px] font-semibold text-[#344823]">
+            Customer Reviews
+          </h2>
+
+          <div className="mt-7 grid items-center gap-8 border-b border-[#dfe2da] pb-8 lg:grid-cols-[260px_1fr_250px]">
+            <div className="lg:border-r lg:border-[#e1e3dd] lg:pr-8">
+              <Stars value={average} size={18} />
+              <p className="mt-3 text-lg">
+                {Number(average || 0).toFixed(2)} out of 5
+              </p>
+              <p className="text-base text-[#62675e]">
+                Based on {total} reviews
+              </p>
+            </div>
+
+            <div className="space-y-1 lg:px-8">
+              {[5, 4, 3, 2, 1].map((star) => {
+                const count = counts[star - 1];
+                const percent = total ? Math.round((count / total) * 100) : 0;
+                return (
+                  <div
+                    key={star}
+                    className="grid grid-cols-[92px_1fr_34px] items-center gap-3 text-md"
+                  >
+                    <Stars value={star} size={14} />
+                    <div className="h-3 bg-[#dedfda]">
+                      <div
+                        className="h-full bg-[#91a079]"
+                        style={{ width: `${percent}%` }}
+                      />
+                    </div>
+                    <span>{count}</span>
+                  </div>
+                );
+              })}
+            </div>
+
+            <Link
+              href="/user/orders"
+              className="flex h-11 items-center justify-center border border-[#788863] px-6 text-md text-[#52633d] transition hover:bg-[#f1f4ec]"
+            >
+              Write a review
+            </Link>
           </div>
-        ) : (
-          <p className="py-8 text-base text-[#73776f]">
-            No customer reviews yet. Be the first to review this blend.
-          </p>
-        )}
-      </div>
+
+          <div className="border-b border-[#e1e3dd] py-4 text-md text-[#4a5540]">
+            Most Recent <ChevronDown className="ml-1 inline h-5 w-5" />
+          </div>
+
+          {reviews.length ? (
+            <div className="divide-y divide-[#e1e3dd]">
+              {reviews.map((review) => (
+                <article key={review.id} className="py-7 text-base">
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex items-center gap-3">
+                      <span className="flex h-10 w-10 items-center justify-center bg-[#f4f5f1]">
+                        <UserRound className="h-5 w-5" />
+                      </span>
+                      <div>
+                        <Stars value={review.rating} size={14} />
+                        <p className="mt-1 font-medium">
+                          {review.name || "Customer"}
+                        </p>
+                      </div>
+                    </div>
+                    <time className="text-md text-[#8d9089]">
+                      {review.date || ""}
+                    </time>
+                  </div>
+                  {review.title ? (
+                    <h3 className="mt-4 font-semibold">{review.title}</h3>
+                  ) : null}
+                  <p className="mt-2 leading-6 text-[#353934]">
+                    {review.review}
+                  </p>
+                  {review.images?.length ? (
+                    <div className="mt-4 flex gap-3">
+                      {review.images.map((image, index) => (
+                        <button
+                          key={`${review.id}-${index}`}
+                          type="button"
+                          onClick={() =>
+                            setGallery({ images: review.images, index })
+                          }
+                          className="h-20 w-20 overflow-hidden"
+                          aria-label={`Open review image ${index + 1} from ${
+                            review.name || "Customer"
+                          }`}
+                        >
+                          <img
+                            src={image}
+                            alt="Customer review"
+                            className="h-full w-full object-cover"
+                          />
+                        </button>
+                      ))}
+                    </div>
+                  ) : null}
+                </article>
+              ))}
+            </div>
+          ) : (
+            <p className="py-8 text-base text-[#73776f]">
+              No customer reviews yet. Be the first to review this blend.
+            </p>
+          )}
+        </div>
       </section>
     </>
   );
@@ -610,7 +616,7 @@ export default function ProductDetail() {
         const [detail, reviewPayload, catalogPayload] = await Promise.all([
           apiFetch(`/products/${encodeURIComponent(safeSlug)}`),
           apiFetch(
-            `/products/${encodeURIComponent(safeSlug)}/reviews?page=1&limit=10`,
+            `/products/${encodeURIComponent(safeSlug)}/reviews?page=1&limit=10`
           ).catch(() => null),
           apiFetch("/products?page=1&limit=8").catch(() => null),
         ]);
@@ -622,19 +628,19 @@ export default function ProductDetail() {
           : [];
         const defaultVariant =
           normalizedVariants.find(
-            (variant) => variant.id === detail.default_variant_id,
+            (variant) => variant.id === detail.default_variant_id
           ) ||
           normalizedVariants.find((variant) => variant.is_default) ||
           normalizedVariants[0] ||
           null;
         const parsedReviews = extractProductReviews(
-          reviewPayload || detail.reviews || {},
+          reviewPayload || detail.reviews || {}
         );
         const related = Array.isArray(detail.related_products)
           ? detail.related_products
           : Array.isArray(detail.recommended_products)
-            ? detail.recommended_products
-            : [];
+          ? detail.recommended_products
+          : [];
         const catalog = extractProductItems(catalogPayload);
         const suggested = (
           related.length
@@ -669,7 +675,7 @@ export default function ProductDetail() {
       reviewSummary.average_rating ??
         reviewSummary.rating ??
         product?.rating ??
-        0,
+        0
     ) || 0;
   const totalReviews =
     Number(
@@ -677,7 +683,7 @@ export default function ProductDetail() {
         reviewSummary.count ??
         product?.rating_count ??
         product?.review_count ??
-        reviews.length,
+        reviews.length
     ) || 0;
   const activeImageUrl = images[activeImage]?.image_url || FALLBACK_IMAGE;
   const selectedDiscountPrice =
@@ -691,7 +697,7 @@ export default function ProductDetail() {
   const currentPrice = selectedDiscountPrice ?? regularPrice;
   const comparePrice = selectedDiscountPrice
     ? regularPrice
-    : (selectedVariant?.compare_price ?? product?.compare_price);
+    : selectedVariant?.compare_price ?? product?.compare_price;
 
   const addToCart = async () => {
     if (!selectedVariant) return;
@@ -699,13 +705,13 @@ export default function ProductDetail() {
       const cart = await apiFetch("/cart");
       const targetId = Number(selectedVariant.id);
       const exists = (Array.isArray(cart?.items) ? cart.items : []).some(
-        (item) => Number(item.variant_id || item.variant?.id) === targetId,
+        (item) => Number(item.variant_id || item.variant?.id) === targetId
       );
       if (exists) {
         window.dispatchEvent(
           new CustomEvent("toast", {
             detail: { message: "Product is already in cart.", type: "error" },
-          }),
+          })
         );
         return;
       }
@@ -719,13 +725,13 @@ export default function ProductDetail() {
       window.dispatchEvent(
         new CustomEvent("toast", {
           detail: { message: "Added to cart.", type: "success" },
-        }),
+        })
       );
     } catch {
       window.dispatchEvent(
         new CustomEvent("toast", {
           detail: { message: "Please login first.", type: "error" },
-        }),
+        })
       );
     }
   };
@@ -842,14 +848,18 @@ export default function ProductDetail() {
                         key={variant.id}
                         type="button"
                         onClick={() => setSelectedVariant(variant)}
-                        className={`min-w-[72px] rounded px-4 py-3 text-center ${selected ? "bg-[#647744] text-white" : "border border-[#d7dad2] bg-white"}`}
+                        className={`min-w-[72px] rounded px-4 py-3 text-center ${
+                          selected
+                            ? "bg-[#647744] text-white"
+                            : "border border-[#d7dad2] bg-white"
+                        }`}
                       >
                         <span className="block text-[20px] text-base font-semibold">
-                          {meta.label}
+                          {variant.name}
                         </span>
-                        {meta.cups ? (
+                        {variant.item_form ? (
                           <span className="mt-1 block text-[16px]">
-                            {meta.cups} cups
+                            {variant.item_form}
                           </span>
                         ) : null}
                       </button>
@@ -885,8 +895,8 @@ export default function ProductDetail() {
                     setQuantity(
                       Math.max(
                         1,
-                        Number(event.target.value.replace(/\D/g, "")) || 1,
-                      ),
+                        Number(event.target.value.replace(/\D/g, "")) || 1
+                      )
                     )
                   }
                   className="w-9 border-x border-[#dfe2da] text-center outline-none"
@@ -933,11 +943,8 @@ export default function ProductDetail() {
               <h2 className="font-basker text-[28px] uppercase">
                 Discover More
               </h2>
-              <Link
-                href="/shop"
-                className="text-cta text-md text-[#52633d]"
-              >
-                View All {" "}
+              <Link href="/shop" className="text-cta text-md text-[#52633d]">
+                View All{" "}
                 <span
                   data-cta-arrow
                   className="inline-block text-lg"
