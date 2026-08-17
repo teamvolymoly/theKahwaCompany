@@ -477,7 +477,7 @@ function Reviews({ reviews, average, total, ratingCounts }) {
           )
         : null}
 
-      <section className="bg-white mt-10">
+      <section className="bg-white">
         <div className="site-container pb-14 lg:pb-20">
           <h2 className="text-[28px] font-semibold text-[#344823]">
             Customer Reviews
@@ -813,7 +813,7 @@ export default function ProductDetail() {
 
           <div className="order-3 lg:pl-16">
             {product.tag_line_1 || product.tag_line ? (
-              <p className="inline bg-[#fff1bd] px-1.5 py-1 text-md text-[#b38700]">
+              <p className="inline bg-[#fff1bd] px-1.5 py-1 text-md text-[#b38700] rounded-sm">
                 {product.tag_line_1 || product.tag_line}
               </p>
             ) : null}
@@ -848,7 +848,7 @@ export default function ProductDetail() {
                         key={variant.id}
                         type="button"
                         onClick={() => setSelectedVariant(variant)}
-                        className={`min-w-[72px] rounded px-4 py-3 text-center ${
+                        className={`min-w-[72px] rounded-md px-4 py-3 text-center ${
                           selected
                             ? "bg-[#647744] text-white"
                             : "border border-[#d7dad2] bg-white"
@@ -915,7 +915,7 @@ export default function ProductDetail() {
               type="button"
               onClick={addToCart}
               disabled={!selectedVariant}
-              className="mt-5 h-11 w-full bg-[#52653b] font-basker font-thin text-md uppercase text-white transition hover:bg-[#6B7F42] disabled:opacity-50 cursor-pointer"
+              className="mt-5 h-12 w-full bg-[#52653b] font-basker font-thin text-lg uppercase text-white transition hover:bg-[#6B7F42] disabled:opacity-50 cursor-pointer"
             >
               Add to cart
             </button>
