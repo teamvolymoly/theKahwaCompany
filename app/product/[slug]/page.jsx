@@ -94,14 +94,7 @@ function ProductTabs({ product, selectedVariant }) {
   const rituals = selectedVariant?.brewing_rituals?.length
     ? selectedVariant.brewing_rituals
     : product.brewing_rituals || [];
-  const ingredientsSource = Array.isArray(product.ingredients)
-    ? product.ingredients
-    : Array.isArray(product.ingredients_list)
-    ? product.ingredients_list
-    : [];
-  const ingredients = ingredientsSource.map((item) =>
-    typeof item === "string" ? { name: item } : item
-  );
+  const ingredients = product.ingredients;
 
   const tabs = [
     { id: "description", label: "Description" },
@@ -225,20 +218,7 @@ function ProductTabs({ product, selectedVariant }) {
           {activeTab === "ingredients" ? (
             ingredients.length ? (
               <div className="flex flex-wrap gap-6">
-                {ingredients.map((item, index) => (
-                  <div key={index} className="flex items-center gap-3">
-                    {item.image_url ? (
-                      <img
-                        src={item.image_url}
-                        alt={item.name || "Ingredient"}
-                        className="h-12 w-12 rounded-full object-cover"
-                      />
-                    ) : null}
-                    <span className="font-medium">
-                      {item.name || "Ingredient"}
-                    </span>
-                  </div>
-                ))}
+                <p className="font-medium">{ingredients}</p>
               </div>
             ) : (
               <p>Ingredient details are coming soon.</p>
@@ -270,7 +250,7 @@ function Queries({ faqs }) {
                 aria-controls={`query-answer-${index}`}
                 onClick={() =>
                   setOpenQueryIndex((current) =>
-                    current === index ? null : index
+                    current === index ? null : index,
                   )
                 }
                 className="flex w-full items-center justify-between gap-4 text-left text-base text-[#252923]"
@@ -308,7 +288,7 @@ function Reviews({ reviews, average, total, ratingCounts }) {
       ratingCounts &&
       typeof ratingCounts === "object" &&
       [1, 2, 3, 4, 5].some((star) =>
-        Object.prototype.hasOwnProperty.call(ratingCounts, `${star}_star`)
+        Object.prototype.hasOwnProperty.call(ratingCounts, `${star}_star`),
       );
 
     if (hasSummaryCounts) {
@@ -340,7 +320,7 @@ function Reviews({ reviews, average, total, ratingCounts }) {
                   (current.index - 1 + current.images.length) %
                   current.images.length,
               }
-            : current
+            : current,
         );
       }
       if (event.key === "ArrowRight") {
@@ -350,7 +330,7 @@ function Reviews({ reviews, average, total, ratingCounts }) {
                 ...current,
                 index: (current.index + 1) % current.images.length,
               }
-            : current
+            : current,
         );
       }
     };
@@ -372,7 +352,7 @@ function Reviews({ reviews, average, total, ratingCounts }) {
               (current.index - 1 + current.images.length) %
               current.images.length,
           }
-        : current
+        : current,
     );
   };
 
@@ -383,7 +363,7 @@ function Reviews({ reviews, average, total, ratingCounts }) {
             ...current,
             index: (current.index + 1) % current.images.length,
           }
-        : current
+        : current,
     );
   };
 
@@ -452,7 +432,7 @@ function Reviews({ reviews, average, total, ratingCounts }) {
                         type="button"
                         onClick={() =>
                           setGallery((current) =>
-                            current ? { ...current, index } : current
+                            current ? { ...current, index } : current,
                           )
                         }
                         className={`h-14 w-14 shrink-0 overflow-hidden border-2 ${
@@ -473,7 +453,7 @@ function Reviews({ reviews, average, total, ratingCounts }) {
                 ) : null}
               </div>
             </div>,
-            document.body
+            document.body,
           )
         : null}
 
@@ -616,7 +596,7 @@ export default function ProductDetail() {
         const [detail, reviewPayload, catalogPayload] = await Promise.all([
           apiFetch(`/products/${encodeURIComponent(safeSlug)}`),
           apiFetch(
-            `/products/${encodeURIComponent(safeSlug)}/reviews?page=1&limit=10`
+            `/products/${encodeURIComponent(safeSlug)}/reviews?page=1&limit=10`,
           ).catch(() => null),
           apiFetch("/products?page=1&limit=8").catch(() => null),
         ]);
@@ -628,19 +608,19 @@ export default function ProductDetail() {
           : [];
         const defaultVariant =
           normalizedVariants.find(
-            (variant) => variant.id === detail.default_variant_id
+            (variant) => variant.id === detail.default_variant_id,
           ) ||
           normalizedVariants.find((variant) => variant.is_default) ||
           normalizedVariants[0] ||
           null;
         const parsedReviews = extractProductReviews(
-          reviewPayload || detail.reviews || {}
+          reviewPayload || detail.reviews || {},
         );
         const related = Array.isArray(detail.related_products)
           ? detail.related_products
           : Array.isArray(detail.recommended_products)
-          ? detail.recommended_products
-          : [];
+            ? detail.recommended_products
+            : [];
         const catalog = extractProductItems(catalogPayload);
         const suggested = (
           related.length
@@ -675,7 +655,7 @@ export default function ProductDetail() {
       reviewSummary.average_rating ??
         reviewSummary.rating ??
         product?.rating ??
-        0
+        0,
     ) || 0;
   const totalReviews =
     Number(
@@ -683,7 +663,7 @@ export default function ProductDetail() {
         reviewSummary.count ??
         product?.rating_count ??
         product?.review_count ??
-        reviews.length
+        reviews.length,
     ) || 0;
   const activeImageUrl = images[activeImage]?.image_url || FALLBACK_IMAGE;
   const selectedDiscountPrice =
@@ -697,7 +677,7 @@ export default function ProductDetail() {
   const currentPrice = selectedDiscountPrice ?? regularPrice;
   const comparePrice = selectedDiscountPrice
     ? regularPrice
-    : selectedVariant?.compare_price ?? product?.compare_price;
+    : (selectedVariant?.compare_price ?? product?.compare_price);
 
   const addToCart = async () => {
     if (!selectedVariant) return;
@@ -705,13 +685,13 @@ export default function ProductDetail() {
       const cart = await apiFetch("/cart");
       const targetId = Number(selectedVariant.id);
       const exists = (Array.isArray(cart?.items) ? cart.items : []).some(
-        (item) => Number(item.variant_id || item.variant?.id) === targetId
+        (item) => Number(item.variant_id || item.variant?.id) === targetId,
       );
       if (exists) {
         window.dispatchEvent(
           new CustomEvent("toast", {
             detail: { message: "Product is already in cart.", type: "error" },
-          })
+          }),
         );
         return;
       }
@@ -725,13 +705,13 @@ export default function ProductDetail() {
       window.dispatchEvent(
         new CustomEvent("toast", {
           detail: { message: "Added to cart.", type: "success" },
-        })
+        }),
       );
     } catch {
       window.dispatchEvent(
         new CustomEvent("toast", {
           detail: { message: "Please login first.", type: "error" },
-        })
+        }),
       );
     }
   };
@@ -895,8 +875,8 @@ export default function ProductDetail() {
                     setQuantity(
                       Math.max(
                         1,
-                        Number(event.target.value.replace(/\D/g, "")) || 1
-                      )
+                        Number(event.target.value.replace(/\D/g, "")) || 1,
+                      ),
                     )
                   }
                   className="w-9 border-x border-[#dfe2da] text-center outline-none"
