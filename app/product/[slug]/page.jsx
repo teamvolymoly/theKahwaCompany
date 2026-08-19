@@ -4,6 +4,8 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { FreeMode, Thumbs } from "swiper/modules";
 import {
   ChevronDown,
   ChevronLeft,
@@ -23,7 +25,9 @@ import {
 } from "@/utils/products";
 import { extractProductReviews } from "@/utils/reviews";
 
-const FALLBACK_IMAGE = "/products/W1.png";
+import "swiper/css";
+import "swiper/css/free-mode";
+import "swiper/css/thumbs";
 
 const stripMarkup = (value = "") =>
   String(value)
@@ -578,6 +582,7 @@ export default function ProductDetail() {
   const [variants, setVariants] = useState([]);
   const [selectedVariant, setSelectedVariant] = useState(null);
   const [activeImage, setActiveImage] = useState(0);
+  const [thumbsSwiper, setThumbsSwiper] = useState(null);
   const [quantity, setQuantity] = useState(1);
   const [reviews, setReviews] = useState([]);
   const [reviewSummary, setReviewSummary] = useState({});
@@ -665,7 +670,7 @@ export default function ProductDetail() {
         product?.review_count ??
         reviews.length,
     ) || 0;
-  const activeImageUrl = images[activeImage]?.image_url || FALLBACK_IMAGE;
+  const activeImageUrl = images[activeImage]?.image_url || null;
   const selectedDiscountPrice =
     selectedVariant?.formatted_discount_price ??
     selectedVariant?.discount_price ??
@@ -730,7 +735,7 @@ export default function ProductDetail() {
 
   return (
     <main className="bg-white pt-[70px] text-[#252923]">
-      {previewOpen ? (
+      {previewOpen && activeImageUrl ? (
         <div
           className="fixed inset-0 z-[80] flex items-center justify-center bg-black/75 p-5"
           role="dialog"
@@ -752,46 +757,82 @@ export default function ProductDetail() {
         </div>
       ) : null}
 
-      <section className="bg-[#f7f9f3]">
-        <div className="site-container grid gap-9 py-12 lg:grid-cols-[minmax(0,520px)_72px_minmax(0,1fr)] lg:gap-4 lg:py-[62px]">
-          <div className="relative overflow-hidden rounded-md bg-white">
-            {product.badge ? (
-              <span className="absolute left-4 top-4 z-10 bg-[#fff1bd] px-2 py-1 text-md text-[#b38700]">
-                {product.badge}
-              </span>
-            ) : null}
-            <button
-              type="button"
-              onClick={() => setPreviewOpen(true)}
-              className="block h-[390px] w-full cursor-zoom-in sm:h-full"
-            >
-              <img
-                src={activeImageUrl}
-                alt={product.name}
-                className="h-full w-full object-cover"
-              />
-            </button>
-          </div>
+      <section className="">
+        <div className="site-container grid gap-9 py-12 lg:grid-cols-[minmax(0,600px)_minmax(0,1fr)] lg:gap-12 lg:py-[62px]">
+          {images.length ? (
+            <div className="grid min-w-0 gap-5 md:relative md:block md:aspect-[6/5]">
+              <div className="relative aspect-square w-full min-h-0 max-w-full overflow-hidden rounded-md md:absolute md:inset-y-0 md:left-0 md:w-5/6 md:aspect-auto">
+                {product.badge ? (
+                  <span className="absolute left-4 top-4 z-10 bg-[#fff1bd] px-2 py-1 text-md text-[#b38700]">
+                    {product.badge}
+                  </span>
+                ) : null}
+                <Swiper
+                  spaceBetween={10}
+                  onSlideChange={(swiper) => setActiveImage(swiper.realIndex)}
+                  thumbs={{
+                    swiper:
+                      thumbsSwiper && !thumbsSwiper.destroyed
+                        ? thumbsSwiper
+                        : null,
+                  }}
+                  modules={[FreeMode, Thumbs]}
+                  className="!absolute !inset-0 !m-0 !h-full !w-full"
+                >
+                  {images.map((image, index) => (
+                    <SwiperSlide key={image.id || image.image_url || index}>
+                      <button
+                        type="button"
+                        onClick={() => setPreviewOpen(true)}
+                        className="block h-full w-full cursor-zoom-in"
+                        aria-label={`Preview image ${index + 1} of ${product.name}`}
+                      >
+                        <img
+                          src={image.image_url}
+                          alt={`${product.name} image ${index + 1}`}
+                          className="h-full w-full object-cover"
+                        />
+                      </button>
+                    </SwiperSlide>
+                  ))}
+                </Swiper>
+              </div>
 
-          <div className="order-2 flex gap-3 overflow-x-auto lg:flex-col lg:overflow-visible">
-            {images.map((image, index) => (
-              <button
-                key={image.id || index}
-                type="button"
-                onClick={() => setActiveImage(index)}
-                className={`h-[72px] w-[72px] shrink-0 overflow-hidden rounded-sm bg-white`}
-                aria-label={`Show image ${index + 1}`}
-              >
-                <img
-                  src={image.image_url}
-                  alt={`${product.name} thumbnail ${index + 1}`}
-                  className="h-full w-full object-cover"
-                />
-              </button>
-            ))}
-          </div>
+              <div className="relative aspect-[5/1] min-h-0 w-full overflow-hidden md:absolute md:inset-y-0 md:right-0 md:w-1/6 md:translate-x-2 md:aspect-auto">
+                <Swiper
+                  onSwiper={setThumbsSwiper}
+                  spaceBetween={0}
+                  slidesPerView={5}
+                  breakpoints={{
+                    768: { direction: "vertical", slidesPerView: 5 },
+                  }}
+                  freeMode
+                  watchSlidesProgress
+                  modules={[FreeMode, Thumbs]}
+                  className="!absolute !inset-0 !m-0 !h-full !w-full"
+                >
+                  {images.map((image, index) => (
+                    <SwiperSlide
+                      key={`thumb-${image.id || image.image_url || index}`}
+                      className="h-full overflow-hidden opacity-55 [&.swiper-slide-thumb-active]:opacity-100"
+                    >
+                      <img
+                        src={image.image_url}
+                        alt=""
+                        className="h-full w-full rounded-sm object-cover"
+                      />
+                    </SwiperSlide>
+                  ))}
+                </Swiper>
+              </div>
+            </div>
+          ) : (
+            <div className="flex aspect-square items-center justify-center rounded-md border border-[#dfe2da] bg-white p-6 text-center text-base text-[#73776f]">
+              Product images are unavailable.
+            </div>
+          )}
 
-          <div className="order-3 lg:pl-16">
+          <div className="lg:pl-4">
             {product.tag_line_1 || product.tag_line ? (
               <p className="inline bg-[#fff1bd] px-1.5 py-1 text-md text-[#b38700] rounded-sm">
                 {product.tag_line_1 || product.tag_line}
