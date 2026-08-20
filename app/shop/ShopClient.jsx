@@ -37,17 +37,13 @@ function Rating({ product }) {
       aria-label={`${rating} out of 5 stars`}
     >
       {Array.from({ length: 5 }).map((_, index) => (
-        <svg
+        <img
           key={`${product.id}-star-${index}`}
-          viewBox="0 0 24 24"
-          className={`h-[18px] w-[18px] ${
-            index < fullStars ? "text-[#eab300]" : "text-[#d3d4cd]"
-          }`}
-          fill="currentColor"
+          src={index < fullStars ? "/icons/starfill.svg" : "/icons/Starborder.svg"}
+          alt=""
+          className="h-[18px] w-[18px] shrink-0"
           aria-hidden="true"
-        >
-          <path d="m12 2.8 2.8 5.68 6.27.91-4.54 4.42 1.07 6.24L12 17.11l-5.6 2.94 1.07-6.24-4.54-4.42 6.27-.91L12 2.8Z" />
-        </svg>
+        />
       ))}
       {reviewCount !== null && reviewCount !== undefined ? (
         <span className="ml-1 text-md text-[#8a8d83]">({reviewCount})</span>

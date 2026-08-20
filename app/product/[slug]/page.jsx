@@ -72,22 +72,17 @@ function Stars({ value = 0, size = 17 }) {
       aria-label={`${Number(value || 0).toFixed(1)} out of 5 stars`}
     >
       {Array.from({ length: 5 }).map((_, index) => (
-        <svg
+        <img
           key={index}
-          viewBox="0 0 24 24"
+          src={
+            index < rounded ? "/icons/starfill.svg" : "/icons/Starborder.svg"
+          }
+          alt=""
           width={size}
           height={size}
-          fill={index < rounded ? "currentColor" : "none"}
-          className={index < rounded ? "text-[#e9b200]" : "text-[#c9cbc4]"}
+          className="shrink-0"
           aria-hidden="true"
-        >
-          <path
-            d="m12 3 2.78 5.63 6.22.9-4.5 4.39 1.06 6.2L12 17.2l-5.56 2.92 1.06-6.2L3 9.53l6.22-.9L12 3Z"
-            stroke="currentColor"
-            strokeWidth="1"
-            strokeLinejoin="round"
-          />
-        </svg>
+        />
       ))}
     </span>
   );
@@ -250,7 +245,6 @@ function Queries({ faqs }) {
             <div key={index} className="py-4">
               <button
                 type="button"
-                aria-expanded={openQueryIndex === index}
                 aria-controls={`query-answer-${index}`}
                 onClick={() =>
                   setOpenQueryIndex((current) =>
@@ -737,23 +731,30 @@ export default function ProductDetail() {
     <main className="bg-white pt-[70px] text-[#252923]">
       {previewOpen && activeImageUrl ? (
         <div
-          className="fixed inset-0 z-[80] flex items-center justify-center bg-black/75 p-5"
+          className="sticky w-screen h-screen inset-0 z-[100] flex items-center justify-center bg-black/85 p-3 sm:p-6 lg:p-10"
           role="dialog"
           aria-modal="true"
+          aria-label={`${product.name} image preview`}
+          onClick={() => setPreviewOpen(false)}
         >
-          <button
-            type="button"
-            onClick={() => setPreviewOpen(false)}
-            className="absolute right-5 top-5 flex h-11 w-11 items-center justify-center rounded-full bg-white text-black"
-            aria-label="Close image preview"
+          <div
+            className="relative flex h-fit w-fit max-h-[78vh] max-w-[90vw] items-center justify-center overflow-hidden rounded-md bg-white"
+            onClick={(event) => event.stopPropagation()}
           >
-            <X />
-          </button>
-          <img
-            src={activeImageUrl}
-            alt={product.name}
-            className="max-h-[88vh] max-w-[92vw] object-contain"
-          />
+            <button
+              type="button"
+              onClick={() => setPreviewOpen(false)}
+              className="absolute right-3 top-3 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-white text-black shadow-lg sm:right-5 sm:top-5 sm:h-11 sm:w-11"
+              aria-label="Close image preview"
+            >
+              <X className="h-5 w-5" />
+            </button>
+            <img
+              src={activeImageUrl}
+              alt={product.name}
+              className="block h-auto max-h-[78vh] w-auto max-w-[90vw] object-contain sm:max-w-[820px]"
+            />
+          </div>
         </div>
       ) : null}
 
@@ -964,16 +965,19 @@ export default function ProductDetail() {
               <h2 className="font-basker text-[28px] uppercase">
                 Discover More
               </h2>
-              <Link href="/shop" className="text-cta text-md text-[#52633d]">
-                View All{" "}
-                <span
-                  data-cta-arrow
-                  className="inline-block text-lg"
-                  aria-hidden="true"
+              <div className="flex justify-center items-center gap-2">
+                <Link
+                  href="/shop"
+                  className="text-md text-[#52633d] hover:underline underline-offset-3"
                 >
-                  ›
-                </span>
-              </Link>
+                  View All
+                </Link>
+                <img
+                  src="/icons/VectorRight.svg"
+                  alt=""
+                  className="h-3.5 w-2 object-contain"
+                />
+              </div>
             </div>
             <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
               {recommendations.map((item) => (

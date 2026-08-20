@@ -9,10 +9,12 @@
 }
 
 :root {
-  --font-body: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+  --font-body:
+    "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
     sans-serif;
-  --font-display: "Inter", system-ui, -apple-system, BlinkMacSystemFont,
-    "Segoe UI", sans-serif;
+  --font-display:
+    "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
   --font-basker: "Baskervville", "Times New Roman", serif;
   --color-accent: #ffbf00;
   --background: oklch(1 0 0);
@@ -73,7 +75,7 @@ body {
 }
 
 /* Shared animated treatment for text-style calls to action. */
-.text-cta {
+/* .text-cta {
   position: relative;
   width: fit-content;
   text-decoration: none !important;
@@ -107,7 +109,7 @@ body {
 .text-cta:focus-visible [data-cta-arrow],
 .group:hover .text-cta:not(.text-cta--self) [data-cta-arrow] {
   transform: translateX(4px);
-}
+} */
 
 @media (min-width: 768px) {
   .site-container {
@@ -129,32 +131,14 @@ body {
 }
 
 /* Keep all readable website copy at the agreed 16px minimum. */
-small,
-[class~="text-xs"],
-[class~="text-sm"],
-[class~="text-[9px]"],
-[class~="text-[10px]"],
-[class~="text-[11px]"],
-[class~="text-[12px]"],
-[class~="text-[13px]"],
-[class~="text-[14px]"],
-[class~="text-[15px]"] {
-  font-size: 1rem !important;
-}
-
-::selection {
-  background: #627646;
-  color: #fff;
-}
-
 a,
 button,
 input,
 select,
 textarea,
 summary {
-  transition-property: color, background-color, border-color, opacity, box-shadow,
-    transform;
+  transition-property:
+    color, background-color, border-color, opacity, box-shadow, transform;
   transition-duration: 240ms;
   transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
 }
@@ -249,7 +233,6 @@ a[href]:active {
     background-position: center bottom;
     background-size: 1156px 220px;
   }
-
 }
 
 @keyframes page-enter {
@@ -295,7 +278,6 @@ a[href]:active {
     scroll-behavior: auto !important;
     transition-duration: 0.01ms !important;
   }
-
 }
 
 /* Testimonials swiper styling */

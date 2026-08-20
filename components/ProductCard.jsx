@@ -143,37 +143,21 @@ export default function ProductCard({ product, variant = "default" }) {
           }`}
         >
           {Array.from({ length: 5 }).map((_, index) => (
-            <svg
+            <img
               key={`${product.id}-star-${index}`}
-              viewBox="0 0 24 24"
-              fill={index < fullStars ? "currentColor" : "none"}
-              className={`${isHomepage ? "h-[18px] w-[18px]" : "h-4 w-4"} ${
-                index < fullStars
-                  ? isHomepage
-                    ? "text-[#e2ae00]"
-                    : "text-[#1c2230]"
-                  : "text-[#1c2230]/30"
-              }`}
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M12 3.5l2.66 5.39 5.94.86-4.3 4.19 1.02 5.93L12 17.77l-5.32 2.8 1.02-5.93-4.3-4.19 5.94-.86L12 3.5z"
-                stroke="currentColor"
-                strokeWidth="1"
-                strokeLinejoin="round"
-              />
-            </svg>
+              src={index < fullStars ? "/icons/starfill.svg" : "/icons/Starborder.svg"}
+              alt=""
+              className={`${isHomepage ? "h-[18px] w-[18px]" : "h-4 w-4"} shrink-0`}
+            />
           ))}
           {Number.isFinite(ratingCount) ? (
-            <span className="ml-1 text-md text-[#777d70]">
-              ({ratingCount})
-            </span>
+            <span className="ml-1 text-md text-[#777d70]">({ratingCount})</span>
           ) : null}
         </div>
 
         <h3
           className={`font-normal uppercase tracking-[0.04em] text-[#1c2230] ${
-            isHomepage ? "mt-2 text-xl" : "mt-3 text-xl"
+            isHomepage ? "mt-2 text-2xl" : "mt-3 text-2xl"
           }`}
           style={{ fontFamily: "var(--font-basker)" }}
         >
@@ -199,8 +183,8 @@ export default function ProductCard({ product, variant = "default" }) {
             <span
               className={`bg-[#fff1c3] font-semibold text-[#a78000] ${
                 isHomepage
-                  ? "px-2 py-0.5 text-[10px] sm:text-md"
-                  : "px-2 py-0.5 text-[10px] uppercase tracking-[0.08em]"
+                  ? "px-2 py-0.5 text-[11px] "
+                  : "px-2 py-0.5 text-[11px] uppercase tracking-[0.08em]"
               }`}
             >
               {product.badge}
@@ -212,10 +196,10 @@ export default function ProductCard({ product, variant = "default" }) {
       <button
         onClick={handleAddToCart}
         disabled={!isAvailable}
-        className={`mb-4 w-full cursor-pointer rounded-none bg-[#52653b] font-basker font-thin uppercase text-white transition hover:bg-[#6B7F42] ${
+        className={`mb-4 w-full py-3 cursor-pointer rounded-none bg-[#52653b] font-basker font-thin uppercase text-white transition hover:bg-[#6B7F42] ${
           isHomepage
-            ? "py-3 text-md tracking-[0.02em] sm:py-3.5 sm:text-base"
-            : "py-3 text-md tracking-[0.12em]"
+            ? "text-md tracking-[0.02em] sm:text-base"
+            : "text-md tracking-[0.12em]"
         }`}
       >
         {isAvailable ? "Add To Cart" : "Out of Stock"}

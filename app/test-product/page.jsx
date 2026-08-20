@@ -11,7 +11,6 @@ import {
   Package,
   Plus,
   ShoppingBag,
-  Star,
 } from "lucide-react";
 
 import "swiper/css";
@@ -141,7 +140,12 @@ export default function TestProductPage() {
               <div className="flex items-center gap-1 pt-1 text-sm font-medium">
                 <span className="flex text-[#b38418]">
                   {Array.from({ length: 5 }).map((_, index) => (
-                    <Star key={index} className="h-4 w-4 fill-current" />
+                    <img
+                      key={index}
+                      src="/icons/starfill.svg"
+                      alt=""
+                      className="h-4 w-4"
+                    />
                   ))}
                 </span>
                 <span>4.8</span>

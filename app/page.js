@@ -94,18 +94,19 @@ export default function Home() {
             >
               Must Have Blends
             </h2>
-            <Link
-              href="/shop"
-              className="text-cta mb-0.5 inline-flex items-center gap-1.5 text-md font-medium text-[#586f34] sm:text-base"
-            >
-              View all Blends
+            <div className="mb-0.5 flex items-center justify-center gap-2">
+              <Link
+                href="/shop"
+                className="text-md font-medium text-[#586f34] hover:underline  underline-offset-3 sm:text-base"
+              >
+                View all Blends
+              </Link>
               <img
-                data-cta-arrow
                 src="/icons/VectorRight.svg"
                 alt=""
                 className="h-3.5 w-2 object-contain"
               />
-            </Link>
+            </div>
           </div>
 
           <Link
@@ -127,10 +128,9 @@ export default function Home() {
                 <p className="mt-2 text-base text-[#6f6965]">
                   Traditional Kahwa Blends You Must Try.
                 </p>
-                <span className="text-cta mt-4 inline-flex items-center gap-2 text-base font-semibold">
-                  Discover More
+                <span className="mt-4 flex w-fit items-center gap-2 text-base font-semibold hover:underline  underline-offset-3">
+                  <span>Discover More</span>
                   <img
-                    data-cta-arrow
                     src="/icons/VectorRight.svg"
                     alt=""
                     className="h-3.5 w-2 object-contain"
@@ -184,18 +184,19 @@ export default function Home() {
             >
               Latest Articles
             </h2>
-            <Link
-              href="/blogs"
-              className="text-cta mb-1 inline-flex items-center gap-1 text-[11px] font-medium text-[#52633c] sm:text-md"
-            >
-              View all Articles
+            <div className="mb-1 flex items-center justify-center gap-2">
+              <Link
+                href="/blogs"
+                className="text-[11px] font-medium text-[#52633c] hover:underline  underline-offset-3 sm:text-md"
+              >
+                View all Articles
+              </Link>
               <img
-                data-cta-arrow
                 src="/icons/VectorRight.svg"
                 alt=""
                 className="h-3.5 w-2 object-contain"
               />
-            </Link>
+            </div>
           </div>
 
           <div className="grid gap-4 md:grid-cols-3">
@@ -224,7 +225,7 @@ export default function Home() {
                     {String(post.excerpt || "").length > 130
                       ? `${String(post.excerpt).slice(0, 127).trim()}...`
                       : post.excerpt}{" "}
-                    <span className="text-cta text-cta--self inline-block text-base font-medium text-[#52633c]">
+                    <span className="inline-block text-base font-medium text-[#52633c] underline  underline-offset-3">
                       Read More
                     </span>
                   </p>
