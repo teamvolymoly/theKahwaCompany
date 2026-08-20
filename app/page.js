@@ -97,7 +97,7 @@ export default function Home() {
             <div className="mb-0.5 flex items-center justify-center gap-2">
               <Link
                 href="/shop"
-                className="text-md font-medium text-[#586f34] hover:underline  underline-offset-3 sm:text-base"
+                className="text-md font-medium text-[#52633c] hover:underline  underline-offset-3 sm:text-base"
               >
                 View all Blends
               </Link>
@@ -187,7 +187,7 @@ export default function Home() {
             <div className="mb-1 flex items-center justify-center gap-2">
               <Link
                 href="/blogs"
-                className="text-[11px] font-medium text-[#52633c] hover:underline  underline-offset-3 sm:text-md"
+                className="text-md font-medium text-[#52633c] hover:underline  underline-offset-3 sm:text-base"
               >
                 View all Articles
               </Link>

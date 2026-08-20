@@ -161,7 +161,7 @@ export default function ProductCard({ product, variant = "default" }) {
 
         <h3
           className={`font-normal uppercase tracking-[0.04em] text-[#1c2230] ${
-            isHomepage ? "mt-2 text-2xl" : "mt-3 text-2xl"
+            isHomepage ? "mt-2 text-xl" : "mt-3 text-xl"
           }`}
           style={{ fontFamily: "var(--font-basker)" }}
         >

@@ -805,7 +805,7 @@ export default function ProductDetail() {
                       type="button"
                       onClick={() => gallerySwiper?.slidePrev()}
                       disabled={activeImage === 0}
-                      className="flex h-8 w-8 items-center justify-center rounded-full bg-white/90 shadow-sm backdrop-blur-sm hover:bg-white disabled:cursor-not-allowed disabled:opacity-40 sm:h-9 sm:w-9"
+                      className="flex h-8 w-8 items-center justify-center rounded-full bg-white/90 backdrop-blur-sm hover:bg-white disabled:cursor-not-allowed disabled:opacity-40 sm:h-9 sm:w-9"
                       aria-label="Previous product image"
                     >
                       <ChevronLeft className="h-6 w-6 text-[#52653b] sm:h-7 sm:w-7" />
@@ -814,7 +814,7 @@ export default function ProductDetail() {
                       type="button"
                       onClick={() => gallerySwiper?.slideNext()}
                       disabled={activeImage === images.length - 1}
-                      className="flex h-8 w-8 items-center justify-center rounded-full bg-white/90 shadow-sm backdrop-blur-sm hover:bg-white disabled:cursor-not-allowed disabled:opacity-40 sm:h-9 sm:w-9"
+                      className="flex h-8 w-8 items-center justify-center rounded-full bg-white/90 backdrop-blur-sm hover:bg-white disabled:cursor-not-allowed disabled:opacity-40 sm:h-9 sm:w-9"
                       aria-label="Next product image"
                     >
                       <ChevronRight className="h-6 w-6 text-[#52653b] sm:h-7 sm:w-7" />
@@ -992,7 +992,7 @@ export default function ProductDetail() {
               <div className="flex justify-center items-center gap-2">
                 <Link
                   href="/shop"
-                  className="text-md text-[#52633d] hover:underline underline-offset-3"
+                  className="text-md text-[#52633d] font-semibold hover:underline underline-offset-3"
                 >
                   View All
                 </Link>
