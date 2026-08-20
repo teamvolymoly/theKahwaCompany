@@ -576,6 +576,7 @@ export default function ProductDetail() {
   const [variants, setVariants] = useState([]);
   const [selectedVariant, setSelectedVariant] = useState(null);
   const [activeImage, setActiveImage] = useState(0);
+  const [gallerySwiper, setGallerySwiper] = useState(null);
   const [thumbsSwiper, setThumbsSwiper] = useState(null);
   const [quantity, setQuantity] = useState(1);
   const [reviews, setReviews] = useState([]);
@@ -744,7 +745,7 @@ export default function ProductDetail() {
             <button
               type="button"
               onClick={() => setPreviewOpen(false)}
-              className="absolute right-3 top-3 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-white text-black shadow-lg sm:right-5 sm:top-5 sm:h-11 sm:w-11"
+              className="absolute right-3 top-3 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-white text-black sm:right-5 sm:top-5 sm:h-11 sm:w-11"
               aria-label="Close image preview"
             >
               <X className="h-5 w-5" />
@@ -770,6 +771,7 @@ export default function ProductDetail() {
                 ) : null}
                 <Swiper
                   spaceBetween={10}
+                  onSwiper={setGallerySwiper}
                   onSlideChange={(swiper) => setActiveImage(swiper.realIndex)}
                   thumbs={{
                     swiper:
@@ -797,6 +799,28 @@ export default function ProductDetail() {
                     </SwiperSlide>
                   ))}
                 </Swiper>
+                {images.length > 1 ? (
+                  <div className="absolute inset-x-3 bottom-3 z-20 flex items-center justify-between sm:inset-x-4 sm:bottom-4">
+                    <button
+                      type="button"
+                      onClick={() => gallerySwiper?.slidePrev()}
+                      disabled={activeImage === 0}
+                      className="flex h-8 w-8 items-center justify-center rounded-full bg-white/90 shadow-sm backdrop-blur-sm hover:bg-white disabled:cursor-not-allowed disabled:opacity-40 sm:h-9 sm:w-9"
+                      aria-label="Previous product image"
+                    >
+                      <ChevronLeft className="h-6 w-6 text-[#52653b] sm:h-7 sm:w-7" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => gallerySwiper?.slideNext()}
+                      disabled={activeImage === images.length - 1}
+                      className="flex h-8 w-8 items-center justify-center rounded-full bg-white/90 shadow-sm backdrop-blur-sm hover:bg-white disabled:cursor-not-allowed disabled:opacity-40 sm:h-9 sm:w-9"
+                      aria-label="Next product image"
+                    >
+                      <ChevronRight className="h-6 w-6 text-[#52653b] sm:h-7 sm:w-7" />
+                    </button>
+                  </div>
+                ) : null}
               </div>
 
               <div className="relative aspect-[5/1] min-h-0 w-full overflow-hidden md:absolute md:inset-y-0 md:right-0 md:w-1/6 md:translate-x-2 md:aspect-auto">

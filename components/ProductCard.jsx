@@ -145,7 +145,11 @@ export default function ProductCard({ product, variant = "default" }) {
           {Array.from({ length: 5 }).map((_, index) => (
             <img
               key={`${product.id}-star-${index}`}
-              src={index < fullStars ? "/icons/starfill.svg" : "/icons/Starborder.svg"}
+              src={
+                index < fullStars
+                  ? "/icons/starfill.svg"
+                  : "/icons/Starborder.svg"
+              }
               alt=""
               className={`${isHomepage ? "h-[18px] w-[18px]" : "h-4 w-4"} shrink-0`}
             />
@@ -181,7 +185,7 @@ export default function ProductCard({ product, variant = "default" }) {
           ) : null}
           {product.badge ? (
             <span
-              className={`bg-[#fff1c3] font-semibold text-[#a78000] ${
+              className={`bg-[#fff1c3] font-semibold text-[#a78000] rounded ${
                 isHomepage
                   ? "px-2 py-0.5 text-[11px] "
                   : "px-2 py-0.5 text-[11px] uppercase tracking-[0.08em]"
