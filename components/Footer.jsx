@@ -1,6 +1,9 @@
 "use client";
 
+"use client";
+
 import Link from "next/link";
+import { useRef, useState } from "react";
 
 const trustItems = [
   {
@@ -78,18 +81,37 @@ const socialLinks = [
 ];
 
 export default function Footer() {
+  const promisesSliderRef = useRef(null);
+  const [activePromise, setActivePromise] = useState(0);
+
+  const handlePromisesScroll = () => {
+    const slider = promisesSliderRef.current;
+    if (!slider) return;
+    const slideWidth = slider.scrollWidth / trustItems.length;
+    setActivePromise(
+      Math.min(
+        trustItems.length - 1,
+        Math.max(0, Math.round(slider.scrollLeft / slideWidth)),
+      ),
+    );
+  };
+
   return (
-    <footer className="kahwa-footer">
+    <footer className="relative mb-[216] md:mb-[316]">
       <div className="kahwa-footer__content">
         <section
           className="border-y border-[#dfe5d8] bg-[#f1f4ec]"
           aria-label="Our product promises"
         >
-          <div className="site-container grid grid-cols-2 gap-x-4 gap-y-8 py-8 sm:grid-cols-3 lg:grid-cols-5 lg:py-9">
+          <div
+            ref={promisesSliderRef}
+            onScroll={handlePromisesScroll}
+            className="footer-promises__slider site-container flex snap-x snap-mandatory overflow-x-auto pb-5 pt-8 sm:grid sm:grid-cols-3 sm:gap-x-4 sm:gap-y-8 sm:overflow-visible sm:py-8 lg:grid-cols-5 lg:py-9"
+          >
             {trustItems.map((item) => (
               <div
                 key={item.label}
-                className="group flex flex-col items-center justify-start text-center"
+                className="group flex w-full shrink-0 snap-center flex-col items-center justify-start text-center sm:w-auto"
               >
                 <img
                   src={item.image}
@@ -100,6 +122,19 @@ export default function Footer() {
                   {item.label}
                 </p>
               </div>
+            ))}
+          </div>
+          <div
+            className="mx-auto mb-6 flex w-[140px] gap-1.5 sm:hidden"
+            aria-label={`Promise ${activePromise + 1} of ${trustItems.length}`}
+          >
+            {trustItems.map((item, index) => (
+              <span
+                key={`${item.label}-pagination`}
+                className={`h-px flex-1 transition-colors ${
+                  activePromise === index ? "bg-[#52653b]" : "bg-[#cbd1c3]"
+                }`}
+              />
             ))}
           </div>
         </section>
@@ -177,7 +212,7 @@ export default function Footer() {
               </div>
             </div>
 
-            <p className="mt-11 max-w-4xl text-base leading-relaxed text-white/55">
+            <p className="mt-11 max-w-4xl text-sm  text-white/55">
               The Kahwa Company&apos;s products are crafted for wellness and
               enjoyment, not for medical use. They are not intended to diagnose,
               treat, or cure any condition. Please consult a healthcare
@@ -214,7 +249,7 @@ export default function Footer() {
       >
         <div className="kahwa-footer__fixed-art" />
         <p
-          className="pointer-events-none absolute inset-x-4 bottom-0 z-10 flex h-[220px] flex-col items-center justify-center text-center text-[28px] uppercase leading-[1.08] text-[#f5f2e9] sm:h-[316px] sm:text-[clamp(1.75rem,3vw,2.5rem)]"
+          className="pointer-events-none absolute inset-x-4 bottom-0 z-10 flex h-[220px] flex-col items-center justify-center text-center text-[24px] uppercase leading-[1.08] text-[#f5f2e9] sm:h-[316px] sm:text-[clamp(1.75rem,3vw,2.5rem)]"
           style={{
             fontFamily: "var(--font-basker)",
             textShadow: "0 2px 14px rgba(0, 0, 0, 0.55)",

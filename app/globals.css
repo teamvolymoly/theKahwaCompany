@@ -190,10 +190,6 @@ select:focus-visible {
 }
 
 /* Seed-style footer reveal: the page scrolls away while the landscape stays pinned. */
-.kahwa-footer {
-  position: relative;
-  margin-bottom: 316px;
-}
 
 .kahwa-footer__content {
   position: relative;
@@ -238,10 +234,33 @@ select:focus-visible {
   display: none;
 }
 
+.product-recommendations__slider {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.product-recommendations__slider::-webkit-scrollbar {
+  display: none;
+}
+
+.footer-promises__slider {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.footer-promises__slider::-webkit-scrollbar {
+  display: none;
+}
+
 @media (max-width: 640px) {
+  .kahwa-footer {
+    margin-bottom: 220px;
+  }
+
   .kahwa-footer__fixed-art {
+    height: 220px;
     background-position: center bottom;
-    background-size: 1156px 220px;
+    background-size: cover;
   }
 }
 

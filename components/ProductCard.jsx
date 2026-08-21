@@ -116,7 +116,7 @@ export default function ProductCard({ product, variant = "default" }) {
           <div
             className={`relative mx-auto flex items-center justify-center ${
               isHomepage
-                ? "h-[190px] w-full sm:h-[240px] lg:h-[270px]"
+                ? "h-[240px] w-full sm:h-[240px] lg:h-[270px]"
                 : "h-auto w-[70%]"
             }`}
           >

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { FreeMode, Thumbs } from "swiper/modules";
@@ -111,7 +111,7 @@ function ProductTabs({ product, selectedVariant }) {
               key={tab.id}
               type="button"
               onClick={() => setActiveTab(tab.id)}
-              className={`relative shrink-0 pb-3 text-base font-semibold sm:text-[28px] ${
+              className={`relative shrink-0 pb-3 text-[22px] font-semibold sm:text-[28px] ${
                 activeTab === tab.id ? "text-[#3f532b]" : "text-[#999c96]"
               }`}
             >
@@ -217,7 +217,7 @@ function ProductTabs({ product, selectedVariant }) {
           {activeTab === "ingredients" ? (
             ingredients.length ? (
               <div className="flex flex-wrap gap-6">
-                <p className="font-medium">{ingredients}</p>
+                <p>{ingredients}</p>
               </div>
             ) : (
               <p>Ingredient details are coming soon.</p>
@@ -237,7 +237,7 @@ function Queries({ faqs }) {
   return (
     <section className="bg-[#f6f8f2]">
       <div className="site-container py-11 lg:py-14">
-        <h2 className="text-[28px] font-semibold text-[#344823]">
+        <h2 className="text-[28px] font-semibold text-[#344823] text-center md:text-left">
           Your Queries
         </h2>
         <div className="mt-7 divide-y divide-[#dfe2da]">
@@ -269,6 +269,87 @@ function Queries({ faqs }) {
                 </p>
               ) : null}
             </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function ProductRecommendations({ recommendations }) {
+  const sliderRef = useRef(null);
+
+  const moveSlider = (direction) => {
+    const slider = sliderRef.current;
+    if (!slider) return;
+    slider.scrollBy({
+      left: direction * slider.clientWidth * 0.88,
+      behavior: "smooth",
+    });
+  };
+
+  return (
+    <section className="bg-white">
+      <div className="site-container py-12 lg:py-16">
+        <div className="flex items-center justify-center sm:justify-between">
+          <h2 className="font-basker text-[28px] uppercase">Discover More</h2>
+          <div className="hidden items-center justify-center gap-2 sm:flex">
+            <Link
+              href="/shop"
+              className="text-md font-semibold text-[#52633d] underline-offset-3 hover:underline"
+            >
+              View All
+            </Link>
+            <img
+              src="/icons/VectorRight.svg"
+              alt=""
+              className="h-3.5 w-2 object-contain"
+            />
+          </div>
+        </div>
+
+        <div
+          ref={sliderRef}
+          className="product-recommendations__slider mt-8 flex snap-x snap-mandatory gap-4 overflow-x-auto sm:hidden"
+        >
+          {recommendations.map((item) => (
+            <div
+              key={item.id}
+              className="w-[88%] shrink-0 snap-start first:ml-0"
+            >
+              <ProductCard product={item} variant="homepage" />
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-7 flex items-center justify-between sm:hidden">
+          <button
+            type="button"
+            onClick={() => moveSlider(-1)}
+            aria-label="Previous product"
+            className="flex h-9 w-9 items-center justify-center rounded-full bg-[#f3f5ee] text-[#65794b]"
+          >
+            <ChevronLeft className="h-5 w-5" />
+          </button>
+          <Link
+            href="/shop"
+            className="text-base font-semibold text-[#52633d] underline underline-offset-4"
+          >
+            View All Blends
+          </Link>
+          <button
+            type="button"
+            onClick={() => moveSlider(1)}
+            aria-label="Next product"
+            className="flex h-9 w-9 items-center justify-center rounded-full bg-[#f3f5ee] text-[#65794b]"
+          >
+            <ChevronRight className="h-5 w-5" />
+          </button>
+        </div>
+
+        <div className="mt-8 hidden grid-cols-2 gap-4 sm:grid lg:grid-cols-4">
+          {recommendations.map((item) => (
+            <ProductCard key={item.id} product={item} variant="homepage" />
           ))}
         </div>
       </div>
@@ -457,12 +538,12 @@ function Reviews({ reviews, average, total, ratingCounts }) {
 
       <section className="bg-white">
         <div className="site-container pb-14 lg:pb-20">
-          <h2 className="text-[28px] font-semibold text-[#344823]">
+          <h2 className="text-[28px] font-semibold text-[#344823] text-center md:text-left">
             Customer Reviews
           </h2>
 
           <div className="mt-7 grid items-center gap-8 border-b border-[#dfe2da] pb-8 lg:grid-cols-[260px_1fr_250px]">
-            <div className="lg:border-r lg:border-[#e1e3dd] lg:pr-8">
+            <div className="lg:border-r lg:border-[#e1e3dd] lg:pr-8 flex flex-col items-center md:items-start">
               <Stars value={average} size={18} />
               <p className="mt-3 text-lg">
                 {Number(average || 0).toFixed(2)} out of 5
@@ -859,15 +940,15 @@ export default function ProductDetail() {
 
           <div className="lg:pl-4">
             {product.tag_line_1 || product.tag_line ? (
-              <p className="inline bg-[#fff1bd] px-1.5 py-1 text-md text-[#b38700] rounded-sm">
+              <p className="inline bg-[#fff1bd] px-1.5 py-1 text-[15px] md:text-md text-[#b38700] rounded-sm">
                 {product.tag_line_1 || product.tag_line}
               </p>
             ) : null}
-            <h1 className="mt-4 font-basker text-4xl font-normal uppercase leading-none text-[#3f532b]">
+            <h1 className="mt-4 font-basker text-[28px] md:text-4xl font-normal uppercase leading-none text-[#3f532b]">
               {product.name}
             </h1>
             {product.tag_line_2 || product.short_description ? (
-              <p className="mt-3 text-md font-normal uppercase">
+              <p className="mt-3 text-[15px] md:text-md font-normal uppercase">
                 {product.tag_line_2 || product.short_description}
               </p>
             ) : null}
@@ -983,33 +1064,7 @@ export default function ProductDetail() {
       <Queries faqs={product.faqs} />
 
       {recommendations.length ? (
-        <section className="bg-white">
-          <div className="site-container py-12 lg:py-16">
-            <div className="flex items-center justify-between">
-              <h2 className="font-basker text-[28px] uppercase">
-                Discover More
-              </h2>
-              <div className="flex justify-center items-center gap-2">
-                <Link
-                  href="/shop"
-                  className="text-md text-[#52633d] font-semibold hover:underline underline-offset-3"
-                >
-                  View All
-                </Link>
-                <img
-                  src="/icons/VectorRight.svg"
-                  alt=""
-                  className="h-3.5 w-2 object-contain"
-                />
-              </div>
-            </div>
-            <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              {recommendations.map((item) => (
-                <ProductCard key={item.id} product={item} variant="homepage" />
-              ))}
-            </div>
-          </div>
-        </section>
+        <ProductRecommendations recommendations={recommendations} />
       ) : null}
 
       <Reviews
