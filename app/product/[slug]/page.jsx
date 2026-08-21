@@ -808,7 +808,7 @@ export default function ProductDetail() {
                       className="flex h-8 w-8 items-center justify-center rounded-full bg-white/90 backdrop-blur-sm hover:bg-white disabled:cursor-not-allowed disabled:opacity-40 sm:h-9 sm:w-9"
                       aria-label="Previous product image"
                     >
-                      <ChevronLeft className="h-6 w-6 text-[#52653b] sm:h-7 sm:w-7" />
+                      <ChevronLeft className="h-6 w-6 text-black sm:h-7 sm:w-7" />
                     </button>
                     <button
                       type="button"
@@ -817,7 +817,7 @@ export default function ProductDetail() {
                       className="flex h-8 w-8 items-center justify-center rounded-full bg-white/90 backdrop-blur-sm hover:bg-white disabled:cursor-not-allowed disabled:opacity-40 sm:h-9 sm:w-9"
                       aria-label="Next product image"
                     >
-                      <ChevronRight className="h-6 w-6 text-[#52653b] sm:h-7 sm:w-7" />
+                      <ChevronRight className="h-6 w-6 text-black sm:h-7 sm:w-7" />
                     </button>
                   </div>
                 ) : null}
@@ -874,7 +874,7 @@ export default function ProductDetail() {
 
             <div className="mt-6 flex items-center gap-2 border-b border-[#e0e3dc] pb-5">
               <Stars value={averageRating} />
-              <span className="text-md text-[#7b7f77]">({totalReviews})</span>
+              <span className="text-sm text-[#7b7f77]">({totalReviews})</span>
             </div>
             {product.short_description ? (
               <p className="mt-5 line-clamp-3 text-base leading-[1.45]">

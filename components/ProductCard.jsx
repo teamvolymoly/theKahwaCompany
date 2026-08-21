@@ -155,7 +155,7 @@ export default function ProductCard({ product, variant = "default" }) {
             />
           ))}
           {Number.isFinite(ratingCount) ? (
-            <span className="ml-1 text-md text-[#777d70]">({ratingCount})</span>
+            <span className="ml-1 text-sm text-[#777d70]">({ratingCount})</span>
           ) : null}
         </div>
 

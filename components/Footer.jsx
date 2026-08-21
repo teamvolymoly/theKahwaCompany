@@ -30,7 +30,7 @@ const footerGroups = [
     title: "Support",
     links: [
       { label: "Contact Us", href: "/contact" },
-      { label: "Track Your Order", href: "/track-order" },
+      // { label: "Track Your Order", href: "/track-order" },
       { label: "Refund Policy", href: "/refund" },
       { label: "Privacy Policy", href: "/privacy-policy" },
       { label: "Shipping Policy", href: "/shipping" },
@@ -60,16 +60,16 @@ const socialLinks = [
     href: "https://www.instagram.com/thekahwacompany/",
     image: "/icons/main_footer_icon/Insta.svg",
   },
-  {
-    label: "Pinterest",
-    href: "https://www.pinterest.com/",
-    image: "/icons/main_footer_icon/Pintrest.svg",
-  },
-  {
-    label: "X",
-    href: "https://x.com/",
-    image: "/icons/main_footer_icon/X.svg",
-  },
+  // {
+  //   label: "Pinterest",
+  //   href: "https://www.pinterest.com/",
+  //   image: "/icons/main_footer_icon/Pintrest.svg",
+  // },
+  // {
+  //   label: "X",
+  //   href: "https://x.com/",
+  //   image: "/icons/main_footer_icon/X.svg",
+  // },
   {
     label: "YouTube",
     href: "https://youtube.com/@thekahwacompany?si=68vWrtaCn4j7srDU",
@@ -128,49 +128,51 @@ export default function Footer() {
                 ))}
               </div>
 
-              <div className="lg:pl-4">
-                <h2 className="font-(family-name:--font-basker) text-xl uppercase tracking-[0.03em] text-[#f0eadc]">
-                  Join the Kahwa Circle
-                </h2>
-                <p className="mt-3 text-base text-white/70">
-                  Stay updated with exclusive blends, stories and offers.
-                </p>
-                <form className="mt-5 flex h-10 w-full max-w-sm items-center rounded-md bg-[#667d45] p-0.5">
-                  <label htmlFor="footer-email" className="sr-only">
-                    Email address
-                  </label>
-                  <input
-                    id="footer-email"
-                    type="email"
-                    required
-                    placeholder="Email"
-                    className="h-full min-w-0 flex-1 bg-transparent px-2.5 text-base text-white outline-none placeholder:text-white/55"
-                  />
-                  <button
-                    type="submit"
-                    className="h-full cursor-pointer rounded-sm bg-[#74894d] px-3 text-base font-normal text-[#e5e8df] transition hover:bg-[#829957]"
-                  >
-                    Subscribe
-                  </button>
-                </form>
-
-                <div className="mt-5 flex items-center gap-1.5">
-                  {socialLinks.map((link) => (
-                    <a
-                      key={link.label}
-                      href={link.href}
-                      target="_blank"
-                      rel="noreferrer"
-                      aria-label={link.label}
-                      className="flex h-7 w-7 items-center justify-center transition hover:opacity-80"
+              <div className="flex justify-end">
+                <div className="lg:pl-4 w-fit">
+                  <h2 className="font-(family-name:--font-basker) text-xl uppercase tracking-[0.03em] text-[#f0eadc]">
+                    Join the Kahwa Circle
+                  </h2>
+                  <p className="mt-3 text-base text-white/70">
+                    Stay updated with exclusive blends, stories and offers.
+                  </p>
+                  <form className="mt-5 flex h-12 w-full max-w-md items-center rounded-md bg-[#667d45] p-1.5 ">
+                    <label htmlFor="footer-email" className="sr-only">
+                      Email address
+                    </label>
+                    <input
+                      id="footer-email"
+                      type="email"
+                      required
+                      placeholder="Email"
+                      className="h-full min-w-0 flex-1 border-0 bg-transparent px-2.5 text-base text-white outline-none ring-0 placeholder:text-white/55 focus:border-0 focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0 active:border-0 active:outline-none"
+                    />
+                    <button
+                      type="submit"
+                      className="h-full cursor-pointer rounded-sm bg-[#74894d] px-3  text-base font-normal text-[#e5e8df] transition hover:bg-[#829957]"
                     >
-                      <img
-                        src={link.image}
-                        alt=""
-                        className="h-7 w-7 object-contain"
-                      />
-                    </a>
-                  ))}
+                      Subscribe
+                    </button>
+                  </form>
+
+                  <div className="mt-5 flex items-center gap-1.5">
+                    {socialLinks.map((link) => (
+                      <a
+                        key={link.label}
+                        href={link.href}
+                        target="_blank"
+                        rel="noreferrer"
+                        aria-label={link.label}
+                        className="flex h-7 w-7 items-center justify-center transition hover:opacity-80"
+                      >
+                        <img
+                          src={link.image}
+                          alt=""
+                          className="h-7 w-7 object-contain"
+                        />
+                      </a>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
@@ -182,17 +184,22 @@ export default function Footer() {
               professional for any medical advice or concerns.
             </p>
 
-            <div className="mt-8 flex flex-col gap-3 text-base text-white/70 sm:flex-row sm:items-center sm:justify-between">
+            <div className="mt-8 flex flex-col gap-3 text-base text-white/70 sm:flex-row sm:items-center sm:justify-between uppercase">
               <p>The Kahwa Company © 2026 · All rights reserved</p>
-              <p>
-                Designed by{" "}
+              <p className="flex items-center gap-2 ">
+                <span>Website by</span>
                 <a
                   href="https://volymoly.com"
                   target="_blank"
                   rel="noreferrer"
-                  className="underline underline-offset-2"
+                  className="inline-flex opacity-80 transition hover:opacity-100"
+                  aria-label="Website by Volymoly"
                 >
-                  Volymoly
+                  <img
+                    src="/logo/volymoly_logo.svg"
+                    alt="Volymoly"
+                    className="h-auto w-[92px]"
+                  />
                 </a>
               </p>
             </div>

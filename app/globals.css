@@ -162,14 +162,24 @@ button:disabled,
   cursor: not-allowed;
 }
 
-button:not(:disabled):active,
+/* button:not(:disabled):active,
 a[href]:active {
   transform: scale(0.985);
-}
+} */
 
 :focus-visible {
   outline: 2px solid #667a49;
   outline-offset: 3px;
+}
+
+input:focus,
+input:focus-visible,
+textarea:focus,
+textarea:focus-visible,
+select:focus,
+select:focus-visible {
+  outline: none;
+  outline-offset: 0;
 }
 
 .page-transition {
@@ -208,7 +218,7 @@ a[href]:active {
   bottom: 0;
   left: 0;
   height: 316px;
-  background-image: url("/bg/Footer Image.png");
+  background-image: url("/bg/Footer_img.jpg");
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
