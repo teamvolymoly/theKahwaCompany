@@ -268,14 +268,14 @@ export default function Home() {
                   )}
                 </div>
                 <div className="px-1 pb-3 pt-3">
-                  <h3 className="text-sm font-semibold leading-snug text-[#23281f] sm:text-lg">
+                  <h3 className="text-md font-semibold leading-snug text-[#23281f] sm:text-lg">
                     {post.title}
                   </h3>
-                  <p className="mt-1.5 text-xs sm:text-sm">
+                  <p className="mt-1.5 text-sm sm:text-sm">
                     {String(post.excerpt || "").length > 130
                       ? `${String(post.excerpt).slice(0, 127).trim()}...`
                       : post.excerpt}{" "}
-                    <span className="inline-block text-base font-medium text-[#52633c] underline  underline-offset-3">
+                    <span className="inline-block text-[14px] font-medium text-[#52633c] underline  underline-offset-3">
                       Read More
                     </span>
                   </p>

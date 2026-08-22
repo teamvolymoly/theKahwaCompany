@@ -269,7 +269,7 @@ select:focus-visible {
   .kahwa-footer__fixed-art {
     height: 220px;
     background-position: center bottom;
-    background-size: cover;
+    background-size: 140% auto;
   }
 }
 

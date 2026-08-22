@@ -64,16 +64,6 @@ const socialLinks = [
     image: "/icons/main_footer_icon/Insta.svg",
   },
   {
-    label: "Pinterest",
-    href: "https://www.pinterest.com/",
-    image: "/icons/main_footer_icon/Pintrest.svg",
-  },
-  {
-    label: "X",
-    href: "https://x.com/",
-    image: "/icons/main_footer_icon/X.svg",
-  },
-  {
     label: "YouTube",
     href: "https://youtube.com/@thekahwacompany?si=68vWrtaCn4j7srDU",
     image: "/icons/main_footer_icon/YT.svg",
@@ -139,13 +129,13 @@ export default function Footer() {
           </div>
         </section>
 
-        <div className="bg-[#4b6038] text-[#f5f2e9]">
+        <div className="bg-[#4b6038] text-[#DDE2D3]">
           <div className="site-container py-12 lg:py-14">
             <div className="grid gap-10 lg:grid-cols-[1.05fr_1fr] lg:gap-20">
               <div className="order-2 grid grid-cols-2 gap-x-8 gap-y-9 sm:order-1 sm:grid-cols-3 sm:gap-8">
                 {footerGroups.map((group) => (
                   <div key={group.title}>
-                    <h2 className="font-(family-name:--font-basker) text-xl uppercase tracking-[0.04em] text-[#f0eadc]">
+                    <h2 className="font-(family-name:--font-basker) text-xl uppercase tracking-[0.04em] text-[#DDE2D3]">
                       {group.title}
                     </h2>
                     <nav className="mt-4 flex flex-col gap-2.5">
@@ -165,7 +155,7 @@ export default function Footer() {
 
               <div className="order-1 flex justify-end sm:order-2">
                 <div className="w-full sm:w-fit lg:pl-4">
-                  <h2 className="font-(family-name:--font-basker) text-xl uppercase tracking-[0.03em] text-[#f0eadc]">
+                  <h2 className="font-(family-name:--font-basker) text-xl uppercase tracking-[0.03em] text-[#DDE2D3]">
                     Join the Kahwa Circle
                   </h2>
                   <p className="mt-3 text-base text-white/70">
@@ -198,7 +188,7 @@ export default function Footer() {
                         target="_blank"
                         rel="noreferrer"
                         aria-label={link.label}
-                        className={`h-7 w-7 items-center justify-center transition hover:opacity-80 ${
+                        className={`h-8 w-8 items-center justify-center transition hover:opacity-80 ${
                           link.label === "Pinterest" || link.label === "X"
                             ? "flex sm:hidden"
                             : "flex"
@@ -207,7 +197,7 @@ export default function Footer() {
                         <img
                           src={link.image}
                           alt=""
-                          className="h-7 w-7 object-contain"
+                          className="h-10 w-10 object-contain"
                         />
                       </a>
                     ))}
@@ -216,14 +206,14 @@ export default function Footer() {
               </div>
             </div>
 
-            <p className="mt-9 max-w-4xl text-sm text-white/55 sm:mt-11">
+            <p className="mt-9 max-w-4xl text-sm text-white/55 sm:mt-11 font-thin">
               The Kahwa Company&apos;s products are crafted for wellness and
               enjoyment, not for medical use. They are not intended to diagnose,
               treat, or cure any condition. Please consult a healthcare
               professional for any medical advice or concerns.
             </p>
 
-            <div className="mt-5 flex flex-col gap-3 text-base normal-case text-white/70 sm:mt-8 sm:flex-row sm:items-center sm:justify-between sm:uppercase">
+            <div className="mt-5 flex flex-col gap-3 text-base normal-case text-white/70 sm:mt-8 sm:flex-row sm:items-center sm:justify-between uppercase">
               <p>The Kahwa Company © 2026 · All rights reserved</p>
               <p className="flex items-center gap-2 ">
                 <span className="sm:hidden">Designed by</span>
@@ -238,7 +228,7 @@ export default function Footer() {
                   <img
                     src="/logo/volymoly_logo.svg"
                     alt="Volymoly"
-                    className="h-auto w-[92px]"
+                    className="h-auto w-[88px]"
                   />
                 </a>
               </p>

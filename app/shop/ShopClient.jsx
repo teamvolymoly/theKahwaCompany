@@ -25,8 +25,9 @@ const oldPrice = (product) => product?.compare_price ?? product?.oldPrice;
 
 function Rating({ product }) {
   const rawRating = Number(product?.rating);
-  const rating =
-    Number.isFinite(rawRating) ? Math.max(0, Math.min(5, rawRating)) : 0;
+  const rating = Number.isFinite(rawRating)
+    ? Math.max(0, Math.min(5, rawRating))
+    : 0;
   const fullStars = Math.max(0, Math.min(5, Math.round(rating)));
   const reviewCount =
     product?.rating_count ?? product?.review_count ?? product?.total_reviews;
@@ -39,7 +40,9 @@ function Rating({ product }) {
       {Array.from({ length: 5 }).map((_, index) => (
         <img
           key={`${product.id}-star-${index}`}
-          src={index < fullStars ? "/icons/starfill.svg" : "/icons/Starborder.svg"}
+          src={
+            index < fullStars ? "/icons/starfill.svg" : "/icons/Starborder.svg"
+          }
           alt=""
           className="h-[18px] w-[18px] shrink-0"
           aria-hidden="true"
@@ -292,7 +295,7 @@ export default function ShopClient() {
 
   return (
     <main className="bg-white pt-[70px] text-[#1f251c]">
-      <section className="relative flex h-[80svh] min-h-[360px] max-h-[720px] items-center justify-center overflow-hidden">
+      <section className="relative flex h-[80svh] min-h-[220px] max-h-[260px] items-center justify-center overflow-hidden">
         <img
           src="/bg/Rectangle 4245.png"
           alt=""
@@ -300,7 +303,7 @@ export default function ShopClient() {
         />
         <div className="absolute inset-0 bg-[#f8ead7]/10" />
         <h1
-          className="relative z-10 mx-auto max-w-[1100px] px-8 text-center text-4xl font-normal uppercase leading-[1.12] text-[#292b27]"
+          className="relative z-10 mx-auto max-w-[1100px] px-8 text-center text-[28px] md:text-4xl font-normal uppercase leading-[1.12] text-[#292b27]"
           style={{ fontFamily: "var(--font-basker)" }}
         >
           <span className="sm:block">A Collection of Authentic Kahwa </span>
