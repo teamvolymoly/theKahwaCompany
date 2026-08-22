@@ -83,7 +83,7 @@ function ProductActions({ product, onAdd, compact = false }) {
   const isAvailable = product.in_stock !== false && product.status !== false;
 
   return (
-    <div className={`grid grid-cols-2 gap-3 ${compact ? "mt-5" : "mt-7"}`}>
+    <div className={`grid grid-cols-2 gap-3 ${compact ? "mt-3" : "mt-5"}`}>
       <Link
         href={`/product/${slugOrId}`}
         className="flex min-h-10 items-center justify-center border border-[#71805d] px-3 text-center font-basker text-md uppercase text-[#52633d] transition hover:bg-[#e8ecdf]"
@@ -96,7 +96,7 @@ function ProductActions({ product, onAdd, compact = false }) {
         disabled={!isAvailable}
         className="min-h-10 cursor-pointer rounded-none bg-[#52653b] px-3 font-basker text-md uppercase text-white transition hover:bg-[#6B7F42] disabled:cursor-not-allowed disabled:opacity-50"
       >
-        {isAvailable ? "Add To Cart" : "Out of Stock"}
+        {isAvailable ? "Shop Now" : "Out of Stock"}
       </button>
     </div>
   );
@@ -113,7 +113,7 @@ function ProductDetails({ product, featured = false, onAdd }) {
     <div className="min-w-0">
       <h2
         className={`font-normal uppercase leading-[1.08] text-[#3f532b] ${
-          featured ? "text-xl" : "text-xl"
+          featured ? "text-[36px]" : "text-2xl"
         }`}
         style={{ fontFamily: "var(--font-basker)" }}
       >
@@ -131,7 +131,11 @@ function ProductDetails({ product, featured = false, onAdd }) {
           {description}
         </p>
       ) : null}
-      <div className="mt-5 flex items-center gap-4 text-base text-[#20231e]">
+      <div
+        className={`mt-4 flex items-center gap-2  text-[#20231e] ${
+          featured ? "text-[20px]" : "text-[20px]"
+        }`}
+      >
         <span>₹ {currentPrice}</span>
         {previousPrice && String(previousPrice) !== String(currentPrice) ? (
           <span className="text-[#6f716c] line-through">₹ {previousPrice}</span>
@@ -372,12 +376,12 @@ export default function ShopClient() {
                   {remainingProducts.map((product) => (
                     <article
                       key={product.id}
-                      className="grid min-h-[285px] items-center rounded-lg bg-[#f6f7f1] px-5 py-8 sm:grid-cols-[160px_minmax(0,1fr)] sm:px-8"
+                      className="grid min-h-[285px] items-center rounded-lg bg-[#f6f7f1] p-5 sm:grid-cols-[160px_minmax(0,1fr)] sm:px-8"
                     >
                       <Link href={`/product/${product.slug || product.id}`}>
                         <ProductImage
                           product={product}
-                          className="mx-auto h-[220px] w-[135px]"
+                          className="mx-auto h-[280px] w-[135px]"
                         />
                       </Link>
                       <div className="mt-6 sm:mt-0 sm:pl-5">

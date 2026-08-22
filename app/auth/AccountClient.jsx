@@ -353,11 +353,11 @@ export default function AccountClient() {
         </div>
 
         <div className="mt-12 grid gap-6 lg:grid-cols-2 lg:gap-8">
-          <div className="rounded-lg bg-[#f1f4ec] p-6 sm:p-8 lg:p-10">
+          <div className="min-w-0 rounded-lg bg-[#f1f4ec] p-6 sm:p-8 lg:p-10">
             <h2 className="font-basker text-2xl uppercase text-[#344823]">
               Login
             </h2>
-            <form onSubmit={onLoginSubmit} className="mt-6 space-y-5">
+            <form onSubmit={onLoginSubmit} className="mt-6 min-w-0 space-y-5">
               <div>
                 <label className="text-md font-thin text-black">
                   Email address <span className="text-red-400">*</span>
@@ -453,11 +453,11 @@ export default function AccountClient() {
             </form>
           </div>
 
-          <div className="rounded-lg bg-[#f1f4ec] p-6 sm:p-8 lg:p-10">
+          <div className="min-w-0 rounded-lg bg-[#f1f4ec] p-6 sm:p-8 lg:p-10">
             <h2 className="font-basker text-2xl uppercase text-[#344823]">
               Register
             </h2>
-            <form onSubmit={onRegisterSubmit} className="mt-6 space-y-5">
+            <form onSubmit={onRegisterSubmit} className="mt-6 min-w-0 space-y-5">
               <div>
                 <label className="text-md font-thin text-black">
                   Name <span className="text-red-400">*</span>
@@ -504,8 +504,8 @@ export default function AccountClient() {
                 <div className="mt-1 text-md text-black/50">
                   {registerForm.phone.length}/15 digits
                 </div>
-                <div className="mt-2 flex gap-2">
-                  <div className="relative w-26">
+                <div className="mt-2 flex min-w-0 gap-2">
+                  <div className="relative w-26 shrink-0">
                     <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center gap-2 px-3 text-md text-[#4e5a50]">
                       {selectedFlagSrc ? (
                         <img
@@ -566,7 +566,7 @@ export default function AccountClient() {
                     value={registerForm.phone}
                     onChange={onRegisterChange}
                     required
-                    className="flex-1 rounded-sm border border-black/15 px-4 py-3 text-md outline-none focus:border-[#4e5a50]"
+                    className="min-w-0 flex-1 rounded-sm border border-black/15 px-4 py-3 text-md outline-none focus:border-[#4e5a50]"
                     placeholder="Enter your phone number..."
                   />
                 </div>

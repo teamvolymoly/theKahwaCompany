@@ -328,7 +328,7 @@ export default function NewHeader() {
                   <img
                     src="/logo/TKC_Logo_Square.svg"
                     alt="The Kahwa Company"
-                    className="h-16 w-auto cursor-pointer object-contain md:hidden"
+                    className="h-16 py-2 w-auto cursor-pointer object-contain md:hidden"
                   />
                   <img
                     src="/logo/tkclogo.svg"
@@ -340,7 +340,7 @@ export default function NewHeader() {
 
               {/* Search, login/profile, cart */}
               <div className="flex items-center gap-3 lg:gap-4">
-                <div
+                {/* <div
                   className="relative inline-flex items-center justify-center cursor-pointer"
                   ref={searchRef}
                 >
@@ -370,9 +370,6 @@ export default function NewHeader() {
     rounded-sm border border-black/10 bg-white shadow-2xl bg-white"
                     >
                       <form onSubmit={submitSearch} className="p-4">
-                        <label className="text-md uppercase tracking-[0.12em] text-black/50">
-                          Search products
-                        </label>
                         <div className="mt-2 flex items-center gap-2 border-b border-black/20 pb-2">
                           <input
                             autoFocus
@@ -384,7 +381,7 @@ export default function NewHeader() {
                           />
                           <button
                             type="submit"
-                            className="shrink-0 rounded-full bg-black px-4 py-2 text-md font-semibold uppercase tracking-[0.08em] text-white disabled:opacity-40"
+                            className="shrink-0 rounded-full bg-black px-4 py-2 text-md font-normal text-white disabled:opacity-40"
                             disabled={!searchQuery.trim()}
                           >
                             Search
@@ -456,10 +453,10 @@ export default function NewHeader() {
                       )}
                     </div>
                   )}
-                </div>
+                </div> */}
 
                 <div
-                  className="relative hidden sm:flex items-center"
+                  className="relative flex items-center"
                   ref={profileRef}
                   onMouseEnter={() => {
                     if (isAuthenticated) setIsProfileOpen(true);
@@ -472,6 +469,7 @@ export default function NewHeader() {
                     aria-expanded={isProfileOpen}
                     aria-haspopup={isAuthenticated ? "menu" : undefined}
                     onClick={() => {
+                      setIsOpen(false);
                       if (!isAuthenticated) {
                         router.push("/auth/login");
                         return;
@@ -497,12 +495,14 @@ export default function NewHeader() {
                         <Link
                           href="/user/profile"
                           className="block px-4 py-2 hover:bg-gray-50"
+                          onClick={closeMobileMenu}
                         >
                           Profile
                         </Link>
                         <Link
                           href="/user/dashboard"
                           className="block px-4 py-2 hover:bg-gray-50"
+                          onClick={closeMobileMenu}
                         >
                           Dashboard
                         </Link>
@@ -573,7 +573,10 @@ export default function NewHeader() {
                         </Link>
                       )}
                       {headerCategories.map((category) => (
-                        <div key={category.slug} className="flex flex-col gap-2">
+                        <div
+                          key={category.slug}
+                          className="flex flex-col gap-2"
+                        >
                           <p className="text-md font-semibold uppercase tracking-wide text-gray-500">
                             {category.name}
                           </p>
@@ -667,15 +670,7 @@ export default function NewHeader() {
                         {isLoggingOut ? "Logging out..." : "Logout"}
                       </button>
                     </div>
-                  ) : (
-                    <Link
-                      href="/auth/login"
-                      className="block py-2 text-gray-700 hover:text-gray-900"
-                      onClick={closeMobileMenu}
-                    >
-                      Login / Sign Up
-                    </Link>
-                  )}
+                  ) : null}
                 </nav>
               </div>
             </div>
