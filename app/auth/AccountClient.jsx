@@ -353,7 +353,7 @@ export default function AccountClient() {
         </div>
 
         <div className="mt-12 grid gap-6 lg:grid-cols-2 lg:gap-8">
-          <div className="min-w-0 rounded-lg bg-[#f1f4ec] p-6 sm:p-8 lg:p-10">
+          <div className="min-w-0 rounded-lg h-fit bg-[#f1f4ec] p-6 sm:p-8 lg:p-10">
             <h2 className="font-basker text-2xl uppercase text-[#344823]">
               Login
             </h2>
@@ -420,13 +420,13 @@ export default function AccountClient() {
                     type="checkbox"
                     checked={rememberMe}
                     onChange={(e) => setRememberMe(e.target.checked)}
-                    className="accent-[#52653b]"
+                    className="accent-[#52653b] "
                   />
                   Remember me
                 </label>
                 <a
                   href="/auth/forgot-password"
-                  className="text-cta text-md text-[#52633c] hover:underline"
+                  className="text-cta text-md text-[#52633c] hover:underline tracking-tighter"
                 >
                   Lost your password?
                 </a>
@@ -457,7 +457,10 @@ export default function AccountClient() {
             <h2 className="font-basker text-2xl uppercase text-[#344823]">
               Register
             </h2>
-            <form onSubmit={onRegisterSubmit} className="mt-6 min-w-0 space-y-5">
+            <form
+              onSubmit={onRegisterSubmit}
+              className="mt-6 min-w-0 space-y-5"
+            >
               <div>
                 <label className="text-md font-thin text-black">
                   Name <span className="text-red-400">*</span>
@@ -665,7 +668,7 @@ export default function AccountClient() {
                 </label>
               </div>
 
-              <p className="text-md text-black/70">
+              <p className="text-xs text-black/70">
                 Your personal data will be used to support your experience
                 throughout this website, to manage access to your account, and
                 for other purposes described in our{" "}

@@ -206,14 +206,14 @@ export default function CartPage() {
     <main className="min-h-[650px] overflow-x-hidden bg-[#fdfefb] pt-[70px] text-[#1f241c]">
       <section className="site-container pb-[86px] pt-16 sm:pt-[86px]">
         <h1
-          className="text-4xl font-normal uppercase leading-none text-[#344823]"
+          className="text-[28px] md:text-4xl text-center md:text-left  font-normal uppercase leading-none text-[#344823]"
           style={{ fontFamily: "var(--font-basker)" }}
         >
           Cart
         </h1>
 
         <div className="mt-10 grid items-start gap-5 lg:grid-cols-[minmax(0,2.05fr)_minmax(330px,1fr)]">
-          <section className="min-h-[405px] rounded-lg bg-[#f3f6ef] px-5 py-7 sm:px-8">
+          <section className="min-h-[405px] h-full rounded-lg bg-[#f3f6ef] px-5 py-7 sm:px-8">
             {loading ? (
               <p className="py-12 text-center text-[#6f756a]">
                 Loading your cart…
@@ -252,7 +252,7 @@ export default function CartPage() {
                             <img
                               src={item.product_image}
                               alt={item.product_name}
-                              className="h-full w-full object-cover"
+                              className="h-full w-full object-scale-down"
                             />
                           ) : (
                             <div className="flex h-full items-center justify-center text-md text-[#8b9086]">
@@ -342,7 +342,7 @@ export default function CartPage() {
               </p>
             ) : null}
 
-            <div className="mt-7 rounded bg-[#e5e9df] px-4 py-3 text-md text-[#454a42]">
+            <div className="mt-7 rounded bg-[#e5e9df] px-4 py-3 text-xs text-[#454a42]">
               {freeShippingThreshold > 0 && subtotal >= freeShippingThreshold
                 ? "You got FREE delivery."
                 : freeShippingThreshold > 0
@@ -397,7 +397,7 @@ export default function CartPage() {
                   <dd>− ₹{discount}</dd>
                 </div>
               ) : null}
-              <div className="flex justify-between pt-1 text-[22px]">
+              <div className="flex justify-between pt-1 text-[22px] font-semibold">
                 <dt>Total</dt>
                 <dd>₹{total}</dd>
               </div>
