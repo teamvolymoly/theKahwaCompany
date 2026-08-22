@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/app/context/AuthContext";
 import { apiFetch } from "@/utils/api";
+import AccountNav from "@/components/AccountNav";
 
 const STATUS_OPTIONS = [
   "All",
@@ -122,7 +123,7 @@ export default function OrdersPage() {
   };
 
   return (
-    <main className="min-h-screen bg-white text-black mt-14">
+    <main className="user-account-page min-h-screen bg-white text-black mt-14">
       <section className="site-container py-14">
         <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
           <div>
@@ -131,20 +132,22 @@ export default function OrdersPage() {
             </p>
             <h1
               className="mt-3 text-3xl md:text-4xl font-semibold"
-              style={{ fontFamily: "var(--font-display)" }}
+              style={{ fontFamily: "var(--font-basker)" }}
             >
               Orders
             </h1>
           </div>
           <Link
             href="/shop"
-            className="self-start text-md font-semibold uppercase tracking-[0.2em] text-black/60 hover:text-black inline-flex items-center gap-2"
+            className="self-start text-md font-semibold text-[#52653b] hover:underline inline-flex items-center gap-2"
           >
             Continue shopping <span aria-hidden="true">&rsaquo;</span>
           </Link>
         </div>
 
-        <div className="mt-10 rounded-sm border border-black/10 bg-white p-6 shadow-sm">
+        <AccountNav />
+
+        <div className="mt-10 rounded-lg border border-[#dfe5d8] bg-[#f3f6ef] p-6">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-[200px_220px_220px_1fr] lg:gap-4">
               <div>
@@ -220,7 +223,7 @@ export default function OrdersPage() {
           </div>
         </div>
 
-        <div className="mt-8 rounded-sm border border-black/10 bg-white p-6 shadow-sm">
+        <div className="mt-8 rounded-lg border border-[#dfe5d8] bg-[#f3f6ef] p-6">
           <div className="flex items-center justify-between">
             <p className="text-md uppercase tracking-[0.12em] text-black/60">
               All orders
@@ -248,7 +251,7 @@ export default function OrdersPage() {
                 <Link
                   key={order.id}
                   href={`/user/orders/${order.id || order.order_id}`}
-                  className="rounded-sm border border-black/10 bg-gray-50 p-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between hover:border-black/40 transition cursor-pointer"
+                  className="rounded-md border border-[#dfe5d8] bg-white p-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between hover:border-[#7d904e] transition cursor-pointer"
                 >
                   <div className="min-w-0">
                     <p className="text-md font-semibold">

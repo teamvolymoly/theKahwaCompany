@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useParams } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import { apiFetch } from "@/utils/api";
 import {
@@ -36,7 +37,7 @@ function ArticleCard({ post }) {
   return (
     <Link
       href={post.href}
-      className="group flex min-h-0 flex-col rounded-lg bg-[#f1f4ec] p-4"
+      className="group flex min-h-0 snap-start flex-col rounded-lg bg-[#f1f4ec] p-3"
     >
       <div className="aspect-[1.42/1] overflow-hidden rounded-md bg-[#e3e8df]">
         {post.image ? (
@@ -118,10 +119,19 @@ function ArticleBody({ blocks }) {
 
 export default function BlogDetailPage() {
   const { slug: blogId } = useParams();
+  const relatedSliderRef = useRef(null);
   const [post, setPost] = useState(null);
   const [related, setRelated] = useState([]);
   const [loading, setLoading] = useState(true);
   const [shareUrl, setShareUrl] = useState("");
+
+  const scrollRelated = (direction) => {
+    const slider = relatedSliderRef.current;
+    if (!slider) return;
+    const card = slider.firstElementChild;
+    const distance = (card?.getBoundingClientRect().width || 0) + 16;
+    slider.scrollBy({ left: direction * distance, behavior: "smooth" });
+  };
 
   useEffect(() => {
     setShareUrl(window.location.href);
@@ -217,10 +227,7 @@ export default function BlogDetailPage() {
         <h1 className="font-(family-name:--font-basker) text-4xl">
           Article not found
         </h1>
-        <Link
-          href="/blogs"
-          className="text-cta mt-6 inline-block"
-        >
+        <Link href="/blogs" className="text-cta mt-6 inline-block">
           View all articles
         </Link>
       </main>
@@ -295,25 +302,57 @@ export default function BlogDetailPage() {
 
       {related.length ? (
         <section className="site-container pb-[74px] pt-7 lg:pt-10">
-          <div className="flex items-end justify-between gap-6">
-            <h2 className="font-(family-name:--font-basker) text-4xl font-normal uppercase leading-none text-[#33372f]">
+          <div className="flex items-end justify-center gap-6 sm:justify-between">
+            <h2 className="font-(family-name:--font-basker) text-[28px] md:text-4xl text-center md:text-left font-normal uppercase leading-none text-[#33372f]">
               Related Articles
             </h2>
-            <Link
-              href="/blogs"
-              className="text-cta shrink-0 text-md text-[#566b3d]"
-            >
-              View all Articles {" "}
-              <span data-cta-arrow className="inline-block" aria-hidden="true">
-                ›
-              </span>
-            </Link>
+            <div className="mb-1 hidden items-center justify-center gap-2 sm:flex">
+              <Link
+                href="/blogs"
+                className="text-md font-medium text-[#52633c] hover:underline  underline-offset-3 sm:text-base"
+              >
+                View all Articles
+              </Link>
+              <img
+                src="/icons/VectorRight.svg"
+                alt=""
+                className="h-3.5 w-2 object-contain"
+              />
+            </div>
           </div>
 
-          <div className="mt-10 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <div
+            ref={relatedSliderRef}
+            className="latest-articles__slider mt-10 grid snap-x snap-mandatory grid-flow-col auto-cols-[calc((100%_-_16px)/1.3)] gap-4 overflow-x-auto sm:grid-flow-row sm:grid-cols-1 sm:auto-cols-auto sm:overflow-visible md:grid-cols-2 lg:grid-cols-3"
+          >
             {related.map((item) => (
               <ArticleCard key={item.id} post={item} />
             ))}
+          </div>
+
+          <div className="mt-5 flex items-center justify-between sm:hidden">
+            <button
+              type="button"
+              onClick={() => scrollRelated(-1)}
+              aria-label="Previous related article"
+              className="flex h-9 w-9 items-center justify-center rounded-full bg-[#f3f5ee] text-[#65794b]"
+            >
+              <ChevronLeft className="h-5 w-5" />
+            </button>
+            <Link
+              href="/blogs"
+              className="text-base font-semibold text-[#52633d] underline underline-offset-4"
+            >
+              View all Articles
+            </Link>
+            <button
+              type="button"
+              onClick={() => scrollRelated(1)}
+              aria-label="Next related article"
+              className="flex h-9 w-9 items-center justify-center rounded-full bg-[#f3f5ee] text-[#65794b]"
+            >
+              <ChevronRight className="h-5 w-5" />
+            </button>
           </div>
         </section>
       ) : null}

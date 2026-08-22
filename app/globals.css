@@ -470,3 +470,26 @@ select:focus-visible {
     @apply font-sans;
   }
 }
+
+/* Shared visual language for authenticated account pages. */
+.user-account-page {
+  background-color: #fdfefb !important;
+  color: #252a23 !important;
+}
+
+.user-account-page h1 {
+  color: #344823;
+  font-family: var(--font-basker);
+  font-weight: 400;
+  text-transform: uppercase;
+}
+
+.user-account-page h2 {
+  color: #344823;
+}
+
+.user-account-page input:focus,
+.user-account-page select:focus,
+.user-account-page textarea:focus {
+  border-color: #52653b;
+}

@@ -5,7 +5,7 @@ export default function NotFound() {
     <main className="flex min-h-[630px] items-center justify-center bg-[#fdfefb] px-5 pt-[70px] text-[#11140f] sm:px-8">
       <div className="grid w-full max-w-[980px] items-center gap-8 py-16 md:grid-cols-[420px_minmax(0,480px)] md:gap-14">
         <img
-          src="/icons/404_cup.png"
+          src="/icons/TeaImage.svg"
           alt="A warm cup of Kahwa"
           className="mx-auto w-full max-w-[390px] object-contain"
         />

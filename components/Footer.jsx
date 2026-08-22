@@ -180,7 +180,7 @@ export default function Footer() {
                     </button>
                   </form>
 
-                  <div className="mt-7 flex items-center gap-1.5 sm:mt-5">
+                  <div className="mt-7 flex items-center gap-2 sm:mt-5">
                     {socialLinks.map((link) => (
                       <a
                         key={link.label}
@@ -188,7 +188,7 @@ export default function Footer() {
                         target="_blank"
                         rel="noreferrer"
                         aria-label={link.label}
-                        className={`h-8 w-8 items-center justify-center transition hover:opacity-80 ${
+                        className={`h-10 w-10 items-center justify-center transition hover:opacity-80 ${
                           link.label === "Pinterest" || link.label === "X"
                             ? "flex sm:hidden"
                             : "flex"
@@ -197,7 +197,7 @@ export default function Footer() {
                         <img
                           src={link.image}
                           alt=""
-                          className="h-10 w-10 object-contain"
+                          className="h-13 w-13 object-contain"
                         />
                       </a>
                     ))}
@@ -206,7 +206,7 @@ export default function Footer() {
               </div>
             </div>
 
-            <p className="mt-9 max-w-4xl text-sm text-white/55 sm:mt-11 font-thin">
+            <p className="mt-9 max-w-4xl text-[13px] md:text-sm text-white/55 sm:mt-11 font-thin">
               The Kahwa Company&apos;s products are crafted for wellness and
               enjoyment, not for medical use. They are not intended to diagnose,
               treat, or cure any condition. Please consult a healthcare

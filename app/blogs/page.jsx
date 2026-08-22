@@ -39,7 +39,7 @@ function FeaturedArticle({ post }) {
   return (
     <Link
       href={post.href}
-      className="group grid gap-4 rounded-lg bg-[#f1f4ec] p-4 lg:grid-cols-[minmax(0,1.65fr)_minmax(320px,1fr)]"
+      className="group grid gap-3 rounded-lg bg-[#f1f4ec] p-3 lg:grid-cols-[minmax(0,1.65fr)_minmax(320px,1fr)]"
     >
       <div className="h-[300px] overflow-hidden rounded-md bg-[#e7ebe2] sm:h-[360px] lg:h-[310px]">
         {post.image ? (
@@ -75,7 +75,7 @@ function ArticleCard({ post }) {
   return (
     <Link
       href={post.href}
-      className="group flex min-h-0 flex-col rounded-lg bg-[#f1f4ec] p-4"
+      className="group flex min-h-0 flex-col rounded-lg bg-[#f1f4ec] p-3"
     >
       <div className="aspect-[1.42/1] overflow-hidden rounded-md bg-[#e4e9df]">
         {post.image ? (
@@ -195,10 +195,10 @@ export default function BlogsPage() {
   };
 
   return (
-    <main className="bg-[#fdfefb] pt-[70px] text-[#20241e]">
+    <main className="bg-[#f8f9f5] pt-[70px] text-[#20241e]">
       <section className="site-container pb-16 pt-14 sm:pb-20 sm:pt-[76px] lg:pb-[88px]">
         <h1
-          className="text-4xl font-normal uppercase leading-none text-[#344823]"
+          className="text-[28px] md:text-4xl font-normal text-center md:text-left  uppercase leading-none text-[#344823]"
           style={{ fontFamily: "var(--font-basker)" }}
         >
           Articles

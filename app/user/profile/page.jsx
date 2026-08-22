@@ -6,6 +6,7 @@ import { useAuth } from "@/app/context/AuthContext";
 import { Pencil, Trash2 } from "lucide-react";
 import { apiFetch } from "@/utils/api";
 import Link from "next/link";
+import AccountNav from "@/components/AccountNav";
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -233,7 +234,7 @@ export default function ProfilePage() {
 
   return (
     <>
-      <main className="min-h-screen bg-white text-black mt-10 sm:mt-12">
+      <main className="user-account-page min-h-screen bg-white text-black mt-10 sm:mt-12">
         <section className="site-container py-10 sm:py-14">
           <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
             <div>
@@ -242,7 +243,7 @@ export default function ProfilePage() {
               </p>
               <h1
                 className="mt-3 text-2xl sm:text-3xl md:text-4xl font-semibold"
-                style={{ fontFamily: "var(--font-display)" }}
+                style={{ fontFamily: "var(--font-basker)" }}
               >
                 Profile overview
               </h1>
@@ -250,16 +251,18 @@ export default function ProfilePage() {
             <button
               type="button"
               onClick={() => setProfileEditing((prev) => !prev)}
-              className="self-start rounded-sm border border-black/60 px-5 py-2 text-md font-semibold uppercase tracking-[0.2em] text-black hover:border-black cursor-pointer"
+              className="self-start rounded-md border border-[#52653b] px-5 py-2 text-md font-semibold uppercase tracking-[0.12em] text-[#52653b] hover:bg-[#52653b] hover:text-white cursor-pointer"
             >
               {profileEditing ? "Close edit" : "Edit profile"}
             </button>
           </div>
 
+          <AccountNav />
+
           <div className="mt-8 sm:mt-10 grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
-            <div className="rounded-sm border border-black/10 bg-white p-6 sm:p-8 shadow-sm">
+            <div className="rounded-lg border border-[#dfe5d8] bg-[#f3f6ef] p-6 sm:p-8">
               <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-                <div className="h-14 w-14 sm:h-16 sm:w-16 rounded-full bg-black text-white flex items-center justify-center text-base sm:text-lg font-semibold">
+                <div className="h-14 w-14 sm:h-16 sm:w-16 rounded-full bg-[#52653b] text-white flex items-center justify-center text-base sm:text-lg font-semibold">
                   {(profile.name || "User")
                     .split(" ")
                     .map((n) => n[0])
@@ -279,7 +282,7 @@ export default function ProfilePage() {
               </div>
 
               <div className="mt-6 grid gap-4 sm:grid-cols-2">
-                <div className="rounded-sm border border-black/10 bg-gray-50 p-4">
+                <div className="rounded-md border border-[#dfe5d8] bg-white p-4">
                   <p className="text-md uppercase tracking-[0.3em] text-black/50">
                     Member since
                   </p>
@@ -294,21 +297,21 @@ export default function ProfilePage() {
               </div>
             </div>
 
-            <div className="rounded-sm border border-black/10 bg-white p-6 sm:p-8 shadow-sm">
+            <div className="rounded-lg border border-[#dfe5d8] bg-[#f3f6ef] p-6 sm:p-8">
               <p className="text-md uppercase tracking-[0.093em] text-black/50">
                 Account quick links
               </p>
               <div className="mt-4 grid gap-3 text-md text-black/70">
                 <Link
                   href="/user/orders"
-                  className="rounded-sm border border-black/10 bg-gray-50 px-4 py-3 text-left hover:border-black/30 cursor-pointer"
+                  className="rounded-md border border-[#dfe5d8] bg-white px-4 py-3 text-left hover:border-[#7d904e] cursor-pointer"
                 >
                   Order history
                 </Link>
 
                 <Link
                   href="/user/password"
-                  className="rounded-sm border border-black/10 bg-gray-50 px-4 py-3 text-left hover:border-black/30 cursor-pointer"
+                  className="rounded-md border border-[#dfe5d8] bg-white px-4 py-3 text-left hover:border-[#7d904e] cursor-pointer"
                 >
                   Change password
                 </Link>
@@ -317,7 +320,7 @@ export default function ProfilePage() {
           </div>
 
           {profileEditing && (
-            <div className="mt-6 rounded-sm border border-black/10 bg-white p-6 sm:p-8 shadow-sm">
+            <div className="mt-6 rounded-lg border border-[#dfe5d8] bg-[#f3f6ef] p-6 sm:p-8">
               <p className="text-md uppercase tracking-[0.2em] text-black/50">
                 Edit profile
               </p>
@@ -367,7 +370,7 @@ export default function ProfilePage() {
                   type="button"
                   onClick={handleProfileSave}
                   disabled={profileSaving}
-                  className="rounded-sm border border-black/60 bg-black px-5 py-2 text-md font-semibold uppercase tracking-[0.2em] text-white hover:bg-black/90 cursor-pointer"
+                  className="rounded-md border border-[#52653b] bg-[#52653b] px-5 py-2 text-md font-semibold uppercase tracking-[0.12em] text-white hover:bg-[#6B7F42] cursor-pointer"
                 >
                   {profileSaving ? "Saving..." : "Save changes"}
                 </button>
@@ -382,7 +385,7 @@ export default function ProfilePage() {
             </div>
           )}
 
-          <div className="mt-8 sm:mt-10 rounded-sm border border-black/10 bg-white p-6 sm:p-8 shadow-sm">
+          <div className="mt-8 sm:mt-10 rounded-lg border border-[#dfe5d8] bg-[#f3f6ef] p-6 sm:p-8">
             <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
               <div>
                 <p className="text-md uppercase tracking-[0.093em] text-black/50">
@@ -395,7 +398,7 @@ export default function ProfilePage() {
               <button
                 type="button"
                 onClick={openAddAddress}
-                className="self-start rounded-sm border border-black/60 px-5 py-2 text-md font-semibold uppercase tracking-[0.2em] text-black hover:border-black cursor-pointer"
+                className="self-start rounded-md border border-[#52653b] px-5 py-2 text-md font-semibold uppercase tracking-[0.12em] text-[#52653b] hover:bg-[#52653b] hover:text-white cursor-pointer"
               >
                 Add new address
               </button>
@@ -403,7 +406,7 @@ export default function ProfilePage() {
             {addressFormOpen && (
               <form
                 onSubmit={handleSaveAddress}
-                className="mt-6 rounded-sm border border-black/10 bg-white p-5"
+                className="mt-6 rounded-md border border-[#dfe5d8] bg-white p-5"
               >
                 <p className="text-md uppercase tracking-[0.2em] text-black/50">
                   {addressForm.id ? "Edit address" : "Add address"}
@@ -517,7 +520,7 @@ export default function ProfilePage() {
                   <button
                     type="submit"
                     disabled={addressSaving}
-                    className="rounded-sm border border-black/60 bg-black px-5 py-2 text-md font-semibold uppercase tracking-[0.2em] text-white hover:bg-black/90 cursor-pointer"
+                    className="rounded-md border border-[#52653b] bg-[#52653b] px-5 py-2 text-md font-semibold uppercase tracking-[0.12em] text-white hover:bg-[#6B7F42] cursor-pointer"
                   >
                     {addressSaving ? "Saving..." : "Save address"}
                   </button>
@@ -540,7 +543,7 @@ export default function ProfilePage() {
               {addresses.map((address) => (
                 <div
                   key={address.id}
-                  className="rounded-sm border border-black/10 bg-gray-50 p-5"
+                  className="rounded-md border border-[#dfe5d8] bg-white p-5"
                 >
                   <p className="text-md uppercase tracking-[0.093em] text-black/70">
                     {address.label || "Address"}

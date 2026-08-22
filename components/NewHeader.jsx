@@ -326,9 +326,14 @@ export default function NewHeader() {
               <div className="absolute left-1/2 -translate-x-1/2 leading-none">
                 <Link href="/" onClick={closeMobileMenu}>
                   <img
-                    src="/logo/LOGO_TKC-02.png"
-                    alt="Logo"
-                    className="h-12 w-auto object-contain cursor-pointer sm:h-14 lg:h-16"
+                    src="/logo/TKC_Logo_Square.svg"
+                    alt="The Kahwa Company"
+                    className="h-16 w-auto cursor-pointer object-contain md:hidden"
+                  />
+                  <img
+                    src="/logo/tkclogo.svg"
+                    alt="The Kahwa Company"
+                    className="hidden h-14 w-auto cursor-pointer object-contain md:block lg:h-16"
                   />
                 </Link>
               </div>
@@ -568,13 +573,13 @@ export default function NewHeader() {
                         </Link>
                       )}
                       {headerCategories.map((category) => (
-                        <div key={category.slug} className="space-y-2">
+                        <div key={category.slug} className="flex flex-col gap-2">
                           <p className="text-md font-semibold uppercase tracking-wide text-gray-500">
                             {category.name}
                           </p>
                           <Link
                             href={`/shop?category=${category.slug}`}
-                            className="hover:text-gray-900"
+                            className="block hover:text-gray-900"
                             onClick={closeMobileMenu}
                           >
                             All {category.name}
@@ -583,7 +588,7 @@ export default function NewHeader() {
                             <Link
                               key={sub.slug}
                               href={`/shop?category=${category.slug}&subcategory=${sub.slug}`}
-                              className="hover:text-gray-900"
+                              className="block hover:text-gray-900"
                               onClick={closeMobileMenu}
                             >
                               {sub.name}

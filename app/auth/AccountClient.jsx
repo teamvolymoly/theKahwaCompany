@@ -341,20 +341,22 @@ export default function AccountClient() {
     : "";
 
   return (
-    <main className="min-h-screen bg-white text-black mt-14">
-      <section className="site-container py-12 lg:py-16">
+    <main className="mt-14 min-h-screen bg-[#fdfefb] text-[#252a23]">
+      <section className="site-container py-14 lg:py-20">
         <div className="text-center">
           <h1
-            className="text-4xl uppercase text-[#4e5a50]"
+            className="text-4xl uppercase text-[#344823] lg:text-5xl"
             style={{ fontFamily: "var(--font-basker)" }}
           >
             My account
           </h1>
         </div>
 
-        <div className="mt-12 grid lg:grid-cols-2 gap-10 md:gap-0">
-          <div className="lg:pr-14">
-            <h2 className="text-2xl font-semibold text-[#4e5a50]">Login</h2>
+        <div className="mt-12 grid gap-6 lg:grid-cols-2 lg:gap-8">
+          <div className="rounded-lg bg-[#f1f4ec] p-6 sm:p-8 lg:p-10">
+            <h2 className="font-basker text-2xl uppercase text-[#344823]">
+              Login
+            </h2>
             <form onSubmit={onLoginSubmit} className="mt-6 space-y-5">
               <div>
                 <label className="text-md font-thin text-black">
@@ -418,13 +420,13 @@ export default function AccountClient() {
                     type="checkbox"
                     checked={rememberMe}
                     onChange={(e) => setRememberMe(e.target.checked)}
-                    className="accent-[#4e5a50]"
+                    className="accent-[#52653b]"
                   />
                   Remember me
                 </label>
                 <a
                   href="/auth/forgot-password"
-                  className="text-cta text-md text-black/60"
+                  className="text-cta text-md text-[#52633c] hover:underline"
                 >
                   Lost your password?
                 </a>
@@ -444,15 +446,17 @@ export default function AccountClient() {
               <button
                 type="submit"
                 disabled={authLoading}
-                className="w-full rounded-sm bg-gradient-to-r from-[#7a8177] to-[#6a716a] py-3 text-md font-semibold uppercase tracking-[0.12em] text-white transition hover:from-[#5f665e] hover:to-[#525a53]"
+                className="w-full rounded-sm bg-[#52653b] py-3 text-md font-semibold uppercase tracking-[0.12em] text-white transition hover:bg-[#6B7F42] disabled:cursor-not-allowed disabled:opacity-70"
               >
                 {authLoading ? "Signing in..." : "Login"}
               </button>
             </form>
           </div>
 
-          <div className="border-black/10 lg:border-l lg:pl-14">
-            <h2 className="text-2xl font-semibold text-[#4e5a50]">Register</h2>
+          <div className="rounded-lg bg-[#f1f4ec] p-6 sm:p-8 lg:p-10">
+            <h2 className="font-basker text-2xl uppercase text-[#344823]">
+              Register
+            </h2>
             <form onSubmit={onRegisterSubmit} className="mt-6 space-y-5">
               <div>
                 <label className="text-md font-thin text-black">
@@ -537,7 +541,7 @@ export default function AccountClient() {
                       name="country_code"
                       value={`${registerForm.country_iso}|${registerForm.country_code}`}
                       onChange={onRegisterChange}
-                      className="w-full rounded-sm border border-black/15 bg-white px-3 py-3 pl-9 pr-8 text-md outline-none focus:border-[#4e5a50]"
+                      className="w-full appearance-none rounded-sm border border-black/15 bg-transparent px-3 py-3 pl-9 pr-8 text-md outline-none focus:border-[#4e5a50]"
                       style={{
                         color: "transparent",
                         WebkitTextFillColor: "transparent",
@@ -655,7 +659,7 @@ export default function AccountClient() {
                     type="checkbox"
                     checked={rememberMeLetter}
                     onChange={(e) => setRememberMeLetter(e.target.checked)}
-                    className="accent-[#4e5a50]"
+                    className="accent-[#52653b]"
                   />
                   Subscribe to our kahwa circle newsletter!
                 </label>
@@ -665,7 +669,10 @@ export default function AccountClient() {
                 Your personal data will be used to support your experience
                 throughout this website, to manage access to your account, and
                 for other purposes described in our{" "}
-                <a href="#privacy-policy" className="text-blue-600 underline">
+                <a
+                  href="/privacy-policy"
+                  className="font-medium text-[#52633c] underline underline-offset-3"
+                >
                   privacy policy
                 </a>
                 .
@@ -685,7 +692,7 @@ export default function AccountClient() {
               <button
                 type="submit"
                 disabled={registerLoading}
-                className="w-full rounded-sm bg-gradient-to-r from-[#7a8177] to-[#6a716a] py-3 text-md font-semibold uppercase tracking-[0.12em] text-white transition hover:from-[#5f665e] hover:to-[#525a53]"
+                className="w-full rounded-sm bg-[#52653b] py-3 text-md font-semibold uppercase tracking-[0.12em] text-white transition hover:bg-[#6B7F42] disabled:cursor-not-allowed disabled:opacity-70"
               >
                 {registerLoading ? "Registering..." : "Register"}
               </button>

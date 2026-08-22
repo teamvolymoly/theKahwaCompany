@@ -5,6 +5,7 @@ import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/app/context/AuthContext";
 import { apiFetch } from "@/utils/api";
+import AccountNav from "@/components/AccountNav";
 import {
   EMPTY_REVIEW_FORM,
   buildReviewFormData,
@@ -472,7 +473,7 @@ export default function OrderDetailPage() {
 
   if (loadingOrder) {
     return (
-      <main className="min-h-screen bg-white text-black mt-14">
+      <main className="user-account-page min-h-screen bg-white text-black mt-14">
         <section className="site-container py-14">
           <p className="text-md text-black/60">Loading order details...</p>
         </section>
@@ -482,7 +483,7 @@ export default function OrderDetailPage() {
 
   if (error || !order) {
     return (
-      <main className="min-h-screen bg-white text-black mt-14">
+      <main className="user-account-page min-h-screen bg-white text-black mt-14">
         <section className="site-container py-14">
           <p className="text-md text-red-600">{error || "Order not found."}</p>
           <Link
@@ -497,7 +498,7 @@ export default function OrderDetailPage() {
   }
 
   return (
-    <main className="min-h-screen bg-white text-black mt-14">
+    <main className="user-account-page min-h-screen bg-white text-black mt-14">
       <section className="site-container py-14">
         <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
           <div>
@@ -506,7 +507,7 @@ export default function OrderDetailPage() {
             </p>
             <h1
               className="mt-3 text-3xl md:text-4xl font-semibold"
-              style={{ fontFamily: "var(--font-display)" }}
+              style={{ fontFamily: "var(--font-basker)" }}
             >
               Order {order.id}
             </h1>
@@ -516,14 +517,16 @@ export default function OrderDetailPage() {
           </div>
           <Link
             href="/user/orders"
-            className="self-start rounded-sm border border-black/60 px-4 py-2 text-md font-semibold uppercase tracking-[0.2em] text-black hover:border-black"
+            className="self-start rounded-md border border-[#52653b] px-4 py-2 text-md font-semibold uppercase tracking-[0.12em] text-[#52653b] hover:bg-[#52653b] hover:text-white"
           >
             Back to orders
           </Link>
         </div>
 
+        <AccountNav />
+
         <div className="mt-10 grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
-          <div className="rounded-sm border border-black/10 bg-white p-6 shadow-sm">
+          <div className="rounded-lg border border-[#dfe5d8] bg-[#f3f6ef] p-6">
             <p className="text-md uppercase tracking-[0.08em] text-black/50">
               Order details
             </p>
@@ -541,7 +544,7 @@ export default function OrderDetailPage() {
               />
             </div>
 
-            <div className="mt-6 rounded-sm border border-black/10 bg-gray-50 p-4">
+            <div className="mt-6 rounded-md border border-[#dfe5d8] bg-white p-4">
               <p className="text-md uppercase tracking-[0.08em] text-black/50">
                 Customer
               </p>
@@ -552,7 +555,7 @@ export default function OrderDetailPage() {
               </div>
             </div>
 
-            <div className="mt-6 rounded-sm border border-black/10 bg-gray-50 p-4">
+            <div className="mt-6 rounded-md border border-[#dfe5d8] bg-white p-4">
               <p className="text-md uppercase tracking-[0.08em] text-black/50">
                 Shipping address
               </p>
@@ -572,7 +575,7 @@ export default function OrderDetailPage() {
               </div>
             </div>
 
-            <div className="mt-6 rounded-sm border border-black/10 bg-white p-4">
+            <div className="mt-6 rounded-md border border-[#dfe5d8] bg-white p-4">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>
                   <p className="text-md uppercase tracking-[0.08em] text-black/50">
@@ -586,14 +589,14 @@ export default function OrderDetailPage() {
                   <button
                     type="button"
                     onClick={() => setInvoiceOpen(true)}
-                    className="rounded-full border border-black px-5 py-2 text-md font-semibold uppercase tracking-[0.08em] text-black hover:bg-black hover:text-white"
+                    className="rounded-md border border-[#52653b] px-5 py-2 text-md font-semibold uppercase tracking-[0.08em] text-[#52653b] hover:bg-[#52653b] hover:text-white"
                   >
                     View
                   </button>
                   <button
                     type="button"
                     onClick={handleDownloadInvoice}
-                    className="rounded-full border border-black px-5 py-2 text-md font-semibold uppercase tracking-[0.08em] text-black hover:bg-black hover:text-white"
+                    className="rounded-md border border-[#52653b] px-5 py-2 text-md font-semibold uppercase tracking-[0.08em] text-[#52653b] hover:bg-[#52653b] hover:text-white"
                   >
                     Download
                   </button>
@@ -628,7 +631,7 @@ export default function OrderDetailPage() {
             </div>
           </div>
 
-          <div className="rounded-sm border border-black/10 bg-gray-50 p-6 h-fit">
+          <div className="rounded-lg border border-[#dfe5d8] bg-[#f3f6ef] p-6 h-fit">
             <p className="text-md uppercase tracking-[0.08em] text-black/50">
               Items in this order
             </p>
@@ -671,7 +674,7 @@ export default function OrderDetailPage() {
                         <button
                           type="button"
                           onClick={() => openReviewModal(item)}
-                          className="mt-3 rounded-full border border-black px-4 py-2 text-md font-semibold uppercase tracking-[0.08em] text-black hover:bg-black hover:text-white"
+                          className="mt-3 rounded-md border border-[#52653b] px-4 py-2 text-md font-semibold uppercase tracking-[0.08em] text-[#52653b] hover:bg-[#52653b] hover:text-white"
                         >
                           Give review
                         </button>
@@ -703,7 +706,7 @@ export default function OrderDetailPage() {
               </Link>
               <Link
                 href="/shop"
-                className="rounded-full bg-black px-6 py-3 text-md font-semibold uppercase tracking-[0.08em] text-white"
+                className="rounded-md bg-[#52653b] px-6 py-3 text-md font-semibold uppercase tracking-[0.08em] text-white hover:bg-[#6B7F42]"
               >
                 Continue shopping
               </Link>

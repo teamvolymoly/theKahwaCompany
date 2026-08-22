@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/app/context/AuthContext";
 import Link from "next/link";
 import { apiFetch } from "@/utils/api";
+import AccountNav from "@/components/AccountNav";
 import {
   EMPTY_REVIEW_FORM,
   buildReviewFormData,
@@ -286,7 +287,7 @@ export default function DashboardPage() {
   };
 
   return (
-    <main className="min-h-screen bg-white text-black mt-14">
+    <main className="user-account-page min-h-screen bg-white text-black mt-14">
       <section className="site-container py-14">
         <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
           <div>
@@ -295,18 +296,20 @@ export default function DashboardPage() {
             </p>
             <h1
               className="mt-3 text-3xl md:text-4xl font-semibold"
-              style={{ fontFamily: "var(--font-display)" }}
+              style={{ fontFamily: "var(--font-basker)" }}
             >
               Dashboard
             </h1>
           </div>
           <Link
             href="/user/orders"
-            className="self-start rounded-sm border border-black/60 px-5 py-2 text-md font-semibold uppercase tracking-[0.2em] text-black hover:border-black cursor-pointer"
+            className="self-start rounded-md border border-[#52653b] px-5 py-2 text-md font-semibold uppercase tracking-[0.12em] text-[#52653b] hover:bg-[#52653b] hover:text-white cursor-pointer"
           >
             View orders
           </Link>
         </div>
+
+        <AccountNav />
 
         {dashboardError && (
           <p className="mt-6 text-md text-red-600">{dashboardError}</p>
@@ -319,7 +322,7 @@ export default function DashboardPage() {
           {stats.map((stat) => (
             <div
               key={stat.label}
-              className="rounded-sm shadow-sm bg-gray-50 p-5"
+              className="rounded-lg border border-[#dfe5d8] bg-[#f3f6ef] p-5"
             >
               <p className="text-md uppercase tracking-[0.093em] text-black/80">
                 {stat.label}
@@ -329,7 +332,7 @@ export default function DashboardPage() {
           ))}
         </div>
 
-        <div className="mt-10 rounded-sm border border-black/10 bg-white p-6 shadow-sm">
+        <div className="mt-10 rounded-lg border border-[#dfe5d8] bg-[#f3f6ef] p-6">
           <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <p className="text-md uppercase tracking-[0.093em] text-black/80">
@@ -341,7 +344,7 @@ export default function DashboardPage() {
             </div>
             <Link
               href="/user/orders"
-              className="self-start rounded-sm border border-black/60 px-4 py-2 text-md font-semibold uppercase tracking-[0.2em] text-black hover:border-black"
+              className="self-start rounded-md border border-[#52653b] px-4 py-2 text-md font-semibold uppercase tracking-[0.12em] text-[#52653b] hover:bg-[#52653b] hover:text-white"
             >
               View delivered orders
             </Link>
@@ -351,7 +354,7 @@ export default function DashboardPage() {
               {reviewItems.map((item) => (
                 <div
                   key={item.order_item_id}
-                  className="rounded-sm border border-black/10 bg-gray-50 p-4"
+                  className="rounded-md border border-[#dfe5d8] bg-white p-4"
                 >
                   <div className="flex gap-3">
                     <div className="h-16 w-16 shrink-0 rounded-sm bg-white p-2">
@@ -378,7 +381,7 @@ export default function DashboardPage() {
                   <button
                     type="button"
                     onClick={() => openReviewModal(item)}
-                    className="mt-4 w-full rounded-full border border-black px-4 py-2 text-md font-semibold uppercase tracking-[0.08em] text-black hover:bg-black hover:text-white"
+                    className="mt-4 w-full rounded-md border border-[#52653b] px-4 py-2 text-md font-semibold uppercase tracking-[0.08em] text-[#52653b] hover:bg-[#52653b] hover:text-white"
                   >
                     Give review
                   </button>
@@ -404,7 +407,7 @@ export default function DashboardPage() {
               </div>
               <Link
                 href="/user/orders"
-                className="rounded-sm border border-black/60 px-4 py-2 text-md font-semibold uppercase tracking-[0.2em] text-black hover:border-black cursor-pointer"
+                className="rounded-md border border-[#52653b] px-4 py-2 text-md font-semibold uppercase tracking-[0.12em] text-[#52653b] hover:bg-[#52653b] hover:text-white cursor-pointer"
               >
                 View all
               </Link>
@@ -414,7 +417,7 @@ export default function DashboardPage() {
                 <Link
                   key={order.id}
                   href={`/user/orders/${order.id}`}
-                  className="rounded-sm shadow-sm bg-gray-50 p-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between hover:border-black/30 border border-transparent transition cursor-pointer"
+                  className="rounded-md border border-[#dfe5d8] bg-white p-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between hover:border-[#7d904e] transition cursor-pointer"
                 >
                   <div className="min-w-0">
                     <p className="text-md font-semibold">{order.id}</p>
@@ -456,7 +459,7 @@ export default function DashboardPage() {
               Saved address
             </p>
             {defaultAddress ? (
-              <div className="mt-4 rounded-sm shadow-sm bg-gray-50 p-4">
+              <div className="mt-4 rounded-md border border-[#dfe5d8] bg-white p-4">
                 <p className="text-md uppercase tracking-[0.093em] text-black/70">
                   {defaultAddress.label}
                 </p>
@@ -474,7 +477,7 @@ export default function DashboardPage() {
               </p>
             )}
             <Link href="/user/profile">
-              <button className="mt-6 w-full rounded-sm border border-black/60 px-4 py-2 text-md font-semibold uppercase tracking-[0.2em] text-black hover:bg-black hover:text-white cursor-pointer">
+              <button className="mt-6 w-full rounded-md border border-[#52653b] px-4 py-2 text-md font-semibold uppercase tracking-[0.12em] text-[#52653b] hover:bg-[#52653b] hover:text-white cursor-pointer">
                 Manage addresses
               </button>
             </Link>
