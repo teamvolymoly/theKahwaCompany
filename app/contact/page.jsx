@@ -13,27 +13,21 @@ const contactOptions = [
     href: "/refund",
   },
   {
+    title: "Phone Number",
+    detail: "+91 95822 51241",
+    image: "/icons/contact/Chat.svg",
+    href: "tel:+919582251241",
+  },
+  {
     title: "Email",
     detail: "info@thekahwacompany.com",
     image: "/icons/contact/Email.svg",
     href: "mailto:info@thekahwacompany.com",
   },
-  {
-    title: "Track Order",
-    detail: "Click to Know More",
-    image: "/icons/contact/TrackOrder.svg",
-    href: "/track-order",
-  },
-  {
-    title: "Phone Number",
-    detail: "+91 95822 51241",
-    image: "/icons/contact/PhoneNumber.svg",
-    href: "tel:+919582251241",
-  },
 ];
 
 const fieldClass =
-  "h-11 w-full rounded-md border border-[#9aa58e]/35 bg-transparent px-5 text-base text-[#30362b] outline-none transition-colors placeholder:text-[#777d73] focus:border-transparent focus:ring-0";
+  "h-11 w-full rounded-md border border-[#9aa58e]/35 bg-transparent px-5 text-base text-[#30362b] outline-none transition-colors placeholder:text-[#777d73] focus:border-[#9aa58e]/35 focus:ring-0";
 
 export default function ContactPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -84,15 +78,15 @@ export default function ContactPage() {
   return (
     <main className="bg-[#fdfefb] pt-[70px] text-[#252a23]">
       <section className="site-container pb-[92px] pt-[72px]">
-        <h1 className="font-(family-name:--font-basker) text-4xl font-normal uppercase leading-none text-[#344823]">
+        <h1 className="font-(family-name:--font-basker) text-4xl text-center md:text-left font-normal uppercase leading-none text-[#344823]">
           Contact Us
         </h1>
-        <p className="mt-6 max-w-[1040px] text-base leading-relaxed text-[#333730]">
+        <p className="mt-6 max-w-[1040px] text-[18px] text-[#333730]">
           If you have questions about your order, need help with brewing, or
           just want to chat we&apos;re here for you!
         </p>
 
-        <div className="mt-10 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
+        <div className="mt-10 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3">
           {contactOptions.map((option) => {
             const externalAction =
               option.href.startsWith("mailto:") ||
@@ -102,9 +96,9 @@ export default function ContactPage() {
                 <img
                   src={option.image}
                   alt=""
-                  className="h-12 w-12 object-contain sm:h-14 sm:w-14"
+                  className=" object-contain sm:h-16 sm:w-16"
                 />
-                <h2 className="mt-5 text-center text-base font-semibold leading-tight text-[#344823] sm:text-xl">
+                <h2 className="mt-3 text-center text-base font-semibold leading-tight text-[#344823] sm:text-xl">
                   {option.title}
                 </h2>
                 <p className="mt-1 text-center text-base leading-tight text-[#30352d] text-md">
@@ -113,8 +107,9 @@ export default function ContactPage() {
               </>
             );
 
-            const cardClass =
-              "group flex min-h-[154px] flex-col items-center justify-center rounded-lg bg-[#f1f4ec] px-3 py-5 transition-colors hover:bg-[#e9eee3] sm:px-5";
+            const cardClass = `group flex min-h-[154px] flex-col items-center justify-center rounded-lg bg-[#f1f4ec] px-3 py-5 transition-colors hover:bg-[#e9eee3] sm:px-5 ${
+              option.title === "Email" ? "col-span-2 sm:col-span-1" : ""
+            }`;
 
             return externalAction ? (
               <a key={option.title} href={option.href} className={cardClass}>
@@ -128,13 +123,13 @@ export default function ContactPage() {
           })}
         </div>
 
-        <p className="mt-11 text-lg font-thin uppercase tracking-[0.01em] text-[#30352d] sm:text-xl">
+        <p className="mt-11 text-lg font-thin text-center md:text-left uppercase tracking-[0.01em] text-[#30352d] sm:text-xl">
           Mon - Friday : 9AM to 7PM IST
         </p>
 
         <div className="mt-11 grid items-stretch gap-5 lg:grid-cols-[1.4fr_1fr]">
           <div className="rounded-lg bg-[#f1f4ec] px-6 py-8 sm:px-9 sm:py-10">
-            <h2 className="max-w-[560px] md:text-3xl 2xl:text-4xl font-semibold leading-[1.2] text-[#2f4819]">
+            <h2 className="max-w-[560px] text-2xl  2xl:text-3xl font-semibold leading-[1.2] text-[#2f4819]">
               Drop your query below and we will
               <br className="hidden sm:block" /> get back to you!
             </h2>
@@ -192,7 +187,7 @@ export default function ContactPage() {
                 id="contact-comment"
                 name="comment"
                 rows={5}
-                className="min-h-[124px] resize-y rounded-md border border-[#9aa58e]/35 bg-transparent px-5 py-3 text-base text-[#30362b] outline-none transition-colors placeholder:text-[#777d73] focus:border-transparent focus:ring-0 sm:col-span-2"
+                className="min-h-[124px] resize-y rounded-md border border-[#9aa58e]/35 bg-transparent px-5 py-3 text-base text-[#30362b] outline-none transition-colors placeholder:text-[#777d73] focus:border-[#9aa58e]/35 focus:ring-0 sm:col-span-2"
                 placeholder="Comment"
               />
 
