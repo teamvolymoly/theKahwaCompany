@@ -243,6 +243,15 @@ select:focus-visible {
   display: none;
 }
 
+.latest-articles__slider {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.latest-articles__slider::-webkit-scrollbar {
+  display: none;
+}
+
 .footer-promises__slider {
   scrollbar-width: none;
   -ms-overflow-style: none;

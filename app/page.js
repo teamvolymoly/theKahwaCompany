@@ -1,7 +1,8 @@
 ﻿"use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 
 import HeroSection from "@/components/HeroSection";
 import ProductCard from "@/components/ProductCard";
@@ -40,9 +41,27 @@ const fallbackArticles = [
 ];
 
 export default function Home() {
+  const productsSliderRef = useRef(null);
+  const articlesSliderRef = useRef(null);
   const [products, setProducts] = useState([]);
   const [blogPosts, setBlogPosts] = useState(fallbackArticles);
   const [loadingProducts, setLoadingProducts] = useState(true);
+
+  const scrollProducts = (direction) => {
+    const slider = productsSliderRef.current;
+    if (!slider) return;
+    const card = slider.firstElementChild;
+    const distance = (card?.getBoundingClientRect().width || 0) + 14;
+    slider.scrollBy({ left: direction * distance, behavior: "smooth" });
+  };
+
+  const scrollArticles = (direction) => {
+    const slider = articlesSliderRef.current;
+    if (!slider) return;
+    const card = slider.firstElementChild;
+    const distance = (card?.getBoundingClientRect().width || 0) + 16;
+    slider.scrollBy({ left: direction * distance, behavior: "smooth" });
+  };
 
   useEffect(() => {
     let active = true;
@@ -87,14 +106,14 @@ export default function Home() {
         aria-labelledby="blends-title"
       >
         <div className="site-container">
-          <div className="mb-8 flex items-end justify-between gap-6">
+          <div className="mb-8 flex items-end justify-center md:justify-between gap-6">
             <h2
               id="blends-title"
-              className="font-(family-name:--font-basker) text-4xl uppercase leading-none tracking-[0.01em] text-[#252a22]"
+              className="font-(family-name:--font-basker) text-[28px] md:text-4xl uppercase leading-none tracking-[0.01em] text-[#252a22]"
             >
               Must Have Blends
             </h2>
-            <div className="mb-0.5 flex items-center justify-center gap-2">
+            <div className="mb-0.5 hidden items-center justify-center gap-2 sm:flex">
               <Link
                 href="/shop"
                 className="text-md font-medium text-[#52633c] hover:underline  underline-offset-3 sm:text-base"
@@ -140,7 +159,10 @@ export default function Home() {
             </div>
           </Link>
 
-          <div className="homepage-products mt-4 grid grid-flow-col gap-3.5 overflow-x-auto pb-3">
+          <div
+            ref={productsSliderRef}
+            className="homepage-products mt-4 grid grid-flow-col gap-3.5 overflow-x-auto pb-2 sm:pb-3"
+          >
             {loadingProducts
               ? Array.from({ length: 4 }).map((_, index) => (
                   <div
@@ -167,6 +189,31 @@ export default function Home() {
                 ))
               : null}
           </div>
+
+          <div className="mt-7 flex items-center justify-between sm:hidden">
+            <button
+              type="button"
+              onClick={() => scrollProducts(-1)}
+              aria-label="Previous product"
+              className="flex h-9 w-9 items-center justify-center rounded-full bg-[#f3f5ee] text-[#65794b]"
+            >
+              <ChevronLeft className="h-5 w-5" />
+            </button>
+            <Link
+              href="/shop"
+              className="text-base font-semibold text-[#52633d] underline underline-offset-4"
+            >
+              View All Blends
+            </Link>
+            <button
+              type="button"
+              onClick={() => scrollProducts(1)}
+              aria-label="Next product"
+              className="flex h-9 w-9 items-center justify-center rounded-full bg-[#f3f5ee] text-[#65794b]"
+            >
+              <ChevronRight className="h-5 w-5" />
+            </button>
+          </div>
         </div>
 
         <div className="mt-12 h-48 bg-[#f1f4ec] sm:h-64 lg:h-80" />
@@ -177,14 +224,14 @@ export default function Home() {
         aria-labelledby="articles-title"
       >
         <div className="site-container">
-          <div className="mb-7 flex items-end justify-between gap-6">
+          <div className="mb-7 flex items-end justify-center gap-6 sm:justify-between">
             <h2
               id="articles-title"
-              className="font-(family-name:--font-basker) text-4xl uppercase tracking-[0.01em] text-[#30352c]"
+              className="font-(family-name:--font-basker) text-[28px] uppercase tracking-[0.01em] text-[#30352c] sm:text-4xl"
             >
               Latest Articles
             </h2>
-            <div className="mb-1 flex items-center justify-center gap-2">
+            <div className="mb-1 hidden items-center justify-center gap-2 sm:flex">
               <Link
                 href="/blogs"
                 className="text-md font-medium text-[#52633c] hover:underline  underline-offset-3 sm:text-base"
@@ -199,14 +246,17 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="grid gap-4 md:grid-cols-3">
+          <div
+            ref={articlesSliderRef}
+            className="latest-articles__slider grid snap-x snap-mandatory grid-flow-col auto-cols-[calc((100%_-_16px)/1.3)] gap-4 overflow-x-auto sm:grid-flow-row sm:grid-cols-1 sm:auto-cols-auto sm:overflow-visible md:grid-cols-3"
+          >
             {blogPosts.slice(0, 3).map((post, index) => (
               <Link
                 key={post.id || `${post.title}-${index}`}
                 href={post.href || "/blogs"}
-                className="group overflow-hidden rounded-md bg-[#f1f4ec] p-2 transition hover:-translate-y-0.5"
+                className="group snap-start overflow-hidden rounded-md bg-[#f1f4ec] p-2 transition hover:-translate-y-0.5"
               >
-                <div className="aspect-[1.85/1] overflow-hidden rounded">
+                <div className="h-[244px] overflow-hidden rounded sm:h-auto sm:aspect-[1.85/1]">
                   {post.image ? (
                     <img
                       src={post.image}
@@ -218,10 +268,10 @@ export default function Home() {
                   )}
                 </div>
                 <div className="px-1 pb-3 pt-3">
-                  <h3 className="text-lg font-semibold leading-snug text-[#23281f]">
+                  <h3 className="text-sm font-semibold leading-snug text-[#23281f] sm:text-lg">
                     {post.title}
                   </h3>
-                  <p className="mt-1.5 text-sm">
+                  <p className="mt-1.5 text-xs sm:text-sm">
                     {String(post.excerpt || "").length > 130
                       ? `${String(post.excerpt).slice(0, 127).trim()}...`
                       : post.excerpt}{" "}
@@ -233,12 +283,37 @@ export default function Home() {
               </Link>
             ))}
           </div>
+
+          <div className="mt-5 flex items-center justify-between sm:hidden">
+            <button
+              type="button"
+              onClick={() => scrollArticles(-1)}
+              aria-label="Previous article"
+              className="flex h-9 w-9 items-center justify-center rounded-full bg-[#f3f5ee] text-[#65794b]"
+            >
+              <ChevronLeft className="h-5 w-5" />
+            </button>
+            <Link
+              href="/blogs"
+              className="text-base font-semibold text-[#52633d] underline underline-offset-4"
+            >
+              View all Articles
+            </Link>
+            <button
+              type="button"
+              onClick={() => scrollArticles(1)}
+              aria-label="Next article"
+              className="flex h-9 w-9 items-center justify-center rounded-full bg-[#f3f5ee] text-[#65794b]"
+            >
+              <ChevronRight className="h-5 w-5" />
+            </button>
+          </div>
         </div>
       </section>
 
       <style jsx global>{`
         .homepage-products {
-          grid-auto-columns: minmax(220px, 78vw);
+          grid-auto-columns: calc((100% - 14px) / 1.3);
           scrollbar-width: none;
         }
 

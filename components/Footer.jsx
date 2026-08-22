@@ -63,16 +63,16 @@ const socialLinks = [
     href: "https://www.instagram.com/thekahwacompany/",
     image: "/icons/main_footer_icon/Insta.svg",
   },
-  // {
-  //   label: "Pinterest",
-  //   href: "https://www.pinterest.com/",
-  //   image: "/icons/main_footer_icon/Pintrest.svg",
-  // },
-  // {
-  //   label: "X",
-  //   href: "https://x.com/",
-  //   image: "/icons/main_footer_icon/X.svg",
-  // },
+  {
+    label: "Pinterest",
+    href: "https://www.pinterest.com/",
+    image: "/icons/main_footer_icon/Pintrest.svg",
+  },
+  {
+    label: "X",
+    href: "https://x.com/",
+    image: "/icons/main_footer_icon/X.svg",
+  },
   {
     label: "YouTube",
     href: "https://youtube.com/@thekahwacompany?si=68vWrtaCn4j7srDU",
@@ -100,7 +100,7 @@ export default function Footer() {
     <footer className="relative mb-[216] md:mb-[316]">
       <div className="kahwa-footer__content">
         <section
-          className="border-y border-[#dfe5d8] bg-[#f1f4ec]"
+          className="border-y border-[#f1f4ec] bg-[#f1f4ec]"
           aria-label="Our product promises"
         >
           <div
@@ -142,7 +142,7 @@ export default function Footer() {
         <div className="bg-[#4b6038] text-[#f5f2e9]">
           <div className="site-container py-12 lg:py-14">
             <div className="grid gap-10 lg:grid-cols-[1.05fr_1fr] lg:gap-20">
-              <div className="grid grid-cols-2 gap-8 sm:grid-cols-3">
+              <div className="order-2 grid grid-cols-2 gap-x-8 gap-y-9 sm:order-1 sm:grid-cols-3 sm:gap-8">
                 {footerGroups.map((group) => (
                   <div key={group.title}>
                     <h2 className="font-(family-name:--font-basker) text-xl uppercase tracking-[0.04em] text-[#f0eadc]">
@@ -163,8 +163,8 @@ export default function Footer() {
                 ))}
               </div>
 
-              <div className="flex justify-end">
-                <div className="lg:pl-4 w-fit">
+              <div className="order-1 flex justify-end sm:order-2">
+                <div className="w-full sm:w-fit lg:pl-4">
                   <h2 className="font-(family-name:--font-basker) text-xl uppercase tracking-[0.03em] text-[#f0eadc]">
                     Join the Kahwa Circle
                   </h2>
@@ -190,7 +190,7 @@ export default function Footer() {
                     </button>
                   </form>
 
-                  <div className="mt-5 flex items-center gap-1.5">
+                  <div className="mt-7 flex items-center gap-1.5 sm:mt-5">
                     {socialLinks.map((link) => (
                       <a
                         key={link.label}
@@ -198,7 +198,11 @@ export default function Footer() {
                         target="_blank"
                         rel="noreferrer"
                         aria-label={link.label}
-                        className="flex h-7 w-7 items-center justify-center transition hover:opacity-80"
+                        className={`h-7 w-7 items-center justify-center transition hover:opacity-80 ${
+                          link.label === "Pinterest" || link.label === "X"
+                            ? "flex sm:hidden"
+                            : "flex"
+                        }`}
                       >
                         <img
                           src={link.image}
@@ -212,17 +216,18 @@ export default function Footer() {
               </div>
             </div>
 
-            <p className="mt-11 max-w-4xl text-sm  text-white/55">
+            <p className="mt-9 max-w-4xl text-sm text-white/55 sm:mt-11">
               The Kahwa Company&apos;s products are crafted for wellness and
               enjoyment, not for medical use. They are not intended to diagnose,
               treat, or cure any condition. Please consult a healthcare
               professional for any medical advice or concerns.
             </p>
 
-            <div className="mt-8 flex flex-col gap-3 text-base text-white/70 sm:flex-row sm:items-center sm:justify-between uppercase">
+            <div className="mt-5 flex flex-col gap-3 text-base normal-case text-white/70 sm:mt-8 sm:flex-row sm:items-center sm:justify-between sm:uppercase">
               <p>The Kahwa Company © 2026 · All rights reserved</p>
               <p className="flex items-center gap-2 ">
-                <span>Website by</span>
+                <span className="sm:hidden">Designed by</span>
+                <span className="hidden sm:inline">Website by</span>
                 <a
                   href="https://volymoly.com"
                   target="_blank"

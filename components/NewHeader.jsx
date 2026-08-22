@@ -215,7 +215,7 @@ export default function NewHeader() {
 
   return (
     <header
-      className={`w-full absolute top-0 z-50 border-b border-gray-200 ${
+      className={`w-full absolute top-0 z-50  ${
         isHome ? "bg-transparent border-none" : "bg-white"
       } text-gray-900`}
     >

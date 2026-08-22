@@ -282,8 +282,10 @@ function ProductRecommendations({ recommendations }) {
   const moveSlider = (direction) => {
     const slider = sliderRef.current;
     if (!slider) return;
+    const card = slider.firstElementChild;
+    const distance = (card?.getBoundingClientRect().width || 0) + 16;
     slider.scrollBy({
-      left: direction * slider.clientWidth * 0.88,
+      left: direction * distance,
       behavior: "smooth",
     });
   };
@@ -315,7 +317,7 @@ function ProductRecommendations({ recommendations }) {
           {recommendations.map((item) => (
             <div
               key={item.id}
-              className="w-[88%] shrink-0 snap-start first:ml-0"
+              className="w-[calc((100%_-_16px)/1.3)] shrink-0 snap-start first:ml-0"
             >
               <ProductCard product={item} variant="homepage" />
             </div>
@@ -553,7 +555,7 @@ function Reviews({ reviews, average, total, ratingCounts }) {
               </p>
             </div>
 
-            <div className="space-y-1 lg:px-8">
+            <div className="space-y-1 lg:px-8 ">
               {[5, 4, 3, 2, 1].map((star) => {
                 const count = counts[star - 1];
                 const percent = total ? Math.round((count / total) * 100) : 0;
@@ -840,7 +842,7 @@ export default function ProductDetail() {
         </div>
       ) : null}
 
-      <section className="">
+      <section className="bg-[#f6f8f2]">
         <div className="site-container grid gap-9 py-12 lg:grid-cols-[minmax(0,600px)_minmax(0,1fr)] lg:gap-12 lg:py-[62px]">
           {images.length ? (
             <div className="grid min-w-0 gap-5 md:relative md:block md:aspect-[6/5]">

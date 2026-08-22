@@ -116,7 +116,7 @@ export default function ProductCard({ product, variant = "default" }) {
           <div
             className={`relative mx-auto flex items-center justify-center ${
               isHomepage
-                ? "h-[240px] w-full sm:h-[240px] lg:h-[270px]"
+                ? "h-[280px] w-full sm:h-[240px] lg:h-[270px]"
                 : "h-auto w-[70%]"
             }`}
           >
@@ -200,13 +200,13 @@ export default function ProductCard({ product, variant = "default" }) {
       <button
         onClick={handleAddToCart}
         disabled={!isAvailable}
-        className={`mb-4 w-full py-3 cursor-pointer rounded-none bg-[#52653b] font-basker font-thin uppercase text-white transition hover:bg-[#6B7F42] ${
+        className={`mb-4 w-full cursor-pointer rounded-none bg-[#52653b] py-3 font-basker font-thin uppercase text-white transition hover:bg-[#6B7F42] ${
           isHomepage
             ? "text-md tracking-[0.02em] sm:text-base"
             : "text-md tracking-[0.12em]"
         }`}
       >
-        {isAvailable ? "Add To Cart" : "Out of Stock"}
+        {isAvailable ? "Shop Now" : "Out of Stock"}
       </button>
     </article>
   );
