@@ -34,7 +34,7 @@ function Rating({ product }) {
 
   return (
     <div
-      className="flex items-center gap-[2px]"
+      className="flex items-center justify-center gap-[2px] sm:justify-start"
       aria-label={`${rating} out of 5 stars`}
     >
       {Array.from({ length: 5 }).map((_, index) => (
@@ -110,16 +110,16 @@ function ProductDetails({ product, featured = false, onAdd }) {
   const currentPrice = productPrice(product);
 
   return (
-    <div className="min-w-0">
+    <div className="min-w-0 text-center sm:text-left">
       <h2
         className={`font-normal uppercase leading-[1.08] text-[#3f532b] ${
-          featured ? "text-[36px]" : "text-2xl"
+          featured ? "text-2xl sm:text-[36px]" : "text-2xl"
         }`}
         style={{ fontFamily: "var(--font-basker)" }}
       >
         {product.name}
       </h2>
-      <div className={featured ? "mt-5" : "mt-4"}>
+      <div className={featured ? "mt-4 sm:mt-5" : "mt-4"}>
         <Rating product={product} />
       </div>
       {description ? (
@@ -132,7 +132,7 @@ function ProductDetails({ product, featured = false, onAdd }) {
         </p>
       ) : null}
       <div
-        className={`mt-4 flex items-center gap-2  text-[#20231e] ${
+        className={`mt-4 flex items-center justify-center gap-2 text-[#20231e] sm:justify-start ${
           featured ? "text-[20px]" : "text-[20px]"
         }`}
       >
@@ -299,7 +299,7 @@ export default function ShopClient() {
 
   return (
     <main className="bg-white pt-[70px] text-[#1f251c]">
-      <section className="relative flex h-[80svh] min-h-[220px] max-h-[260px] items-center justify-center overflow-hidden">
+      <section className="relative flex h-[240px] md:h-[360px]  items-center justify-center overflow-hidden">
         <img
           src="/bg/Rectangle 4245.png"
           alt=""
@@ -352,7 +352,7 @@ export default function ShopClient() {
                   >
                     <ProductImage
                       product={featuredProduct}
-                      className="mx-auto h-[285px] w-[190px] sm:h-[340px] sm:w-[220px]"
+                      className="mx-auto h-[320px] w-[170px] sm:h-[340px] sm:w-[220px]"
                     />
                   </Link>
                   <div className="mt-8 sm:mt-0 sm:pl-7 lg:pl-8">
@@ -364,11 +364,13 @@ export default function ShopClient() {
                   </div>
                 </article>
 
-                <img
-                  src="/products/all_products/Rectangle 4343.png"
-                  alt="Kashmiri Kahwa presented with saffron and flowers"
-                  className="hidden h-[439px] w-full rounded-lg object-cover lg:block"
-                />
+                <div className="group hidden h-[439px] overflow-hidden rounded-lg lg:block">
+                  <img
+                    src="/products/all_products/Kashmiri_Image.png"
+                    alt="Kashmiri Kahwa presented with saffron and flowers"
+                    className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-110"
+                  />
+                </div>
               </div>
 
               {remainingProducts.length ? (
@@ -381,7 +383,7 @@ export default function ShopClient() {
                       <Link href={`/product/${product.slug || product.id}`}>
                         <ProductImage
                           product={product}
-                          className="mx-auto h-[280px] w-[135px]"
+                          className="mx-auto h-[320px] w-[170px] sm:h-[280px] sm:w-[135px]"
                         />
                       </Link>
                       <div className="mt-6 sm:mt-0 sm:pl-5">

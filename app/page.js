@@ -254,7 +254,7 @@ export default function Home() {
               <Link
                 key={post.id || `${post.title}-${index}`}
                 href={post.href || "/blogs"}
-                className="group snap-start overflow-hidden rounded-md bg-[#f1f4ec] p-2 transition hover:-translate-y-0.5"
+                className="group snap-start overflow-hidden rounded-md bg-[#f1f4ec] p-3 transition hover:-translate-y-0.5"
               >
                 <div className="h-[244px] overflow-hidden rounded sm:h-auto sm:aspect-[1.85/1]">
                   {post.image ? (

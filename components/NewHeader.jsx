@@ -25,7 +25,6 @@ export default function NewHeader() {
   const [isShopOpen, setIsShopOpen] = useState(false);
   const [isGiftsOpen, setIsGiftsOpen] = useState(false);
   const [isReadOpen, setIsReadOpen] = useState(false);
-  const [isOfferOpen, setIsOfferOpen] = useState(true);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -219,59 +218,6 @@ export default function NewHeader() {
         isHome ? "bg-transparent border-none" : "bg-white"
       } text-gray-900`}
     >
-      {isOfferOpen ? (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
-          <div className="relative w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl">
-            <button
-              type="button"
-              className="absolute right-4 top-4 cursor-pointer"
-              aria-label="Close offer"
-              onClick={() => setIsOfferOpen(false)}
-            >
-              <svg
-                className="w-7 h-7 text-gray-800 dark:text-white"
-                aria-hidden="true"
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                fill="black"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10S2 17.523 2 12Zm7.707-3.707a1 1 0 0 0-1.414 1.414L10.586 12l-2.293 2.293a1 1 0 1 0 1.414 1.414L12 13.414l2.293 2.293a1 1 0 0 0 1.414-1.414L13.414 12l2.293-2.293a1 1 0 0 0-1.414-1.414L12 10.586 9.707 8.293Z"
-                  clipRule="evenodd"
-                />
-              </svg>
-            </button>
-            <p className="text-md font-semibold uppercase tracking-[0.2em] text-black/60">
-              Welcome offer
-            </p>
-            <h3 className="mt-3 text-2xl font-semibold text-gray-900">
-              Get first dibs on new Kahwa drops
-            </h3>
-            <p className="mt-2 text-md text-gray-600">
-              Join our newsletter or WhatsApp list for early access and launch
-              offers.
-            </p>
-            <div className="mt-5 flex flex-col gap-3 sm:flex-row">
-              <button
-                type="button"
-                className="inline-flex flex-1 items-center justify-center rounded-full border border-black px-4 py-2 text-md font-semibold text-black hover:bg-black hover:text-white"
-              >
-                Join Newsletter
-              </button>
-              <button
-                type="button"
-                className="inline-flex flex-1 items-center justify-center rounded-full bg-black px-4 py-2 text-md font-semibold text-white hover:bg-black/80"
-              >
-                WhatsApp Updates
-              </button>
-            </div>
-          </div>
-        </div>
-      ) : null}
-
       <div>
         <div
           className={`relative ${
@@ -741,7 +687,7 @@ export default function NewHeader() {
                       Bestsellers
                     </p>
                     <Link
-                      href="/shop?search=kashmiri-kahwa"
+                      href="/shop"
                       className="relative block w-[340px] h-[340px] overflow-hidden rounded-sm"
                       onClick={closeShopDropdown}
                     >

@@ -188,7 +188,7 @@ export default function Footer() {
                         target="_blank"
                         rel="noreferrer"
                         aria-label={link.label}
-                        className={`h-10 w-10 items-center justify-center transition hover:opacity-80 ${
+                        className={`h-10 w-10 md:h-8 md:w-8 items-center justify-center transition hover:opacity-80 ${
                           link.label === "Pinterest" || link.label === "X"
                             ? "flex sm:hidden"
                             : "flex"
