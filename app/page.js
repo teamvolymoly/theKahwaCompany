@@ -150,7 +150,7 @@ export default function Home() {
                 <span className="mt-4 flex w-fit items-center gap-2 text-base font-semibold hover:underline  underline-offset-3">
                   <span>Discover More</span>
                   <img
-                    src="/icons/VectorRight.svg"
+                    src="/icons/VectorRight_black.svg"
                     alt=""
                     className="h-3.5 w-2 object-contain"
                   />
