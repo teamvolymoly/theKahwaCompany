@@ -451,86 +451,82 @@ export default function CheckoutPage() {
   };
 
   return (
-    <main className="min-h-screen bg-white text-black mt-14">
-      <section className="site-container py-12 lg:py-16">
+    <main className="min-h-screen bg-[#f7f9f3] pt-[70px] text-[#252923]">
+      <section className="site-container py-10 lg:py-14">
         <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
           <div>
-            <p className="text-md uppercase tracking-[0.09em] text-black/60">
+            {/* <p className="text-md uppercase tracking-[0.09em] text-[#667a49]">
               Checkout
-            </p>
-            <h1
-              className="mt-3 text-3xl md:text-4xl font-semibold"
-              style={{ fontFamily: "var(--font-display)" }}
-            >
+            </p> */}
+            <h1 className="mt-2 font-basker text-3xl text-center md:text-left  uppercase leading-none text-[#344823] md:text-4xl">
               Delivery details
             </h1>
           </div>
           <Link
             href="/cart"
-            className="self-start text-md font-semibold uppercase tracking-[0.08em] text-black/60 hover:text-black inline-flex items-center gap-2"
+            className="hidden md:inline-flex self-start items-center gap-2 text-md font-medium text-[#52633c] hover:underline underline-offset-3 sm:text-base"
           >
-            Back to cart <span aria-hidden="true">›</span>
+            Back to Cart
+            <img
+              src="/icons/VectorRight.svg"
+              alt=""
+              className="h-3.5 w-2 object-contain"
+            />
           </Link>
         </div>
 
-        <div className="mt-10 grid gap-8 lg:grid-cols-[1fr_1fr]">
-          <div className="rounded-sm border border-black/10 bg-white p-6 sm:p-8 shadow-sm h-fit">
+        <div className="mt-9 grid gap-6 lg:grid-cols-[minmax(0,1.15fr)_minmax(360px,.85fr)] lg:gap-8">
+          <div className="h-fit rounded-lg border border-[#dfe2da] bg-white p-5 shadow-[0_10px_30px_rgba(60,79,43,0.06)] sm:p-7">
             <div className="flex items-center gap-3">
-              <span className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-black/10 bg-black/5 text-black/70">
+              <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-[#e7ecdf] text-[#52653b]">
                 <User className="h-4 w-4" />
               </span>
               <div>
-                <p className="text-md uppercase tracking-[0.08em] text-black/50">
+                <p className="text-md font-semibold uppercase  text-[#344823]">
                   Shipping information
                 </p>
-                <p className="text-md text-black/60">
+                <p className="text-md text-[#687067]">
                   Confirm your contact details and choose an address.
                 </p>
               </div>
             </div>
             <div className="mt-6 grid gap-6">
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-2">
-                <div className="rounded-sm border border-black/10 bg-gray-50 p-4">
-                  <p className="text-[11px] uppercase tracking-[0.08em] text-black/50">
-                    Name
-                  </p>
-                  <p className="mt-2 text-md font-medium text-black">
+                <div className="rounded-md border border-[#dfe2da] bg-[#f7f9f3] p-4">
+                  <p className="text-[11px] uppercase  text-[#737b70]">Name</p>
+                  <p className="mt-2 text-md font-medium text-[#252923]">
                     {profile.name || "—"}
                   </p>
                 </div>
-                <div className="rounded-sm border border-black/10 bg-gray-50 p-4">
-                  <p className="text-[11px] uppercase tracking-[0.08em] text-black/50">
-                    Email
-                  </p>
-                  <p className="mt-2 text-md font-medium text-black">
+                <div className="rounded-md border border-[#dfe2da] bg-[#f7f9f3] p-4">
+                  <p className="text-[11px] uppercase  text-[#737b70]">Email</p>
+                  <p className="mt-2 text-md font-medium text-[#252923]">
                     {profile.email || "—"}
                   </p>
                 </div>
-                <div className="rounded-sm border border-black/10 bg-gray-50 p-4 h-fit">
-                  <p className="text-[11px] uppercase tracking-[0.08em] text-black/50">
-                    Phone
-                  </p>
-                  <p className="mt-2 text-md font-medium text-black">
+                <div className="h-fit rounded-md border border-[#dfe2da] bg-[#f7f9f3] p-4">
+                  <p className="text-[11px] uppercase  text-[#737b70]">Phone</p>
+                  <p className="mt-2 text-md font-medium text-[#252923]">
                     {profile.phone || "—"}
                   </p>
                 </div>
-                <div className="rounded-sm border border-black/10 bg-gray-50 p-4">
-                  <p className="text-[11px] uppercase tracking-[0.08em] text-black/50">
+                <div className="rounded-md border border-[#dfe2da] bg-[#f7f9f3] p-4">
+                  <p className="text-[11px] uppercase  text-[#737b70]">
                     Delivery phone
                   </p>
                   {deliveryPhone ? (
                     <div className="mt-2 flex flex-wrap items-center gap-3">
-                      <span className="text-md font-medium text-black">
+                      <span className="text-md font-medium text-[#252923]">
                         {deliveryPhone}
                       </span>
-                      <div className="flex gap-2 text-[11px] uppercase tracking-[0.08em] text-black/60">
+                      <div className="flex gap-2 text-[11px] uppercase  text-[#52653b]">
                         <button
                           type="button"
                           onClick={() => {
                             setEditingDeliveryPhone(true);
                             setDeliveryPhoneDraft(deliveryPhone);
                           }}
-                          className="rounded-sm border border-black/20 px-2.5 py-1 hover:border-black/60 cursor-pointer inline-flex items-center gap-2"
+                          className="inline-flex cursor-pointer items-center gap-2 rounded-sm border border-[#aeb9a1] px-2.5 py-1 hover:border-[#667a49]"
                         >
                           <Pencil className="h-2.5 w-2.5" />
                           Edit
@@ -556,7 +552,7 @@ export default function CheckoutPage() {
                         setEditingDeliveryPhone(true);
                         setDeliveryPhoneDraft("");
                       }}
-                      className="mt-2 rounded-sm border border-black/20 px-3 py-1.5 text-md uppercase tracking-[0.08em] text-black/70 hover:border-black/60 cursor-pointer"
+                      className="mt-2 cursor-pointer rounded-sm border border-[#aeb9a1] px-3 py-1.5 text-sm uppercase  text-[#52653b] hover:border-[#667a49]"
                     >
                       Add delivery phone
                     </button>
@@ -574,16 +570,16 @@ export default function CheckoutPage() {
                           )
                         }
                         placeholder="Alternate number"
-                        className="w-full rounded-sm border border-black/20 bg-white px-3 py-2 text-md outline-none focus:border-black"
+                        className="w-full rounded-md border border-[#cfd6c8] bg-white px-3 py-2 text-md outline-none focus:border-[#667a49]"
                       />
-                      <div className="flex gap-2 text-[11px] uppercase tracking-[0.08em] text-black/60">
+                      <div className="flex gap-2 text-[11px] uppercase  text-[#52653b]">
                         <button
                           type="button"
                           onClick={() => {
                             setDeliveryPhone(deliveryPhoneDraft);
                             setEditingDeliveryPhone(false);
                           }}
-                          className="rounded-sm border border-black/60 px-3 py-1.5 text-black hover:border-black cursor-pointer"
+                          className="cursor-pointer rounded-sm border border-[#52653b] px-3 py-1.5 text-[#52653b] hover:bg-[#f1f4ec]"
                         >
                           Save
                         </button>
@@ -593,7 +589,7 @@ export default function CheckoutPage() {
                             setEditingDeliveryPhone(false);
                             setDeliveryPhoneDraft(deliveryPhone);
                           }}
-                          className="rounded-sm border border-black/20 px-3 py-1.5 text-black/60 hover:border-black/60 cursor-pointer"
+                          className="cursor-pointer rounded-sm border border-[#aeb9a1] px-3 py-1.5 text-[#667061] hover:border-[#667a49]"
                         >
                           Cancel
                         </button>
@@ -604,17 +600,17 @@ export default function CheckoutPage() {
               </div>
 
               <div>
-                <div className="flex flex-wrap items-center justify-between gap-3 mt-8 border-t border-black/10 pt-6">
+                <div className="mt-8 flex flex-wrap items-center justify-between gap-3 border-t border-[#dfe2da] pt-6">
                   <div className="flex items-center gap-2">
-                    <MapPin className="h-4 w-4 text-black/60" />
-                    <p className="text-md uppercase tracking-[0.08em] text-black/50">
+                    <MapPin className="h-4 w-4 text-[#52653b]" />
+                    <p className="text-md font-semibold uppercase  text-[#344823]">
                       Select address
                     </p>
                   </div>
                   <button
                     type="button"
                     onClick={openAddAddress}
-                    className="rounded-sm border border-black/60 px-4 py-2 text-md font-semibold uppercase tracking-[0.08em] text-black hover:border-black cursor-pointer"
+                    className="rounded-md border border-[#6b7f42] px-4 py-2 text-md font-semibold uppercase  text-[#52653b] hover:bg-[#f1f4ec]"
                   >
                     Add new address
                   </button>
@@ -623,14 +619,14 @@ export default function CheckoutPage() {
                 {addressFormOpen && (
                   <form
                     onSubmit={handleSaveAddress}
-                    className="rounded-sm border border-black/10 bg-gray-50 p-5 mt-6"
+                    className="mt-6 rounded-md border border-[#dfe2da] bg-[#f7f9f3] p-5"
                   >
-                    <p className="text-md uppercase tracking-[0.08em] text-black/50">
+                    <p className="text-md uppercase  text-[#737b70]">
                       {addressForm.id ? "Edit address" : "Add address"}
                     </p>
                     <div className="mt-4 grid gap-4 md:grid-cols-2">
                       <div>
-                        <label className="text-md uppercase tracking-[0.08em] text-black/50">
+                        <label className="text-md uppercase  text-[#737b70]">
                           Label
                         </label>
                         <input
@@ -638,13 +634,13 @@ export default function CheckoutPage() {
                           name="label"
                           value={addressForm.label}
                           onChange={handleAddressChange}
-                          className="mt-2 w-full rounded-sm border border-black/20 px-3 py-2 text-md outline-none focus:border-black"
+                          className="mt-2 w-full rounded-md border border-[#cfd6c8] bg-white px-3 py-2 text-md outline-none focus:border-[#667a49]"
                           placeholder="Home / Office"
                           required
                         />
                       </div>
                       <div>
-                        <label className="text-md uppercase tracking-[0.08em] text-black/50">
+                        <label className="text-md uppercase  text-[#737b70]">
                           Country
                         </label>
                         <input
@@ -652,11 +648,11 @@ export default function CheckoutPage() {
                           name="country"
                           value={addressForm.country}
                           onChange={handleAddressChange}
-                          className="mt-2 w-full rounded-sm border border-black/20 px-3 py-2 text-md outline-none focus:border-black"
+                          className="mt-2 w-full rounded-md border border-[#cfd6c8] bg-white px-3 py-2 text-md outline-none focus:border-[#667a49]"
                         />
                       </div>
                       <div className="md:col-span-2">
-                        <label className="text-md uppercase tracking-[0.08em] text-black/50">
+                        <label className="text-md uppercase  text-[#737b70]">
                           Address line 1
                         </label>
                         <input
@@ -664,12 +660,12 @@ export default function CheckoutPage() {
                           name="address_line1"
                           value={addressForm.address_line1}
                           onChange={handleAddressChange}
-                          className="mt-2 w-full rounded-sm border border-black/20 px-3 py-2 text-md outline-none focus:border-black"
+                          className="mt-2 w-full rounded-md border border-[#cfd6c8] bg-white px-3 py-2 text-md outline-none focus:border-[#667a49]"
                           required
                         />
                       </div>
                       <div className="md:col-span-2">
-                        <label className="text-md uppercase tracking-[0.08em] text-black/50">
+                        <label className="text-md uppercase  text-[#737b70]">
                           Address line 2
                         </label>
                         <input
@@ -677,11 +673,11 @@ export default function CheckoutPage() {
                           name="address_line2"
                           value={addressForm.address_line2}
                           onChange={handleAddressChange}
-                          className="mt-2 w-full rounded-sm border border-black/20 px-3 py-2 text-md outline-none focus:border-black"
+                          className="mt-2 w-full rounded-md border border-[#cfd6c8] bg-white px-3 py-2 text-md outline-none focus:border-[#667a49]"
                         />
                       </div>
                       <div>
-                        <label className="text-md uppercase tracking-[0.08em] text-black/50">
+                        <label className="text-md uppercase  text-[#737b70]">
                           City
                         </label>
                         <input
@@ -689,12 +685,12 @@ export default function CheckoutPage() {
                           name="city"
                           value={addressForm.city}
                           onChange={handleAddressChange}
-                          className="mt-2 w-full rounded-sm border border-black/20 px-3 py-2 text-md outline-none focus:border-black"
+                          className="mt-2 w-full rounded-md border border-[#cfd6c8] bg-white px-3 py-2 text-md outline-none focus:border-[#667a49]"
                           required
                         />
                       </div>
                       <div>
-                        <label className="text-md uppercase tracking-[0.08em] text-black/50">
+                        <label className="text-md uppercase  text-[#737b70]">
                           State
                         </label>
                         <input
@@ -702,12 +698,12 @@ export default function CheckoutPage() {
                           name="state"
                           value={addressForm.state}
                           onChange={handleAddressChange}
-                          className="mt-2 w-full rounded-sm border border-black/20 px-3 py-2 text-md outline-none focus:border-black"
+                          className="mt-2 w-full rounded-md border border-[#cfd6c8] bg-white px-3 py-2 text-md outline-none focus:border-[#667a49]"
                           required
                         />
                       </div>
                       <div>
-                        <label className="text-md uppercase tracking-[0.08em] text-black/50">
+                        <label className="text-md uppercase  text-[#737b70]">
                           Pincode
                         </label>
                         <input
@@ -715,17 +711,17 @@ export default function CheckoutPage() {
                           name="pincode"
                           value={addressForm.pincode}
                           onChange={handleAddressChange}
-                          className="mt-2 w-full rounded-sm border border-black/20 px-3 py-2 text-md outline-none focus:border-black"
+                          className="mt-2 w-full rounded-md border border-[#cfd6c8] bg-white px-3 py-2 text-md outline-none focus:border-[#667a49]"
                           required
                         />
                       </div>
-                      <label className="flex items-center gap-2 text-md uppercase tracking-[0.08em] text-black/60 md:col-span-2">
+                      <label className="flex items-center gap-2 text-md uppercase  text-[#667061] md:col-span-2">
                         <input
                           type="checkbox"
                           name="is_default"
                           checked={addressForm.is_default}
                           onChange={handleAddressChange}
-                          className="accent-black"
+                          className="accent-[#52653b]"
                         />
                         Set as default
                       </label>
@@ -734,14 +730,14 @@ export default function CheckoutPage() {
                       <button
                         type="submit"
                         disabled={addressSaving}
-                        className="rounded-sm border border-black/60 bg-black px-5 py-2 text-md font-semibold uppercase tracking-[0.08em] text-white hover:bg-black/90 cursor-pointer"
+                        className="rounded-md bg-[#52653b] px-5 py-2 text-md font-semibold uppercase  text-white hover:bg-[#6b7f42]"
                       >
                         {addressSaving ? "Saving..." : "Save address"}
                       </button>
                       <button
                         type="button"
                         onClick={() => setAddressFormOpen(false)}
-                        className="rounded-sm border border-black/30 px-5 py-2 text-md font-semibold uppercase tracking-[0.08em] text-black hover:border-black cursor-pointer"
+                        className="rounded-md border border-[#aeb9a1] px-5 py-2 text-md font-semibold uppercase  text-[#52653b] hover:bg-white"
                       >
                         Cancel
                       </button>
@@ -753,7 +749,7 @@ export default function CheckoutPage() {
                   <p className="mt-3 text-md text-red-600">{addressError}</p>
                 )}
                 {loadingAddresses ? (
-                  <p className="mt-4 text-md text-black/60">
+                  <p className="mt-4 text-md text-[#667061]">
                     Loading addresses...
                   </p>
                 ) : addresses.length ? (
@@ -773,8 +769,8 @@ export default function CheckoutPage() {
                           }}
                           className={`rounded-sm border p-4 text-left transition cursor-pointer ${
                             isSelected
-                              ? "border-black/20 bg-gray-50"
-                              : "border-black/10 bg-white hover:border-black/30"
+                              ? "border-[#667a49] bg-[#f1f4ec]"
+                              : "border-[#dfe2da] bg-white hover:border-[#aeb9a1]"
                           }`}
                         >
                           <div className="flex items-center justify-between gap-3">
@@ -784,36 +780,36 @@ export default function CheckoutPage() {
                                 checked={isSelected}
                                 readOnly
                               />
-                              <p className="text-md uppercase tracking-[0.08em] text-black/50">
+                              <p className="text-md uppercase  text-[#737b70]">
                                 {address.label || "Address"}
                               </p>
                             </div>
                             {address.is_default && (
-                              <span className="rounded-sm border border-[#7a8177]/40 bg-[#7a8177]/10 px-2 py-1 text-[10px] uppercase tracking-[0.08em] text-[#4e5a50]">
+                              <span className="rounded-sm border border-[#7a8177]/40 bg-[#7a8177]/10 px-2 py-1 text-[10px] uppercase  text-[#4e5a50]">
                                 Default
                               </span>
                             )}
                           </div>
-                          <p className="mt-2 text-md text-black/80">
+                          <p className="mt-2 text-md text-[#252923]">
                             {address.address_line1}
                           </p>
-                          <p className="text-md text-black/70">
+                          <p className="text-md text-[#667061]">
                             {address.address_line2}
                           </p>
-                          <p className="text-md text-black/70">
+                          <p className="text-md text-[#667061]">
                             {address.city}, {address.state} {address.pincode}
                           </p>
-                          <p className="text-md text-black/70">
+                          <p className="text-md text-[#667061]">
                             {address.country}
                           </p>
-                          <div className="mt-4 flex flex-wrap gap-2 text-[11px] uppercase tracking-[0.08em] text-black/60">
+                          <div className="mt-4 flex flex-wrap gap-2 text-[11px] uppercase  text-[#52653b]">
                             <button
                               type="button"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 openEditAddress(address);
                               }}
-                              className="rounded-sm border border-black/20 px-2.5 py-1.5 hover:border-black/60 cursor-pointer inline-flex items-center gap-2"
+                              className="inline-flex cursor-pointer items-center gap-2 rounded-sm border border-[#aeb9a1] px-2.5 py-1.5 hover:border-[#667a49]"
                             >
                               <Pencil className="h-3.5 w-3.5" />
                               Edit
@@ -836,7 +832,7 @@ export default function CheckoutPage() {
                                   e.stopPropagation();
                                   handleSetDefault(address.id);
                                 }}
-                                className="rounded-sm border border-black/20 px-3 py-1.5 hover:border-black/60 cursor-pointer"
+                                className="cursor-pointer rounded-sm border border-[#aeb9a1] px-3 py-1.5 hover:border-[#667a49]"
                               >
                                 Make default
                               </button>
@@ -847,7 +843,7 @@ export default function CheckoutPage() {
                     })}
                   </div>
                 ) : (
-                  <p className="mt-4 text-md text-black/60">
+                  <p className="mt-4 text-md text-[#667061]">
                     No saved addresses yet.
                   </p>
                 )}
@@ -855,20 +851,20 @@ export default function CheckoutPage() {
             </div>
           </div>
 
-          <div className="rounded-sm border border-black/10 bg-gray-50 p-6 sm:p-8 h-fit">
-            <p className="text-md uppercase tracking-[0.09em] text-black/50">
+          <aside className="h-fit rounded-lg border border-[#dfe2da] bg-[#f1f4ec] p-5 shadow-[0_10px_30px_rgba(60,79,43,0.06)] sm:p-7 lg:sticky lg:top-24">
+            <p className="font-basker text-[28px] uppercase leading-none text-[#344823]">
               Order summary
             </p>
             <div className="mt-5 space-y-4">
               {checkoutLoading ? (
-                <p className="text-md text-black/60">Loading order...</p>
+                <p className="text-md text-[#667061]">Loading order...</p>
               ) : orderItems.length ? (
                 orderItems.map((item) => (
                   <div
                     key={`${item.id}-${item.variant_id}`}
-                    className="flex items-center gap-4 border-b border-black/10 pb-4"
+                    className="flex items-center gap-4 border-b border-[#d8dfd1] pb-4"
                   >
-                    <div className="h-14 w-14 overflow-hidden rounded-sm bg-white p-2">
+                    <div className="h-16 w-16 overflow-hidden rounded-md bg-white p-2">
                       <img
                         src={item.image}
                         alt={item.name}
@@ -876,37 +872,35 @@ export default function CheckoutPage() {
                       />
                     </div>
                     <div className="flex-1">
-                      <p className="text-md font-semibold text-black">
+                      <p className="text-md font-semibold text-[#252923]">
                         {item.name}
                       </p>
-                      <p className="text-md text-black/60">{item.variant}</p>
-                      <p className="text-md text-black/60">Qty: {item.qty}</p>
+                      <p className="text-md text-[#667061]">{item.variant}</p>
+                      <p className="text-md text-[#667061]">Qty: {item.qty}</p>
                     </div>
-                    <p className="text-md font-semibold text-black">
+                    <p className="text-md font-semibold text-[#344823]">
                       ₹ {item.line_total}
                     </p>
                   </div>
                 ))
               ) : (
-                <p className="text-md text-black/60">Your cart is empty.</p>
+                <p className="text-md text-[#667061]">Your cart is empty.</p>
               )}
             </div>
             {checkoutError && (
               <p className="mt-4 text-md text-red-600">{checkoutError}</p>
             )}
             {selectedAddressId && (
-              <div className="mt-5 rounded-sm border border-black/10 bg-white p-4">
-                <p className="text-md uppercase tracking-[0.2em] text-black/50">
-                  Deliver to
-                </p>
+              <div className="mt-5 rounded-md border border-[#d8dfd1] bg-white p-4">
+                <p className="text-md uppercase  text-[#737b70]">Deliver to</p>
                 {(() => {
                   const address = addresses.find(
                     (item) => item.id === selectedAddressId,
                   );
                   if (!address) return null;
                   return (
-                    <div className="mt-2 text-md text-black/70">
-                      <p className="font-semibold text-black">
+                    <div className="mt-2 text-md text-[#626a5b]">
+                      <p className="font-semibold text-[#344823]">
                         {address.label || "Address"}
                       </p>
                       <p>{address.address_line1}</p>
@@ -920,7 +914,7 @@ export default function CheckoutPage() {
                 })()}
               </div>
             )}
-            <div className="mt-4 space-y-3 text-md text-black/70">
+            <div className="mt-5 space-y-3 text-md text-[#626a5b]">
               <div className="flex items-center justify-between">
                 <span>Subtotal</span>
                 <span>₹ {subtotal}</span>
@@ -939,13 +933,13 @@ export default function CheckoutPage() {
                   <span>{`- ₹ ${discount}`}</span>
                 </div>
               )}
-              <div className="flex items-center justify-between border-t border-black/10 pt-3 text-black font-semibold">
-                <span>Total</span>
-                <span>₹ {total}</span>
+              <div className="flex items-center justify-between border-t border-[#cfd8c5] pt-4 font-semibold text-[#344823]">
+                <span className="text-lg">Total</span>
+                <span className="text-xl">₹ {total}</span>
               </div>
             </div>
 
-            <p className="mt-4 text-md text-black/50">
+            <p className="mt-4 text-md text-[#737b70]">
               By placing this order you agree to the Terms & Conditions.
             </p>
             {paymentError && (
@@ -957,43 +951,49 @@ export default function CheckoutPage() {
               disabled={
                 processingPayment || checkoutLoading || !orderItems.length
               }
-              className="mt-6 inline-flex w-full items-center justify-center rounded-full bg-black px-6 py-3 text-md uppercase tracking-[0.01em] text-white hover:bg-black/90 transition disabled:opacity-60 cursor-pointer"
+              className="mt-6 inline-flex w-full items-center justify-center rounded-full bg-[#52653b] px-6 py-3 text-md uppercase tracking-[0.04em] text-white hover:bg-[#6b7f42] disabled:opacity-60"
             >
               {processingPayment ? "Processing..." : "Pay now"}
             </button>
 
-            <div className="mt-6 rounded-sm border border-black/10 bg-white p-5">
-              <p className="text-md uppercase tracking-[0.2em] text-black/50">
+            <div className="mt-6 rounded-md border border-[#d8dfd1] bg-white p-5">
+              <p className="text-md uppercase  text-[#737b70]">
                 Secure payment
               </p>
               <div className="mt-4 flex flex-wrap items-center gap-3">
-                <div className="px-3 py-2 bg-gray-50 rounded-sm">
+                <div className="rounded-md px-3 py-2">
                   <img
                     src="/icons/payment/razorpay-icon.png"
                     alt="Razorpay"
                     className="h-10 w-auto object-contain"
                   />
                 </div>
-                <div className="px-3 py-2 bg-gray-50 rounded-sm">
+                <div className="rounded-md px-3 py-2">
                   <img
                     src="/icons/payment/upi-icon.png"
                     alt="UPI"
                     className="h-10 w-auto object-contain"
                   />
                 </div>
-                <div className="px-3 py-2 bg-gray-50 rounded-sm">
-                  <img
-                    src="/icons/payment/icons8-card-100.png"
-                    alt="Cards"
-                    className="h-10 w-auto object-contain"
-                  />
-                </div>
               </div>
-              <p className="mt-4 text-md text-black/60">
+              <p className="mt-4 text-sm text-[#687067]">
                 Click Pay Now to open the Razorpay secure payment window.
               </p>
             </div>
-          </div>
+          </aside>
+        </div>
+        <div className="flex justify-center md:hidden mt-5 ">
+          <Link
+            href="/cart"
+            className="inline-flex self-start items-center gap-2 text-md font-medium text-[#52633c] hover:underline underline-offset-3 sm:text-base"
+          >
+            Back to Cart
+            <img
+              src="/icons/VectorRight.svg"
+              alt=""
+              className="h-3.5 w-2 object-contain"
+            />
+          </Link>
         </div>
       </section>
     </main>
