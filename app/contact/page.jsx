@@ -78,7 +78,7 @@ export default function ContactPage() {
   return (
     <main className="bg-[#fdfefb] pt-[70px] text-[#252a23]">
       <section className="site-container pb-[92px] pt-[72px]">
-        <h1 className="font-(family-name:--font-basker) text-4xl text-center md:text-left font-normal uppercase leading-none text-[#344823]">
+        <h1 className="font-(family-name:--font-basker) text-[28px] md:text-4xl text-center md:text-left font-normal uppercase leading-none text-[#344823]">
           Contact Us
         </h1>
         <p className="mt-6 max-w-[1040px] text-[18px] text-[#333730]">
