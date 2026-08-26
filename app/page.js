@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { Swiper, SwiperSlide } from "swiper/react";
 
 import HeroSection from "@/components/HeroSection";
 import ProductCard from "@/components/ProductCard";
@@ -12,6 +13,8 @@ import {
   extractProductItems,
   normalizeProductListItem,
 } from "@/utils/products";
+
+import "swiper/css";
 
 const fallbackArticles = [
   {
@@ -41,18 +44,17 @@ const fallbackArticles = [
 ];
 
 export default function Home() {
-  const productsSliderRef = useRef(null);
+  const productsSwiperRef = useRef(null);
   const articlesSliderRef = useRef(null);
   const [products, setProducts] = useState([]);
   const [blogPosts, setBlogPosts] = useState(fallbackArticles);
   const [loadingProducts, setLoadingProducts] = useState(true);
 
   const scrollProducts = (direction) => {
-    const slider = productsSliderRef.current;
-    if (!slider) return;
-    const card = slider.firstElementChild;
-    const distance = (card?.getBoundingClientRect().width || 0) + 14;
-    slider.scrollBy({ left: direction * distance, behavior: "smooth" });
+    const slider = productsSwiperRef.current;
+    if (!slider || slider.destroyed) return;
+    if (direction < 0) slider.slidePrev();
+    else slider.slideNext();
   };
 
   const scrollArticles = (direction) => {
@@ -159,36 +161,48 @@ export default function Home() {
             </div>
           </Link>
 
-          <div
-            ref={productsSliderRef}
-            className="homepage-products mt-4 grid grid-flow-col gap-3.5 overflow-x-auto pb-2 sm:pb-3"
+          <Swiper
+            onSwiper={(swiper) => {
+              productsSwiperRef.current = swiper;
+            }}
+            slidesPerView={1.3}
+            spaceBetween={14}
+            grabCursor
+            breakpoints={{
+              640: { slidesPerView: 2, spaceBetween: 14 },
+              768: { slidesPerView: 3, spaceBetween: 14 },
+              1024: { slidesPerView: 4, spaceBetween: 14 },
+            }}
+            className="mt-4 !pb-2 sm:!pb-3"
           >
             {loadingProducts
               ? Array.from({ length: 4 }).map((_, index) => (
-                  <div
+                  <SwiperSlide
                     key={`product-loading-${index}`}
-                    className="h-[350px] animate-pulse rounded-sm border border-[#e8ecdf] bg-[#f1f4ec]"
+                    className="!h-auto"
                     aria-hidden="true"
-                  />
+                  >
+                    <div className="h-[350px] animate-pulse rounded-sm border border-[#e8ecdf] bg-[#f1f4ec]" />
+                  </SwiperSlide>
                 ))
               : null}
 
             {!loadingProducts && products.length === 0 ? (
-              <div className="col-span-full rounded-sm border border-[#e8ecdf] bg-[#f7f9f3] p-8 text-md text-[#626a5b]">
-                No products are available right now.
-              </div>
+              <SwiperSlide className="!h-auto">
+                <div className="rounded-sm border border-[#e8ecdf] bg-[#f7f9f3] p-8 text-md text-[#626a5b]">
+                  No products are available right now.
+                </div>
+              </SwiperSlide>
             ) : null}
 
             {!loadingProducts
               ? products.map((product) => (
-                  <ProductCard
-                    key={product.id}
-                    product={product}
-                    variant="homepage"
-                  />
+                  <SwiperSlide key={product.id} className="!h-auto">
+                    <ProductCard product={product} variant="homepage" />
+                  </SwiperSlide>
                 ))
               : null}
-          </div>
+          </Swiper>
 
           <div className="mt-7 flex items-center justify-between sm:hidden">
             <button
@@ -254,14 +268,14 @@ export default function Home() {
               <Link
                 key={post.id || `${post.title}-${index}`}
                 href={post.href || "/blogs"}
-                className="group snap-start overflow-hidden rounded-md bg-[#f1f4ec] p-3 transition hover:-translate-y-0.5"
+                className="snap-start overflow-hidden rounded-md bg-[#f1f4ec] p-3"
               >
                 <div className="h-[244px] overflow-hidden rounded sm:h-auto sm:aspect-[1.85/1]">
                   {post.image ? (
                     <img
                       src={post.image}
                       alt={post.title}
-                      className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.025]"
+                      className="h-full w-full object-cover"
                     />
                   ) : (
                     <div className="h-full w-full bg-[#e3e8db]" />
@@ -311,34 +325,6 @@ export default function Home() {
         </div>
       </section>
 
-      <style jsx global>{`
-        .homepage-products {
-          grid-auto-columns: calc((100% - 14px) / 1.3);
-          scrollbar-width: none;
-        }
-
-        .homepage-products::-webkit-scrollbar {
-          display: none;
-        }
-
-        @media (min-width: 640px) {
-          .homepage-products {
-            grid-auto-columns: calc((100% - 14px) / 2);
-          }
-        }
-
-        @media (min-width: 768px) {
-          .homepage-products {
-            grid-auto-columns: calc((100% - 28px) / 3);
-          }
-        }
-
-        @media (min-width: 1024px) {
-          .homepage-products {
-            grid-auto-columns: calc((100% - 42px) / 4);
-          }
-        }
-      `}</style>
     </main>
   );
 }

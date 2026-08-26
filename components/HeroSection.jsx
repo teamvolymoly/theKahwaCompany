@@ -1,10 +1,14 @@
 "use client";
 
-import { useEffect, useRef, useMemo, useState } from "react";
-import gsap from "gsap";
+import { useEffect, useMemo, useState } from "react";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { A11y, FreeMode, Keyboard } from "swiper/modules";
 import ShopNowButton from "@/components/ShopNowButton";
 import Link from "next/link";
 import { apiFetch } from "@/utils/api";
+
+import "swiper/css";
+import "swiper/css/free-mode";
 
 const FALLBACK_ITEMS = [
   {
@@ -33,25 +37,16 @@ const FALLBACK_ITEMS = [
 export default function HeroSection() {
   const [items, setItems] = useState(FALLBACK_ITEMS);
   const [apiReady, setApiReady] = useState(false);
-  const [readyTick, setReadyTick] = useState(0);
-  const containerRef = useRef(null);
-  const cardsRef = useRef([]);
-  const prefersReducedMotion = useRef(false);
-  const snapTweenRef = useRef(null);
-  const snapTimerRef = useRef(null);
-  const snapIntervalRef = useRef(null);
 
-  // Stable mutable refs — no re-renders on change
-  const stateRef = useRef({
-    offset: 0,
-    step: 0,
-    total: 0,
-    cardWidth: 0,
-    containerWidth: 0,
-    drag: { isDown: false, startX: 0, startOffset: 0, velocity: 0, lastX: 0 },
-    // Cache base positions to avoid per-frame calculation
-    basePositions: /** @type {number[]} */ ([]),
-  });
+  // Centered loop mode needs a healthy slide buffer in both directions,
+  // especially when desktop displays almost four slides at once.
+  const sliderItems = useMemo(() => {
+    if (items.length < 2 || items.length >= 10) return items;
+    return Array.from(
+      { length: Math.ceil(10 / items.length) },
+      () => items,
+    ).flat();
+  }, [items]);
 
   useEffect(() => {
     let active = true;
@@ -87,248 +82,6 @@ export default function HeroSection() {
     };
   }, []);
 
-  // Triple-clone for seamless infinite loop (prev | real | next)
-  const galleryItems = useMemo(() => [...items, ...items, ...items], [items]);
-  const count = galleryItems.length;
-
-  useEffect(() => {
-    cardsRef.current = Array.from({ length: count }, () => null);
-  }, [count]);
-
-  useEffect(() => {
-    const container = containerRef.current;
-    const cards = cardsRef.current.filter(Boolean).slice(0, count);
-    if (!apiReady || !container || cards.length !== count) {
-      const id = requestAnimationFrame(() => setReadyTick((tick) => tick + 1));
-      return () => cancelAnimationFrame(id);
-    }
-
-    prefersReducedMotion.current = window.matchMedia?.(
-      "(prefers-reduced-motion: reduce)",
-    )?.matches;
-
-    // --- Promote all cards to their own GPU layer once ---
-    cards.forEach((card) => {
-      card.style.willChange = "transform";
-    });
-
-    // ─── Metrics ────────────────────────────────────────────────────────────
-    const compute = () => {
-      const W = container.clientWidth;
-      const H = container.clientHeight;
-      // Control outer padding and inner spacing separately for tighter layout
-      const outerGap = W < 640 ? 4 : W < 1024 ? 8 : 12;
-      const innerGap = W < 640 ? 1 : W < 1024 ? 4 : 6;
-
-      // Responsive visible cards:
-      // - small: 1.5 cards
-      // - medium: 2.5 cards
-      // - large+: ~3.2 cards (slightly smaller cards to prevent bottom overflow)
-      const cardsVisible = W < 640 ? 1.5 : W < 1024 ? 2.5 : W < 1280 ? 3 : 3.6;
-
-      const baseCardWidth =
-        (W - outerGap * 2 - innerGap * (cardsVisible - 1)) / cardsVisible;
-      // Cap card height so the carousel never overflows on large screens
-      const maxCardHeight = H * 0.78;
-      const maxCardWidth = maxCardHeight * (3 / 4); // aspect-[3/4]
-      const cardWidth = Math.min(baseCardWidth, maxCardWidth);
-      const positionScale = W < 640 ? 0.93 : W < 1024 ? 0.95 : 0.96;
-      const step = (cardWidth + innerGap) * positionScale;
-      const total = count * step;
-
-      // Seed offset so the real (middle) set is centred on screen
-      const centerSet = items.length; // index of first "real" item
-      const centreOffset = centerSet * step - (W / 2 - cardWidth / 2);
-
-      const state = stateRef.current;
-      state.drag.velocity = 0;
-      state.drag.isDown = false;
-      state.cardWidth = cardWidth;
-      state.step = step;
-      state.total = total;
-      state.containerWidth = W;
-      state.offset = centreOffset;
-
-      // Pre-compute base X for each card (never changes after resize)
-      state.basePositions = cards.map((_, i) => i * step);
-
-      // Set card dimensions via CSS only — no JS height calculation
-      cards.forEach((card) => {
-        card.style.width = `${cardWidth}px`;
-      });
-    };
-
-    compute();
-
-    // Debounce resize to avoid thrashing
-    let resizeTimer;
-    const onResize = () => {
-      clearTimeout(resizeTimer);
-      resizeTimer = setTimeout(compute, 60);
-    };
-    window.addEventListener("resize", onResize, { passive: true });
-
-    // ─── Ticker ──────────────────────────────────────────────────────────────
-    const FRICTION = 0.93;
-
-    const snapToNearest = () => {
-      const state = stateRef.current;
-      const { step, total, cardWidth, containerWidth } = state;
-      if (!step || !total) return;
-      const center = containerWidth / 2;
-      const rawIndex = Math.round(
-        (state.offset + center - cardWidth / 2) / step,
-      );
-      const targetBase = rawIndex * step;
-      let targetOffset = targetBase + cardWidth / 2 - center;
-      targetOffset = ((targetOffset % total) + total) % total;
-
-      snapTweenRef.current?.kill();
-      snapTweenRef.current = gsap.to(state, {
-        offset: targetOffset,
-        duration: 0.3,
-        ease: "power2.out",
-        onComplete: () => {
-          snapTweenRef.current = null;
-          state.drag.velocity = 0;
-        },
-      });
-    };
-
-    const tick = () => {
-      const state = stateRef.current;
-      const { step, total, cardWidth, containerWidth, drag, basePositions } =
-        state;
-      if (!total) return;
-
-      // Auto-scroll + inertia when not dragging
-      if (!drag.isDown) {
-        state.offset += drag.velocity;
-        drag.velocity *= FRICTION;
-        if (Math.abs(drag.velocity) < 0.01) drag.velocity = 0;
-        // Let inertia breathe; snapping is handled after pointer up
-      }
-
-      // Keep offset in [0, total) — modulo wrapping
-      state.offset = ((state.offset % total) + total) % total;
-
-      const center = containerWidth / 2;
-
-      for (let i = 0; i < count; i++) {
-        const card = cards[i];
-        // Shift raw base position by current offset
-        let x = basePositions[i] - state.offset;
-
-        // Wrap into the visible window ±1 full set
-        if (x < -step) x += total;
-        else if (x > total - step) x -= total;
-
-        const cardCenter = x + cardWidth / 2;
-        const distanceInCards = Math.abs(cardCenter - center) / step;
-        const scale = 1 - Math.min(0.16, distanceInCards * 0.08);
-
-        // Keep the row flat while making the centred product the focus.
-        gsap.set(card, {
-          x,
-          y: 0,
-          rotation: 0,
-          scale,
-          zIndex: Math.max(1, 5 - Math.round(distanceInCards)),
-          transformOrigin: "50% 50%",
-        });
-      }
-    };
-
-    if (!prefersReducedMotion.current) {
-      gsap.ticker.add(tick);
-    } else {
-      tick();
-    }
-
-    // ─── Drag ────────────────────────────────────────────────────────────────
-    const onPointerDown = (e) => {
-      const drag = stateRef.current.drag;
-      snapTweenRef.current?.kill();
-      snapTweenRef.current = null;
-      clearTimeout(snapTimerRef.current);
-      clearInterval(snapIntervalRef.current);
-      drag.isDown = true;
-      drag.startX = e.clientX;
-      drag.lastX = e.clientX;
-      drag.startOffset = stateRef.current.offset;
-      drag.velocity = 0;
-      container.setPointerCapture(e.pointerId);
-      container.style.cursor = "grabbing";
-    };
-
-    const onPointerMove = (e) => {
-      const drag = stateRef.current.drag;
-      if (!drag.isDown) return;
-      const dx = e.clientX - drag.startX;
-      stateRef.current.offset = drag.startOffset - dx;
-      drag.velocity = drag.lastX - e.clientX;
-      drag.lastX = e.clientX;
-    };
-
-    const onPointerUp = () => {
-      stateRef.current.drag.isDown = false;
-      container.style.cursor = "grab";
-      if (!prefersReducedMotion.current) {
-        clearTimeout(snapTimerRef.current);
-        clearInterval(snapIntervalRef.current);
-        snapTimerRef.current = setTimeout(() => {
-          let checks = 0;
-          snapIntervalRef.current = setInterval(() => {
-            const { velocity, isDown } = stateRef.current.drag;
-            if (isDown) {
-              clearInterval(snapIntervalRef.current);
-              return;
-            }
-            if (Math.abs(velocity) < 0.2) {
-              clearInterval(snapIntervalRef.current);
-              snapToNearest();
-            }
-            checks += 1;
-            if (checks > 12) {
-              clearInterval(snapIntervalRef.current);
-            }
-          }, 80);
-        }, 220);
-      }
-    };
-
-    container.addEventListener("pointerdown", onPointerDown);
-    container.addEventListener("pointermove", onPointerMove);
-    container.addEventListener("pointerup", onPointerUp);
-    container.addEventListener("pointercancel", onPointerUp);
-
-    container.style.cursor = "grab";
-
-    return () => {
-      snapTweenRef.current?.kill();
-      snapTweenRef.current = null;
-      clearTimeout(snapTimerRef.current);
-      clearInterval(snapIntervalRef.current);
-      if (!prefersReducedMotion.current) {
-        gsap.ticker.remove(tick);
-      }
-      clearTimeout(resizeTimer);
-      window.removeEventListener("resize", onResize);
-      container.removeEventListener("pointerdown", onPointerDown);
-      container.removeEventListener("pointermove", onPointerMove);
-      container.removeEventListener("pointerup", onPointerUp);
-      container.removeEventListener("pointercancel", onPointerUp);
-      cards.forEach((card) => (card.style.willChange = "auto"));
-    };
-  }, [count, items.length, readyTick, apiReady]);
-
-  const nudge = (dir) => {
-    const state = stateRef.current;
-    if (!state.step) return;
-    state.offset += dir * state.step;
-    state.drag.velocity = dir * 6;
-  };
-
   return (
     <div
       className="relative isolate flex min-h-[760px] w-full flex-col items-center justify-start bg-cover bg-center sm:min-h-[900px] md:min-h-[1000px] lg:min-h-[1120px] xl:min-h-[1240px]"
@@ -354,48 +107,57 @@ export default function HeroSection() {
       {/* Carousel */}
       {apiReady ? (
         <section
-          ref={containerRef}
-          className="
-            relative w-full overflow-hidden select-none touch-pan-y
-            bg-gradient-to-t from-white via-white/70 to-transparent
-            mt-8 h-[440px] sm:h-[560px] md:h-[680px] lg:h-[800px] xl:h-[900px] max-h-[980px]
-          "
+          className="relative mt-8 h-[440px] max-h-[980px] w-full overflow-hidden bg-gradient-to-t from-white via-white/70 to-transparent sm:h-[560px] md:h-[680px] lg:h-[800px] xl:h-[900px]"
           aria-label="Product carousel"
-          tabIndex={0}
-          onKeyDown={(e) => {
-            if (e.key === "ArrowLeft") nudge(1);
-            if (e.key === "ArrowRight") nudge(-1);
-          }}
         >
-          {galleryItems.map((item, i) => (
-            <article
-              key={`${item.text}-${i}`}
-              ref={(el) => {
-                cardsRef.current[i] = el || null;
-              }}
-              className="
-                absolute left-0
-                top-[42%] -translate-y-1/2
-                md:top-[38%] lg:top-[36%] xl:top-[34%]
-                flex flex-col items-center justify-end
-                /* aspect ratio driven by CSS ? no JS height */
-                aspect-[3/4]
-              "
-              aria-label={item.text}
-            >
-              <div className="flex h-full w-full items-center justify-center">
-                <img
-                  src={item.image}
-                  alt={item.text}
-                  className="max-h-full max-w-full object-contain drop-shadow-[0_18px_35px_rgba(0,0,0,0.18)]"
-                  draggable={false}
-                />
-              </div>
-              <p className="mt-1 mb-1 text-md md:text-xl text-black uppercase font-medium tracking-wide opacity-80">
-                {item.text}
-              </p>
-            </article>
-          ))}
+          <Swiper
+            modules={[A11y, FreeMode, Keyboard]}
+            className="h-full w-full"
+            slidesPerView={1.5}
+            spaceBetween={8}
+            centeredSlides
+            loop={sliderItems.length > 1}
+            loopAdditionalSlides={sliderItems.length}
+            grabCursor
+            freeMode={{
+              enabled: true,
+              momentum: true,
+              momentumRatio: 0.7,
+              sticky: true,
+            }}
+            keyboard={{ enabled: true }}
+            speed={400}
+            slideToClickedSlide
+            breakpoints={{
+              640: { slidesPerView: 2.2, spaceBetween: 16 },
+              768: { slidesPerView: 2.5, spaceBetween: 20 },
+              1024: { slidesPerView: 3, spaceBetween: 24 },
+            }}
+          >
+            {sliderItems.map((item, index) => (
+              <SwiperSlide
+                key={`${item.slug || item.text}-${index}`}
+                className="!flex items-start justify-center pt-6 transition-[scale,opacity] duration-500 ease-out [&.swiper-slide-active]:scale-105 [&:not(.swiper-slide-active)]:scale-90 [&:not(.swiper-slide-active)]:opacity-80 sm:pt-8 md:pt-10"
+              >
+                <article
+                  className="flex h-[78%] max-w-full aspect-[3/4] flex-col items-center justify-end"
+                  aria-label={item.text}
+                >
+                  <div className="flex min-h-0 w-full flex-1 items-center justify-center">
+                    <img
+                      src={item.image}
+                      alt={item.text}
+                      className="max-h-full max-w-full object-contain drop-shadow-[0_18px_35px_rgba(0,0,0,0.18)]"
+                      draggable={false}
+                    />
+                  </div>
+                  <p className="mb-1 mt-1 text-center text-md font-medium uppercase tracking-wide text-black opacity-80 md:text-xl">
+                    {item.text}
+                  </p>
+                </article>
+              </SwiperSlide>
+            ))}
+          </Swiper>
         </section>
       ) : (
         <div className="mt-8 flex h-[440px] w-full items-center justify-center text-md text-black/60 sm:h-[560px] md:h-[680px] lg:h-[800px] xl:h-[900px]">
