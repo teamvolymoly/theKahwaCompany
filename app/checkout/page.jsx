@@ -453,7 +453,7 @@ export default function CheckoutPage() {
   return (
     <main className="min-h-screen bg-[#f7f9f3] pt-[70px] text-[#252923]">
       <section className="site-container py-10 lg:py-14">
-        <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
             {/* <p className="text-md uppercase tracking-[0.09em] text-[#667a49]">
               Checkout
@@ -462,21 +462,23 @@ export default function CheckoutPage() {
               Delivery details
             </h1>
           </div>
-          <Link
-            href="/cart"
-            className="hidden md:inline-flex self-start items-center gap-2 text-md font-medium text-[#52633c] hover:underline underline-offset-3 sm:text-base"
-          >
-            Back to Cart
-            <img
-              src="/icons/VectorRight.svg"
-              alt=""
-              className="h-3.5 w-2 object-contain"
-            />
-          </Link>
+          <div>
+            <Link
+              href="/cart"
+              className="hidden md:inline-flex self-start items-center gap-2 text-md font-medium text-[#52633c] hover:underline underline-offset-3 sm:text-base"
+            >
+              Back to Cart
+              <img
+                src="/icons/VectorRight.svg"
+                alt=""
+                className="h-3.5 w-2 object-contain"
+              />
+            </Link>
+          </div>
         </div>
 
         <div className="mt-9 grid gap-6 lg:grid-cols-[minmax(0,1.15fr)_minmax(360px,.85fr)] lg:gap-8">
-          <div className="h-fit rounded-lg border border-[#dfe2da] bg-white p-5 shadow-[0_10px_30px_rgba(60,79,43,0.06)] sm:p-7">
+          <div className="h-fit rounded-lg bg-white p-5 sm:p-7">
             <div className="flex items-center gap-3">
               <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-[#e7ecdf] text-[#52653b]">
                 <User className="h-4 w-4" />
@@ -492,25 +494,25 @@ export default function CheckoutPage() {
             </div>
             <div className="mt-6 grid gap-6">
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-2">
-                <div className="rounded-md border border-[#dfe2da] bg-[#f7f9f3] p-4">
+                <div className="rounded-md bg-[#f7f9f3] p-4">
                   <p className="text-[11px] uppercase  text-[#737b70]">Name</p>
                   <p className="mt-2 text-md font-medium text-[#252923]">
                     {profile.name || "—"}
                   </p>
                 </div>
-                <div className="rounded-md border border-[#dfe2da] bg-[#f7f9f3] p-4">
+                <div className="rounded-md bg-[#f7f9f3] p-4">
                   <p className="text-[11px] uppercase  text-[#737b70]">Email</p>
                   <p className="mt-2 text-md font-medium text-[#252923]">
                     {profile.email || "—"}
                   </p>
                 </div>
-                <div className="h-fit rounded-md border border-[#dfe2da] bg-[#f7f9f3] p-4">
+                <div className="h-fit rounded-md bg-[#f7f9f3] p-4">
                   <p className="text-[11px] uppercase  text-[#737b70]">Phone</p>
                   <p className="mt-2 text-md font-medium text-[#252923]">
                     {profile.phone || "—"}
                   </p>
                 </div>
-                <div className="rounded-md border border-[#dfe2da] bg-[#f7f9f3] p-4">
+                <div className="rounded-md bg-[#f7f9f3] p-4">
                   <p className="text-[11px] uppercase  text-[#737b70]">
                     Delivery phone
                   </p>
@@ -851,9 +853,9 @@ export default function CheckoutPage() {
             </div>
           </div>
 
-          <aside className="h-fit rounded-lg border border-[#dfe2da] bg-[#f1f4ec] p-5 shadow-[0_10px_30px_rgba(60,79,43,0.06)] sm:p-7 lg:sticky lg:top-24">
+          <aside className="h-fit rounded-lg bg-[#f1f4ec] p-5 sm:p-7 lg:sticky lg:top-24">
             <p className="font-basker text-[28px] uppercase leading-none text-[#344823]">
-              Order summary
+              Order Summary
             </p>
             <div className="mt-5 space-y-4">
               {checkoutLoading ? (
@@ -891,7 +893,7 @@ export default function CheckoutPage() {
               <p className="mt-4 text-md text-red-600">{checkoutError}</p>
             )}
             {selectedAddressId && (
-              <div className="mt-5 rounded-md border border-[#d8dfd1] bg-white p-4">
+              <div className="mt-5 rounded-md bg-white p-4">
                 <p className="text-md uppercase  text-[#737b70]">Deliver to</p>
                 {(() => {
                   const address = addresses.find(
@@ -939,9 +941,6 @@ export default function CheckoutPage() {
               </div>
             </div>
 
-            <p className="mt-4 text-md text-[#737b70]">
-              By placing this order you agree to the Terms & Conditions.
-            </p>
             {paymentError && (
               <p className="mt-4 text-md text-red-600">{paymentError}</p>
             )}
@@ -956,9 +955,27 @@ export default function CheckoutPage() {
               {processingPayment ? "Processing..." : "Pay now"}
             </button>
 
-            <div className="mt-6 rounded-md border border-[#d8dfd1] bg-white p-5">
+            <p className="mt-4 text-center text-sm leading-relaxed text-[#737b70]">
+              By placing this order, you agree to the{" "}
+              <Link
+                href="/shipping"
+                className="font-medium text-[#52653b] underline decoration-1 underline-offset-2 hover:text-[#344823]"
+              >
+                Shipping
+              </Link>{" "}
+              and{" "}
+              <Link
+                href="/refund"
+                className="font-medium text-[#52653b] underline decoration-1 underline-offset-2 hover:text-[#344823]"
+              >
+                Refund Policy
+              </Link>
+              .
+            </p>
+
+            <div className="mt-6 rounded-md bg-white p-5">
               <p className="text-md uppercase  text-[#737b70]">
-                Secure payment
+                Secure payment with
               </p>
               <div className="mt-4 flex flex-wrap items-center gap-3">
                 <div className="rounded-md px-3 py-2">
@@ -976,9 +993,9 @@ export default function CheckoutPage() {
                   />
                 </div>
               </div>
-              <p className="mt-4 text-sm text-[#687067]">
+              {/* <p className="mt-4 text-sm text-[#687067]">
                 Click Pay Now to open the Razorpay secure payment window.
-              </p>
+              </p> */}
             </div>
           </aside>
         </div>
