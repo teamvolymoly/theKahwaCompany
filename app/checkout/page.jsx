@@ -458,7 +458,7 @@ export default function CheckoutPage() {
             {/* <p className="text-md uppercase tracking-[0.09em] text-[#667a49]">
               Checkout
             </p> */}
-            <h1 className="mt-2 font-basker text-3xl text-center md:text-left  uppercase leading-none text-[#344823] md:text-4xl">
+            <h1 className="mt-2 font-basker text-[28px] md:text-4xl text-center md:text-left  uppercase leading-none text-[#344823]">
               Delivery details
             </h1>
           </div>
