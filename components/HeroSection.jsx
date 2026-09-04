@@ -2,13 +2,15 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { A11y, FreeMode, Keyboard } from "swiper/modules";
+import { A11y, EffectCoverflow, Keyboard } from "swiper/modules";
 import ShopNowButton from "@/components/ShopNowButton";
 import Link from "next/link";
 import { apiFetch } from "@/utils/api";
 
 import "swiper/css";
-import "swiper/css/free-mode";
+import "swiper/css/effect-coverflow";
+
+import styles from "./HeroSection.module.css";
 
 const FALLBACK_ITEMS = [
   {
@@ -24,7 +26,7 @@ const FALLBACK_ITEMS = [
   {
     image: "/products/tin/BLTIN1.png",
     text: "Blue Kahwa",
-    slug: "kashmiri-kahwa",
+    slug: "blue-kahwa",
   },
   {
     image: "/products/tin/OTTIN1.png",
@@ -84,7 +86,7 @@ export default function HeroSection() {
 
   return (
     <div
-      className="relative isolate flex min-h-[760px] w-full flex-col items-center justify-start bg-cover bg-center sm:min-h-[900px] md:min-h-[1000px] lg:min-h-[1120px] xl:min-h-[1240px]"
+      className={`${styles.hero} relative isolate flex min-h-[760px] w-full flex-col items-center justify-start bg-cover bg-center sm:min-h-[900px] md:min-h-[1000px] lg:min-h-[1120px] xl:min-h-[1240px]`}
       style={{
         backgroundImage: "url('/bg/beautiful-view-mountains-sunny-day.png')",
       }}
@@ -107,51 +109,58 @@ export default function HeroSection() {
       {/* Carousel */}
       {apiReady ? (
         <section
-          className="relative mt-8 h-[440px] max-h-[980px] w-full overflow-hidden bg-gradient-to-t from-white via-white/70 to-transparent sm:h-[560px] md:h-[680px] lg:h-[800px] xl:h-[900px]"
+          className={styles.sliderSection}
           aria-label="Product carousel"
         >
           <Swiper
-            modules={[A11y, FreeMode, Keyboard]}
-            className="h-full w-full"
-            slidesPerView={1.5}
-            spaceBetween={8}
+            modules={[A11y, EffectCoverflow, Keyboard]}
+            className={styles.slider}
+            effect="coverflow"
+            grabCursor
             centeredSlides
             loop={sliderItems.length > 1}
-            loopAdditionalSlides={sliderItems.length}
-            grabCursor
-            freeMode={{
+            loopAdditionalSlides={2}
+            keyboard={{ enabled: true, onlyInViewport: true }}
+            a11y={{
               enabled: true,
-              momentum: true,
-              momentumRatio: 0.7,
-              sticky: true,
+              prevSlideMessage: "Show previous Kahwa",
+              nextSlideMessage: "Show next Kahwa",
+              slideLabelMessage: "{{index}} of {{slidesLength}}",
             }}
-            keyboard={{ enabled: true }}
-            speed={400}
             slideToClickedSlide
+            slidesPerView={1.35}
+            spaceBetween={24}
             breakpoints={{
-              640: { slidesPerView: 2.2, spaceBetween: 16 },
-              768: { slidesPerView: 2.5, spaceBetween: 20 },
-              1024: { slidesPerView: 3, spaceBetween: 24 },
+              640: { slidesPerView: 2.2, spaceBetween: 24 },
+              1024: { slidesPerView: 3, spaceBetween: 32 },
             }}
+            coverflowEffect={{
+              rotate: 0,
+              stretch: 0,
+              depth: 110,
+              modifier: 1.35,
+              slideShadows: false,
+            }}
+            speed={700}
           >
             {sliderItems.map((item, index) => (
               <SwiperSlide
                 key={`${item.slug || item.text}-${index}`}
-                className="!flex items-start justify-center pt-6 transition-[scale,opacity] duration-500 ease-out [&.swiper-slide-active]:scale-105 [&:not(.swiper-slide-active)]:scale-90 [&:not(.swiper-slide-active)]:opacity-80 sm:pt-8 md:pt-10"
+                className={styles.slide}
               >
                 <article
-                  className="flex h-[78%] max-w-full aspect-[3/4] flex-col items-center justify-end"
+                  className={styles.productCard}
                   aria-label={item.text}
                 >
-                  <div className="flex min-h-0 w-full flex-1 items-center justify-center">
+                  <div className={styles.imageFrame}>
                     <img
                       src={item.image}
                       alt={item.text}
-                      className="max-h-full max-w-full object-contain drop-shadow-[0_18px_35px_rgba(0,0,0,0.18)]"
+                      className={styles.productImage}
                       draggable={false}
                     />
                   </div>
-                  <p className="mb-1 mt-1 text-center text-md font-medium uppercase tracking-wide text-black opacity-80 md:text-xl">
+                  <p className={styles.productName}>
                     {item.text}
                   </p>
                 </article>
@@ -160,7 +169,7 @@ export default function HeroSection() {
           </Swiper>
         </section>
       ) : (
-        <div className="mt-8 flex h-[440px] w-full items-center justify-center text-md text-black/60 sm:h-[560px] md:h-[680px] lg:h-[800px] xl:h-[900px]">
+        <div className={styles.loadingState}>
           Loading hero...
         </div>
       )}

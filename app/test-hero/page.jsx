@@ -1,11 +1,13 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { A11y } from "swiper/modules";
+import { A11y, EffectCoverflow, Keyboard } from "swiper/modules";
 
 import "swiper/css";
+import "swiper/css/effect-coverflow";
+
+import styles from "./test-hero-slider.module.css";
 
 const PRODUCTS = [
   {
@@ -35,9 +37,9 @@ const PRODUCTS = [
   },
 ];
 
-export default function TestHeroPage() {
-  const [swiper, setSwiper] = useState(null);
+const LOOP_PRODUCTS = [...PRODUCTS, ...PRODUCTS];
 
+export default function TestHeroPage() {
   return (
     <main className="min-h-screen bg-white">
       <section
@@ -59,59 +61,59 @@ export default function TestHeroPage() {
           </p>
         </div>
 
-        <div className="relative z-10 mt-8 h-[430px] w-full sm:mt-10 sm:h-[540px] lg:h-[610px]">
+        <div className={styles.sliderSection}>
           <Swiper
-            modules={[A11y]}
-            onSwiper={setSwiper}
-            className="h-full w-full"
-            slidesPerView={1}
-            spaceBetween={12}
-            speed={500}
-            loop
+            modules={[A11y, EffectCoverflow, Keyboard]}
+            className={styles.slider}
+            effect="coverflow"
             grabCursor
-            breakpoints={{
-              640: { slidesPerView: 2, spaceBetween: 24 },
-              1024: { slidesPerView: 3, spaceBetween: 40 },
+            centeredSlides
+            loop
+            loopAdditionalSlides={2}
+            keyboard={{ enabled: true, onlyInViewport: true }}
+            a11y={{
+              enabled: true,
+              prevSlideMessage: "Show previous Kahwa",
+              nextSlideMessage: "Show next Kahwa",
+              slideLabelMessage: "{{index}} of {{slidesLength}}",
             }}
+            slideToClickedSlide
+            slidesPerView={1.35}
+            spaceBetween={24}
+            breakpoints={{
+              640: { slidesPerView: 2.2, spaceBetween: 24 },
+              1024: { slidesPerView: 3, spaceBetween: 32 },
+            }}
+            coverflowEffect={{
+              rotate: 0,
+              stretch: 0,
+              depth: 110,
+              modifier: 1.35,
+              slideShadows: false,
+            }}
+            speed={700}
           >
-            {PRODUCTS.map((product) => (
+            {LOOP_PRODUCTS.map((product, index) => (
               <SwiperSlide
-                key={product.slug}
-                className="!flex items-center justify-center"
+                key={`${product.slug}-${index}`}
+                className={styles.slide}
               >
-                <article className="flex h-[88%] w-full max-w-[330px] flex-col items-center justify-center">
-                  <div className="flex min-h-0 w-full flex-1 items-center justify-center">
+                <article className={styles.productCard}>
+                  <div className={styles.imageFrame}>
                     <img
                       src={product.image}
                       alt={product.name}
-                      className="max-h-full max-w-full select-none object-contain drop-shadow-[0_20px_35px_rgba(0,0,0,0.2)]"
+                      className={styles.productImage}
                       draggable={false}
                     />
                   </div>
-                  <h2 className="mt-4 text-center text-base font-medium uppercase tracking-wide text-[#222820] sm:text-lg">
+                  <h2 className={styles.productName}>
                     {product.name}
                   </h2>
                 </article>
               </SwiperSlide>
             ))}
           </Swiper>
-
-          <button
-            type="button"
-            onClick={() => swiper?.slidePrev()}
-            aria-label="Previous product"
-            className="absolute left-3 top-1/2 z-20 flex h-11 w-11 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border border-[#52653b] bg-white/90 text-2xl text-[#52653b] shadow-md transition hover:bg-[#52653b] hover:text-white sm:left-6"
-          >
-            ←
-          </button>
-          <button
-            type="button"
-            onClick={() => swiper?.slideNext()}
-            aria-label="Next product"
-            className="absolute right-3 top-1/2 z-20 flex h-11 w-11 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border border-[#52653b] bg-white/90 text-2xl text-[#52653b] shadow-md transition hover:bg-[#52653b] hover:text-white sm:right-6"
-          >
-            →
-          </button>
         </div>
 
         <div className="relative z-10 mx-auto -mt-3 pb-14 sm:mt-0">
