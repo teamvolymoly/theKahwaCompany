@@ -173,7 +173,7 @@ export default function HeroSection() {
           Loading hero...
         </div>
       )}
-      <div className="relative z-10 mb-12 -mt-10 md:absolute md:bottom-[104px] md:mb-0 md:mt-0 lg:bottom-[144px] xl:bottom-[144px]">
+      <div className="relative z-10 mb-12">
         <Link href="/shop" className="cursor-pointer">
           <ShopNowButton className="cursor-pointer" />
         </Link>

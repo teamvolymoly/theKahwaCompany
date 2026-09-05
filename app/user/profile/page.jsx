@@ -3,595 +3,84 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/app/context/AuthContext";
-import { Pencil, Trash2 } from "lucide-react";
 import { apiFetch } from "@/utils/api";
-import Link from "next/link";
 import AccountNav from "@/components/AccountNav";
+import styles from "./profile.module.css";
+
+const fields = [
+  { name: "name", label: "Name", type: "text", placeholder: "Enter your name..." },
+  { name: "email", label: "Email address", type: "email", placeholder: "Enter your email address..." },
+  { name: "phone", label: "Phone", type: "tel", placeholder: "Enter your phone number..." },
+];
 
 export default function ProfilePage() {
   const router = useRouter();
-  const { isAuthenticated, loading } = useAuth();
-
-  const [profile, setProfile] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    memberSince: "",
-  });
-  const [profileLoading, setProfileLoading] = useState(true);
-  const [profileError, setProfileError] = useState("");
-  const [profileForm, setProfileForm] = useState({
-    name: "",
-    email: "",
-    phone: "",
-  });
-  const [profileSaving, setProfileSaving] = useState(false);
-  const [profileEditing, setProfileEditing] = useState(false);
-
-  const [addresses, setAddresses] = useState([]);
-  const [addressLoading, setAddressLoading] = useState(true);
-  const [addressError, setAddressError] = useState("");
-  const [addressFormOpen, setAddressFormOpen] = useState(false);
-  const [addressSaving, setAddressSaving] = useState(false);
-  const [addressForm, setAddressForm] = useState({
-    id: null,
-    label: "",
-    address_line1: "",
-    address_line2: "",
-    city: "",
-    state: "",
-    pincode: "",
-    country: "India",
-    is_default: false,
-  });
+  const { isAuthenticated, loading, reloadUser } = useAuth();
+  const [form, setForm] = useState({ name: "", email: "", phone: "" });
+  const [fetching, setFetching] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
-    if (!loading && !isAuthenticated) {
-      router.push("/auth/login?next=/user/profile");
-    }
+    if (!loading && !isAuthenticated) router.replace("/auth/login?next=/user/profile");
   }, [loading, isAuthenticated, router]);
 
   useEffect(() => {
-    if (!isAuthenticated) return;
+    if (loading || !isAuthenticated) return;
     let active = true;
-    const load = async () => {
-      setProfileLoading(true);
-      setAddressLoading(true);
-      setProfileError("");
-      setAddressError("");
-      try {
-        const [profileRes, addressRes] = await Promise.all([
-          apiFetch("/auth/profile"),
-          apiFetch("/addresses"),
-        ]);
-        if (!active) return;
-        setProfile({
-          name: profileRes?.name || "",
-          email: profileRes?.email || "",
-          phone: profileRes?.phone || "",
-          memberSince: profileRes?.created_at
-            ? new Date(profileRes.created_at).toLocaleString("en-US", {
-                month: "long",
-                year: "numeric",
-              })
-            : "",
-        });
-        setProfileForm({
-          name: profileRes?.name || "",
-          email: profileRes?.email || "",
-          phone: profileRes?.phone || "",
-        });
-        setAddresses(
-          Array.isArray(addressRes)
-            ? addressRes
-            : Array.isArray(addressRes?.data)
-              ? addressRes.data
-              : [],
-        );
-      } catch (err) {
-        if (!active) return;
-        setProfileError(err?.message || "Failed to load profile.");
-        setAddressError(err?.message || "Failed to load addresses.");
-      } finally {
-        if (active) {
-          setProfileLoading(false);
-          setAddressLoading(false);
-        }
-      }
-    };
-    load();
-    return () => {
-      active = false;
-    };
-  }, [isAuthenticated]);
+    apiFetch("/auth/profile").then(data => {
+      if (!active) return;
+      setForm({ name: data?.name ?? "", email: data?.email ?? "", phone: data?.phone ?? "" });
+      setLoaded(true);
+    }).catch(() => {
+      if (active) setError("Unable to load your personal information. Please refresh to try again.");
+    }).finally(() => { if (active) setFetching(false); });
+    return () => { active = false; };
+  }, [loading, isAuthenticated]);
 
-  const handleProfileChange = (e) => {
-    const { name, value } = e.target;
-    setProfileForm((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleProfileSave = async () => {
-    setProfileSaving(true);
-    setProfileError("");
+  async function handleSave(event) {
+    event.preventDefault();
+    if (saving || !loaded) return;
+    setSaving(true);
+    setError("");
+    setSuccess("");
     try {
-      const updated = await apiFetch("/auth/profile", {
-        method: "PUT",
-        body: JSON.stringify(profileForm),
-      });
-      setProfile((prev) => ({
-        ...prev,
-        name: updated?.name || prev.name,
-        email: updated?.email || prev.email,
-        phone: updated?.phone || prev.phone,
-      }));
-      setProfileEditing(false);
-    } catch (err) {
-      setProfileError(err?.message || "Profile update failed.");
-    } finally {
-      setProfileSaving(false);
-    }
-  };
-
-  const openAddAddress = () => {
-    setAddressForm({
-      id: null,
-      label: "",
-      address_line1: "",
-      address_line2: "",
-      city: "",
-      state: "",
-      pincode: "",
-      country: "India",
-      is_default: false,
-    });
-    setAddressFormOpen(true);
-  };
-
-  const openEditAddress = (address) => {
-    setAddressForm({
-      id: address.id,
-      label: address.label || "",
-      address_line1: address.address_line1 || "",
-      address_line2: address.address_line2 || "",
-      city: address.city || "",
-      state: address.state || "",
-      pincode: address.pincode || "",
-      country: address.country || "India",
-      is_default: !!address.is_default,
-    });
-    setAddressFormOpen(true);
-  };
-
-  const handleAddressChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setAddressForm((prev) => ({
-      ...prev,
-      [name]: type === "checkbox" ? checked : value,
-    }));
-  };
-
-  const handleSaveAddress = async (e) => {
-    e.preventDefault();
-    setAddressSaving(true);
-    setAddressError("");
-    try {
-      let savedAddress = null;
-      if (addressForm.id) {
-        const updated = await apiFetch(`/addresses/${addressForm.id}`, {
-          method: "PUT",
-          body: JSON.stringify(addressForm),
-        });
-        savedAddress = updated;
-        setAddresses((prev) =>
-          prev.map((item) => (item.id === updated.id ? updated : item)),
-        );
-      } else {
-        const created = await apiFetch("/addresses", {
-          method: "POST",
-          body: JSON.stringify(addressForm),
-        });
-        savedAddress = created;
-        setAddresses((prev) => [created, ...prev]);
-      }
-      if (savedAddress?.is_default) {
-        setAddresses((prev) =>
-          prev.map((item) => ({
-            ...item,
-            is_default: item.id === savedAddress.id,
-          })),
-        );
-      }
-      setAddressFormOpen(false);
-    } catch (err) {
-      setAddressError(err?.message || "Address save failed.");
-    } finally {
-      setAddressSaving(false);
-    }
-  };
-
-  const handleRemoveAddress = async (id) => {
-    try {
-      await apiFetch(`/addresses/${id}`, { method: "DELETE" });
-      setAddresses((prev) => prev.filter((item) => item.id !== id));
-    } catch (err) {
-      setAddressError(err?.message || "Address delete failed.");
-    }
-  };
-
-  const handleSetDefault = async (id) => {
-    try {
-      await apiFetch(`/addresses/${id}/set-default`, { method: "POST" });
-      setAddresses((prev) =>
-        prev.map((item) => ({
-          ...item,
-          is_default: item.id === id,
-        })),
-      );
-    } catch (err) {
-      setAddressError(err?.message || "Default update failed.");
-    }
-  };
+      const updated = await apiFetch("/auth/profile", { method: "PUT", body: JSON.stringify(form) });
+      setForm(previous => ({ name: updated?.name ?? previous.name, email: updated?.email ?? previous.email, phone: updated?.phone ?? previous.phone }));
+      await reloadUser();
+      setSuccess("Your personal information has been saved.");
+    } catch {
+      setError("Unable to save your personal information. Please try again.");
+    } finally { setSaving(false); }
+  }
 
   return (
-    <>
-      <main className="user-account-page min-h-screen bg-white text-black mt-10 sm:mt-12">
-        <section className="site-container py-10 sm:py-14">
-          <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-            <div>
-              <p className="text-md uppercase tracking-[0.094em] text-black/60">
-                My account
-              </p>
-              <h1
-                className="mt-3 text-2xl sm:text-3xl md:text-4xl font-semibold"
-                style={{ fontFamily: "var(--font-basker)" }}
-              >
-                Profile overview
-              </h1>
-            </div>
-            <button
-              type="button"
-              onClick={() => setProfileEditing((prev) => !prev)}
-              className="self-start rounded-md border border-[#52653b] px-5 py-2 text-md font-semibold uppercase tracking-[0.12em] text-[#52653b] hover:bg-[#52653b] hover:text-white cursor-pointer"
-            >
-              {profileEditing ? "Close edit" : "Edit profile"}
-            </button>
+    <main className={`${styles.page} bg-[#fdfefb] pt-[88px] text-[#252a23]`}>
+      <section className="site-container pb-20 pt-12 md:pt-20">
+        <h1 className="font-basker text-[28px] font-normal uppercase leading-[1.2] text-[#344823] md:text-4xl">My Personal Informations</h1>
+        {loading || !isAuthenticated ? <p role="status" className="mt-11">Loading your account…</p> : (
+          <div className="mt-8 rounded-lg bg-[#f1f4ec] p-4 md:mt-11 md:p-6">
+            <AccountNav appearance="panel" />
+            <form id="personal-information" onSubmit={handleSave} aria-busy={fetching || saving} className="mx-auto w-full py-8 md:w-[68%] md:py-10">
+              {fetching && <p role="status" className="mb-4">Loading personal information…</p>}
+              <fieldset disabled={fetching || saving || !loaded} className="space-y-5 disabled:opacity-70">
+                {fields.map(field => (
+                  <div key={field.name}>
+                    <label htmlFor={`profile-${field.name}`} className="mb-2 block text-base">{field.label}</label>
+                    <input id={`profile-${field.name}`} name={field.name} type={field.type} autoComplete={field.name} placeholder={field.placeholder} value={form[field.name]}
+                      onChange={event => { setForm(previous => ({ ...previous, [field.name]: event.target.value })); setError(""); setSuccess(""); }} className="w-full" />
+                  </div>
+                ))}
+                <button type="submit" className="h-12 w-full cursor-pointer rounded-lg bg-[#52653b] text-base font-semibold text-white hover:bg-[#6b7f42] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#52653b] disabled:cursor-wait">{saving ? "Saving…" : "Save"}</button>
+              </fieldset>
+              {error && <p role="alert" className="mt-4 text-sm text-red-700">{error}</p>}
+              {success && <p role="status" className="mt-4 text-sm text-[#344823]">{success}</p>}
+            </form>
           </div>
-
-          <AccountNav />
-
-          <div className="mt-8 sm:mt-10 grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
-            <div className="rounded-lg border border-[#dfe5d8] bg-[#f3f6ef] p-6 sm:p-8">
-              <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-                <div className="h-14 w-14 sm:h-16 sm:w-16 rounded-full bg-[#52653b] text-white flex items-center justify-center text-base sm:text-lg font-semibold">
-                  {(profile.name || "User")
-                    .split(" ")
-                    .map((n) => n[0])
-                    .join("")}
-                </div>
-                <div>
-                  <h2 className="text-lg sm:text-xl font-semibold">
-                    {profileLoading ? "Loading..." : profile.name || "—"}
-                  </h2>
-                  <p className="text-md text-black/60">
-                    {profileLoading ? " " : profile.email || "—"}
-                  </p>
-                  <p className="text-md text-black/60">
-                    {profileLoading ? " " : profile.phone || "—"}
-                  </p>
-                </div>
-              </div>
-
-              <div className="mt-6 grid gap-4 sm:grid-cols-2">
-                <div className="rounded-md border border-[#dfe5d8] bg-white p-4">
-                  <p className="text-md uppercase tracking-[0.3em] text-black/50">
-                    Member since
-                  </p>
-                  <p className="mt-2 text-md">{profile.memberSince || "—"}</p>
-                </div>
-                {/* <div className="rounded-sm border border-black/10 bg-gray-50 p-4">
-                  <p className="text-md uppercase tracking-[0.3em] text-black/50">
-                    Email address
-                  </p>
-                  <p className="mt-2 text-md">{profile.email}</p>
-                </div> */}
-              </div>
-            </div>
-
-            <div className="rounded-lg border border-[#dfe5d8] bg-[#f3f6ef] p-6 sm:p-8">
-              <p className="text-md uppercase tracking-[0.093em] text-black/50">
-                Account quick links
-              </p>
-              <div className="mt-4 grid gap-3 text-md text-black/70">
-                <Link
-                  href="/user/orders"
-                  className="rounded-md border border-[#dfe5d8] bg-white px-4 py-3 text-left hover:border-[#7d904e] cursor-pointer"
-                >
-                  Order history
-                </Link>
-
-                <Link
-                  href="/user/password"
-                  className="rounded-md border border-[#dfe5d8] bg-white px-4 py-3 text-left hover:border-[#7d904e] cursor-pointer"
-                >
-                  Change password
-                </Link>
-              </div>
-            </div>
-          </div>
-
-          {profileEditing && (
-            <div className="mt-6 rounded-lg border border-[#dfe5d8] bg-[#f3f6ef] p-6 sm:p-8">
-              <p className="text-md uppercase tracking-[0.2em] text-black/50">
-                Edit profile
-              </p>
-              <div className="mt-4 grid gap-4 sm:grid-cols-3">
-                <div>
-                  <label className="text-md uppercase tracking-[0.12em] text-black/50">
-                    Name
-                  </label>
-                  <input
-                    type="text"
-                    name="name"
-                    value={profileForm.name}
-                    onChange={handleProfileChange}
-                    className="mt-2 w-full rounded-sm border border-black/20 px-3 py-2 text-md outline-none focus:border-black"
-                  />
-                </div>
-                <div>
-                  <label className="text-md uppercase tracking-[0.12em] text-black/50">
-                    Email
-                  </label>
-                  <input
-                    type="email"
-                    name="email"
-                    value={profileForm.email}
-                    onChange={handleProfileChange}
-                    className="mt-2 w-full rounded-sm border border-black/20 px-3 py-2 text-md outline-none focus:border-black"
-                  />
-                </div>
-                <div>
-                  <label className="text-md uppercase tracking-[0.12em] text-black/50">
-                    Phone
-                  </label>
-                  <input
-                    type="text"
-                    name="phone"
-                    value={profileForm.phone}
-                    onChange={handleProfileChange}
-                    className="mt-2 w-full rounded-sm border border-black/20 px-3 py-2 text-md outline-none focus:border-black"
-                  />
-                </div>
-              </div>
-              {profileError && (
-                <p className="mt-3 text-md text-red-600">{profileError}</p>
-              )}
-              <div className="mt-4 flex flex-wrap gap-3">
-                <button
-                  type="button"
-                  onClick={handleProfileSave}
-                  disabled={profileSaving}
-                  className="rounded-md border border-[#52653b] bg-[#52653b] px-5 py-2 text-md font-semibold uppercase tracking-[0.12em] text-white hover:bg-[#6B7F42] cursor-pointer"
-                >
-                  {profileSaving ? "Saving..." : "Save changes"}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setProfileEditing(false)}
-                  className="rounded-sm border border-black/30 px-5 py-2 text-md font-semibold uppercase tracking-[0.2em] text-black hover:border-black cursor-pointer"
-                >
-                  Cancel
-                </button>
-              </div>
-            </div>
-          )}
-
-          <div className="mt-8 sm:mt-10 rounded-lg border border-[#dfe5d8] bg-[#f3f6ef] p-6 sm:p-8">
-            <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-              <div>
-                <p className="text-md uppercase tracking-[0.093em] text-black/50">
-                  Saved addresses
-                </p>
-                <h2 className="mt-2 text-lg sm:text-xl font-semibold">
-                  Delivery details
-                </h2>
-              </div>
-              <button
-                type="button"
-                onClick={openAddAddress}
-                className="self-start rounded-md border border-[#52653b] px-5 py-2 text-md font-semibold uppercase tracking-[0.12em] text-[#52653b] hover:bg-[#52653b] hover:text-white cursor-pointer"
-              >
-                Add new address
-              </button>
-            </div>
-            {addressFormOpen && (
-              <form
-                onSubmit={handleSaveAddress}
-                className="mt-6 rounded-md border border-[#dfe5d8] bg-white p-5"
-              >
-                <p className="text-md uppercase tracking-[0.2em] text-black/50">
-                  {addressForm.id ? "Edit address" : "Add address"}
-                </p>
-                <div className="mt-4 grid gap-4 sm:grid-cols-2">
-                  <div>
-                    <label className="text-md uppercase tracking-[0.12em] text-black/50">
-                      Label
-                    </label>
-                    <input
-                      type="text"
-                      name="label"
-                      value={addressForm.label}
-                      onChange={handleAddressChange}
-                      className="mt-2 w-full rounded-sm border border-black/20 px-3 py-2 text-md outline-none focus:border-black"
-                      placeholder="Home / Office"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="text-md uppercase tracking-[0.12em] text-black/50">
-                      Country
-                    </label>
-                    <input
-                      type="text"
-                      name="country"
-                      value={addressForm.country}
-                      onChange={handleAddressChange}
-                      className="mt-2 w-full rounded-sm border border-black/20 px-3 py-2 text-md outline-none focus:border-black"
-                    />
-                  </div>
-                  <div className="sm:col-span-2">
-                    <label className="text-md uppercase tracking-[0.12em] text-black/50">
-                      Address line 1
-                    </label>
-                    <input
-                      type="text"
-                      name="address_line1"
-                      value={addressForm.address_line1}
-                      onChange={handleAddressChange}
-                      className="mt-2 w-full rounded-sm border border-black/20 px-3 py-2 text-md outline-none focus:border-black"
-                      required
-                    />
-                  </div>
-                  <div className="sm:col-span-2">
-                    <label className="text-md uppercase tracking-[0.12em] text-black/50">
-                      Address line 2
-                    </label>
-                    <input
-                      type="text"
-                      name="address_line2"
-                      value={addressForm.address_line2}
-                      onChange={handleAddressChange}
-                      className="mt-2 w-full rounded-sm border border-black/20 px-3 py-2 text-md outline-none focus:border-black"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-md uppercase tracking-[0.12em] text-black/50">
-                      City
-                    </label>
-                    <input
-                      type="text"
-                      name="city"
-                      value={addressForm.city}
-                      onChange={handleAddressChange}
-                      className="mt-2 w-full rounded-sm border border-black/20 px-3 py-2 text-md outline-none focus:border-black"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="text-md uppercase tracking-[0.12em] text-black/50">
-                      State
-                    </label>
-                    <input
-                      type="text"
-                      name="state"
-                      value={addressForm.state}
-                      onChange={handleAddressChange}
-                      className="mt-2 w-full rounded-sm border border-black/20 px-3 py-2 text-md outline-none focus:border-black"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="text-md uppercase tracking-[0.12em] text-black/50">
-                      Pincode
-                    </label>
-                    <input
-                      type="text"
-                      name="pincode"
-                      value={addressForm.pincode}
-                      onChange={handleAddressChange}
-                      className="mt-2 w-full rounded-sm border border-black/20 px-3 py-2 text-md outline-none focus:border-black"
-                      required
-                    />
-                  </div>
-                  <label className="flex items-center gap-2 text-md uppercase tracking-[0.12em] text-black/60 sm:col-span-2">
-                    <input
-                      type="checkbox"
-                      name="is_default"
-                      checked={addressForm.is_default}
-                      onChange={handleAddressChange}
-                      className="accent-black"
-                    />
-                    Set as default
-                  </label>
-                </div>
-                {addressError && (
-                  <p className="mt-3 text-md text-red-600">{addressError}</p>
-                )}
-                <div className="mt-4 flex flex-wrap gap-3">
-                  <button
-                    type="submit"
-                    disabled={addressSaving}
-                    className="rounded-md border border-[#52653b] bg-[#52653b] px-5 py-2 text-md font-semibold uppercase tracking-[0.12em] text-white hover:bg-[#6B7F42] cursor-pointer"
-                  >
-                    {addressSaving ? "Saving..." : "Save address"}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setAddressFormOpen(false)}
-                    className="rounded-sm border border-black/30 px-5 py-2 text-md font-semibold uppercase tracking-[0.2em] text-black hover:border-black cursor-pointer"
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </form>
-            )}
-            <div className="mt-6 grid gap-4 sm:grid-cols-2">
-              {addressLoading && (
-                <div className="text-md text-black/60">
-                  Loading addresses...
-                </div>
-              )}
-              {addresses.map((address) => (
-                <div
-                  key={address.id}
-                  className="rounded-md border border-[#dfe5d8] bg-white p-5"
-                >
-                  <p className="text-md uppercase tracking-[0.093em] text-black/70">
-                    {address.label || "Address"}
-                  </p>
-                  {address.is_default && (
-                    <span className="mt-2 inline-flex rounded-sm border border-[#7a8177]/40 bg-[#7a8177]/10 px-2 py-1 text-[10px] uppercase tracking-[0.2em] text-[#4e5a50]">
-                      Default
-                    </span>
-                  )}
-                  <p className="mt-2 text-md">{address.address_line1}</p>
-                  <p className="text-md">{address.address_line2}</p>
-                  <p className="text-md">
-                    {address.city}, {address.state} {address.pincode}
-                  </p>
-                  <p className="text-md">{address.country}</p>
-                  <div className="mt-4 flex flex-wrap gap-2 text-md uppercase tracking-[0.2em] text-black/60">
-                    <button
-                      type="button"
-                      onClick={() => openEditAddress(address)}
-                      className="rounded-sm border border-[#7a8177] bg-[#7a8177]/10 px-3 py-1.5 text-[#4e5a50] hover:border-[#4e5a50] hover:bg-[#7a8177]/20 inline-flex items-center gap-2 cursor-pointer"
-                    >
-                      <Pencil className="h-3.5 w-3.5" />
-                      Edit
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleRemoveAddress(address.id)}
-                      className="rounded-sm border border-[#b86b6b] bg-[#b86b6b]/10 px-3 py-1.5 text-[#7a3e3e] hover:border-[#7a3e3e] hover:bg-[#b86b6b]/20 inline-flex items-center gap-2 cursor-pointer"
-                    >
-                      <Trash2 className="h-3.5 w-3.5" />
-                      Delete
-                    </button>
-                    {!address.is_default && (
-                      <button
-                        type="button"
-                        onClick={() => handleSetDefault(address.id)}
-                        className="rounded-sm border border-black/20 px-3 py-1.5 hover:border-black/60 inline-flex items-center gap-2 cursor-pointer"
-                      >
-                        Make default
-                      </button>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-      </main>
-    </>
+        )}
+      </section>
+    </main>
   );
 }
